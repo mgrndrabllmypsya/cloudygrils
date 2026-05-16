@@ -40,10 +40,8 @@ $user_id = $_SESSION['user_id'];
 $q_user  = mysqli_query($conn, "SELECT * FROM pembeli WHERE id=$user_id LIMIT 1");
 $user    = mysqli_fetch_assoc($q_user);
 
-// Foto tambahan
-$q_foto = mysqli_query($conn, "SELECT url_foto FROM foto_produk_tambahan WHERE produk_id=$id ORDER BY urutan ASC");
-$foto_list = [$produk['foto_utama']];
-if ($q_foto) while ($f = mysqli_fetch_assoc($q_foto)) $foto_list[] = $f['url_foto'];
+// Hanya 1 foto utama
+$foto_utama = $produk['foto_utama'];
 
 // Ulasan produk ini
 $q_ulasan = mysqli_query($conn, "
@@ -62,7 +60,11 @@ $toko   = $q_toko ? mysqli_fetch_assoc($q_toko) : [];
 $q_pesan = mysqli_query($conn, "SELECT id FROM pesanan WHERE produk_id=$id AND pembeli_id=$user_id AND status NOT IN ('dibatalkan','selesai') LIMIT 1");
 $sudah_pesan = $q_pesan && mysqli_num_rows($q_pesan) > 0;
 
-$base_url = '../';
+// Cek nego aktif milik pembeli untuk produk ini
+$q_nego = mysqli_query($conn, "SELECT * FROM nego_harga WHERE produk_id=$id AND pembeli_id=$user_id ORDER BY created_at DESC LIMIT 1");
+$nego   = $q_nego && mysqli_num_rows($q_nego) > 0 ? mysqli_fetch_assoc($q_nego) : null;
+
+$base_url   = '../';
 $page_title = escape($produk['nama_barang']);
 include '../includes/header.php';
 ?>
@@ -70,25 +72,53 @@ include '../includes/header.php';
 .container-detail{max-width:1100px;margin:40px auto;padding:0 40px;display:grid;grid-template-columns:1fr 1fr;gap:48px;}
 .foto-utama{aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--cream);border:1px solid var(--border);}
 .foto-utama img{width:100%;height:100%;object-fit:cover;}
-.foto-thumb-wrap{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
-.foto-thumb{width:64px;height:64px;border-radius:10px;overflow:hidden;border:2px solid transparent;cursor:pointer;transition:border-color .2s;}
-.foto-thumb.active,.foto-thumb:hover{border-color:var(--accent2);}
-.foto-thumb img{width:100%;height:100%;object-fit:cover;}
 .produk-info{}
 .produk-kategori{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:8px;}
 .produk-nama{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;line-height:1.2;margin-bottom:12px !important;}
-.produk-harga{font-size:28px;font-weight:700;color:var(--accent2);margin-bottom:16px;}
+.produk-harga{font-size:28px;font-weight:700;color:var(--accent2);margin-bottom:4px;}
+.harga-asli{font-size:16px;color:var(--muted);text-decoration:line-through;margin-bottom:16px;}
 .produk-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
 .meta-tag{font-size:12px;padding:5px 12px;border-radius:20px;background:var(--cream);border:1px solid var(--border);color:var(--muted);}
 .produk-desc{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:24px;}
 .divider{height:1px;background:var(--border);margin:20px 0;}
-.btn-beli{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-bottom:10px;}
+.btn-beli{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
 .btn-beli:hover{opacity:.88;}
 .btn-beli:disabled{opacity:.5;cursor:not-allowed;}
+.btn-nego{width:100%;padding:13px;background:var(--white);color:var(--accent2);border:1.5px solid var(--accent2);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
+.btn-nego:hover{background:rgba(124,58,237,.06);}
 .btn-chat{width:100%;padding:13px;background:var(--white);color:var(--dark);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .btn-chat:hover{border-color:var(--dark);}
 .toko-info{margin-top:20px;padding:16px;background:var(--cream);border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;}
 .toko-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;font-family:'Playfair Display',serif;}
+
+/* STATUS NEGO */
+.nego-status{border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:13px;}
+.nego-menunggu{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);color:#92400e;}
+.nego-disetujui{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);color:#065f46;}
+.nego-ditolak{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:#991b1b;}
+.nego-counter{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.3);color:#4c1d95;}
+.nego-status-title{font-weight:700;margin-bottom:4px;}
+.nego-status-harga{font-size:18px;font-weight:700;margin:6px 0;}
+
+/* MODAL NEGO */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .25s;}
+.modal-overlay.open{opacity:1;visibility:visible;}
+.modal-box{background:var(--white);border-radius:20px;padding:32px;width:100%;max-width:420px;margin:20px;transform:translateY(16px);transition:transform .25s;}
+.modal-overlay.open .modal-box{transform:translateY(0);}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.modal-field{margin-bottom:16px;}
+.modal-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--dark);margin-bottom:6px;}
+.modal-field input,.modal-field textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;color:var(--dark);}
+.modal-field input:focus,.modal-field textarea:focus{border-color:var(--accent2);}
+.modal-field textarea{resize:vertical;min-height:80px;}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+.modal-btn-batal{flex:1;padding:12px;background:var(--cream);border:1px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;color:var(--dark);}
+.modal-btn-kirim{flex:2;padding:12px;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.modal-btn-kirim:hover{opacity:.88;}
+.harga-ref{font-size:12px;color:var(--muted);margin-bottom:4px;}
+
+/* ULASAN */
 .ulasan-section{max-width:1100px;margin:40px auto 60px;padding:0 40px;}
 .ulasan-section h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px !important;}
 .ulasan-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
@@ -104,29 +134,40 @@ include '../includes/header.php';
 <div class="container-detail">
     <!-- FOTO -->
     <div>
-        <div class="foto-utama" id="mainImg">
-            <img src="../uploads/produk/<?= escape($foto_list[0]) ?>"
+        <div class="foto-utama">
+            <img src="../uploads/produk/<?= escape($foto_utama) ?>"
                  alt="<?= escape($produk['nama_barang']) ?>"
-                 id="mainImgEl"
                  onerror="this.src='https://placehold.co/400x500/FAF7F2/A78BFA?text=Cloudy+Girls'">
         </div>
-        <?php if (count($foto_list) > 1): ?>
-        <div class="foto-thumb-wrap">
-            <?php foreach ($foto_list as $i => $foto): ?>
-            <div class="foto-thumb <?= $i === 0 ? 'active' : '' ?>" onclick="gantiFoto(this, '../uploads/produk/<?= escape($foto) ?>')">
-                <img src="../uploads/produk/<?= escape($foto) ?>" alt="foto <?= $i+1 ?>"
-                     onerror="this.src='https://placehold.co/64x64/FAF7F2/A78BFA?text=+'">
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
     </div>
 
     <!-- INFO -->
     <div class="produk-info">
         <div class="produk-kategori"><?= escape($produk['kategori']) ?></div>
         <h1 class="produk-nama"><?= escape($produk['nama_barang']) ?></h1>
-        <div class="produk-harga"><?= formatRupiah($produk['harga']) ?></div>
+
+        <?php
+        // Tentukan harga yang ditampilkan berdasarkan status nego
+        $harga_tampil  = $produk['harga'];
+        $nego_checkout = null;
+
+        if ($nego) {
+            if ($nego['status'] === 'disetujui') {
+                $harga_tampil  = $nego['harga_deal'];
+                $nego_checkout = $nego['id'];
+            } elseif ($nego['status'] === 'counter') {
+                // Harga tampil tetap normal, counter ditampilkan di status box
+            }
+        }
+        ?>
+
+        <!-- Harga -->
+        <?php if ($nego_checkout): ?>
+        <div class="produk-harga"><?= formatRupiah($harga_tampil) ?></div>
+        <div class="harga-asli"><?= formatRupiah($produk['harga']) ?></div>
+        <?php else: ?>
+        <div class="produk-harga"><?= formatRupiah($harga_tampil) ?></div>
+        <?php endif; ?>
 
         <div class="produk-meta">
             <span class="meta-tag"><i class="bi bi-patch-check"></i> <?= escape($produk['kondisi']) ?></span>
@@ -148,12 +189,81 @@ include '../includes/header.php';
         </div>
         <?php endif; ?>
 
+        <!-- STATUS NEGO -->
+        <?php if ($nego): ?>
+            <?php if ($nego['status'] === 'menunggu'): ?>
+            <div class="nego-status nego-menunggu">
+                <div class="nego-status-title"><i class="bi bi-hourglass-split"></i> Nego sedang diproses</div>
+                <div>Penawaran kamu sebesar <strong><?= formatRupiah($nego['harga_tawar']) ?></strong> sedang ditinjau penjual.</div>
+            </div>
+            <?php elseif ($nego['status'] === 'disetujui'): ?>
+            <div class="nego-status nego-disetujui">
+                <div class="nego-status-title"><i class="bi bi-check-circle-fill"></i> Nego disetujui!</div>
+                <div>Harga deal kamu:</div>
+                <div class="nego-status-harga"><?= formatRupiah($nego['harga_deal']) ?></div>
+                <?php if ($nego['pesan_admin']): ?>
+                <div style="font-size:12px;margin-top:4px;"><i class="bi bi-chat-quote"></i> "<?= escape($nego['pesan_admin']) ?>"</div>
+                <?php endif; ?>
+            </div>
+            <?php elseif ($nego['status'] === 'ditolak'): ?>
+            <div class="nego-status nego-ditolak">
+                <div class="nego-status-title"><i class="bi bi-x-circle-fill"></i> Nego ditolak</div>
+                <?php if ($nego['pesan_admin']): ?>
+                <div><?= escape($nego['pesan_admin']) ?></div>
+                <?php else: ?>
+                <div>Penjual tidak menyetujui harga tawarmu.</div>
+                <?php endif; ?>
+            </div>
+            <?php elseif ($nego['status'] === 'counter'): ?>
+            <div class="nego-status nego-counter">
+                <div class="nego-status-title"><i class="bi bi-arrow-left-right"></i> Penjual mengajukan harga balik</div>
+                <div>Harga counter dari penjual:</div>
+                <div class="nego-status-harga"><?= formatRupiah($nego['harga_counter']) ?></div>
+                <?php if ($nego['pesan_admin']): ?>
+                <div style="font-size:12px;margin-top:4px;"><i class="bi bi-chat-quote"></i> "<?= escape($nego['pesan_admin']) ?>"</div>
+                <?php endif; ?>
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                    <form method="POST" action="../transaksi/proses_nego.php" style="flex:1;">
+                        <input type="hidden" name="nego_id" value="<?= $nego['id'] ?>">
+                        <input type="hidden" name="aksi" value="terima_counter">
+                        <button type="submit" style="width:100%;padding:9px;background:#7C3AED;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+                            Terima Counter
+                        </button>
+                    </form>
+                    <form method="POST" action="../transaksi/proses_nego.php" style="flex:1;">
+                        <input type="hidden" name="nego_id" value="<?= $nego['id'] ?>">
+                        <input type="hidden" name="aksi" value="tolak_counter">
+                        <button type="submit" style="width:100%;padding:9px;background:var(--white);color:var(--dark);border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+                            Tolak Counter
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <?php endif; ?>
+        <?php endif; ?>
+
         <div class="divider"></div>
 
         <?php if ($produk['status'] === 'aktif' && !$sudah_pesan): ?>
-        <button class="btn-beli" onclick="window.location='../transaksi/checkout.php?produk_id=<?= $id ?>'">
-            <i class="bi bi-bag-check"></i> Beli Sekarang
-        </button>
+            <?php if ($nego_checkout): ?>
+            <!-- Beli pakai harga nego yang sudah deal -->
+            <button class="btn-beli" onclick="window.location='../transaksi/checkout.php?produk_id=<?= $id ?>&nego_id=<?= $nego_checkout ?>'">
+                <i class="bi bi-bag-check"></i> Beli dengan Harga Nego
+            </button>
+            <?php elseif ($nego && in_array($nego['status'], ['menunggu','counter'])): ?>
+            <!-- Nego sedang berjalan, sembunyikan tombol nego baru -->
+            <button class="btn-beli" onclick="window.location='../transaksi/checkout.php?produk_id=<?= $id ?>'">
+                <i class="bi bi-bag-check"></i> Beli Sekarang (Harga Normal)
+            </button>
+            <?php else: ?>
+            <!-- Belum nego / nego ditolak → tampilkan tombol nego -->
+            <button class="btn-beli" onclick="window.location='../transaksi/checkout.php?produk_id=<?= $id ?>'">
+                <i class="bi bi-bag-check"></i> Beli Sekarang
+            </button>
+            <button class="btn-nego" onclick="bukaModalNego()">
+                <i class="bi bi-tags"></i> Nego Harga
+            </button>
+            <?php endif; ?>
         <?php elseif ($sudah_pesan): ?>
         <button class="btn-beli" disabled><i class="bi bi-check-circle"></i> Sudah Dipesan</button>
         <?php else: ?>
@@ -177,6 +287,36 @@ include '../includes/header.php';
                 <?php endif; ?>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- MODAL NEGO -->
+<div class="modal-overlay" id="modalNego">
+    <div class="modal-box">
+        <div class="modal-title">Nego Harga</div>
+        <div class="modal-sub">Ajukan harga tawarmu, penjual akan merespons secepatnya.</div>
+        <form method="POST" action="../transaksi/proses_nego.php">
+            <input type="hidden" name="produk_id" value="<?= $id ?>">
+            <input type="hidden" name="aksi" value="ajukan">
+            <div class="modal-field">
+                <div class="harga-ref">Harga asli: <strong><?= formatRupiah($produk['harga']) ?></strong></div>
+                <label>Harga Tawarmu (Rp)</label>
+                <input type="number"
+                       name="harga_tawar"
+                       min="1"
+                       max="<?= $produk['harga'] - 1 ?>"
+                       placeholder="Contoh: <?= $produk['harga'] - 10000 ?>"
+                       required>
+            </div>
+            <div class="modal-field">
+                <label>Pesan (opsional)</label>
+                <textarea name="pesan" placeholder="Contoh: kak boleh kurang sedikit? kondisi masih bagus kan?"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="modal-btn-batal" onclick="tutupModalNego()">Batal</button>
+                <button type="submit" class="modal-btn-kirim"><i class="bi bi-send"></i> Kirim Penawaran</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -209,6 +349,17 @@ include '../includes/header.php';
 <?php endif; ?>
 
 <script>
+function bukaModalNego() {
+    document.getElementById('modalNego').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function tutupModalNego() {
+    document.getElementById('modalNego').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.getElementById('modalNego').addEventListener('click', function(e) {
+    if (e.target === this) tutupModalNego();
+});
 function gantiFoto(el, src) {
     document.getElementById('mainImgEl').src = src;
     document.querySelectorAll('.foto-thumb').forEach(t => t.classList.remove('active'));
