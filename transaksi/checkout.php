@@ -805,21 +805,15 @@ async function loadKecamatan() {
 }
 
 async function onKecamatanChange() {
-  const selKec  = document.getElementById('selKecamatan');
-  const selKota = document.getElementById('selKota');
-  const optKec  = selKec.options[selKec.selectedIndex];
-  const optKota = selKota.options[selKota.selectedIndex];
+  const selKec = document.getElementById('selKecamatan');
+  const optKec = selKec.options[selKec.selectedIndex];
   if (!optKec.value) return;
 
   document.getElementById('inp_kec_id').value = optKec.value;
   kecamatanSel = true;
 
-  // Pakai nama kota saja (tanpa KAB./KOTA)
-  const namaKota = (optKota.dataset.nama || '').toLowerCase()
-                    .replace('kab. ', '').replace('kota ', '').trim();
-
   document.getElementById('areaEkspedisi').style.display = 'block';
-  await hitungOngkir(namaKota); // ← kirim nama kota saja
+  await hitungOngkir(optKec.value); // ← kirim ID kecamatan, bukan nama
   cekSubmit();
 }
 

@@ -5,7 +5,7 @@ include '../config/koneksi.php';
 $kode = $_GET['kode'] ?? '';
 if (!$kode) { header("Location: ../pages/home.php"); exit; }
 
-$stmt = $conn->prepare("SELECT p.*, pr.nama AS nama_produk FROM pesanan p JOIN produk pr ON pr.id = p.produk_id WHERE p.kode_pesanan = ?");
+$stmt = $conn->prepare("SELECT p.*, pr.nama_barang AS nama_produk FROM pesanan p JOIN produk pr ON pr.id = p.produk_id WHERE p.kode_pesanan = ?");
 $stmt->bind_param("s", $kode);
 $stmt->execute();
 $pesanan = $stmt->get_result()->fetch_assoc();
