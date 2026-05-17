@@ -279,55 +279,86 @@ function copyResi() {
 }
 
 async function loadTracking() {
-    try {
-        const res = await fetch(`../ajax/cek_resi.php?courier=${KURIR}&awb=${NO_RESI}`);
-        const data = await res.json();
-        const area = document.getElementById('trackingArea');
+    const area = document.getElementById('trackingArea');
 
-        if (data.code != 200 || !data.data) {
-            area.innerHTML = `<div class="no-resi-box"><div class="icon">❌</div><p>${data.message || 'Data tracking tidak ditemukan'}</p></div>`;
+    try {
+        // Kirim POST ke cek_resi.php
+        const formData = new FormData();
+        formData.append('resi', NO_RESI);
+        formData.append('kurir', KURIR);
+
+        const res  = await fetch('../ajax/cek_resi.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+            area.innerHTML = `
+                <div class="no-resi-box">
+                    <div class="icon">❌</div>
+                    <p>${data.message || 'Data tracking tidak ditemukan'}</p>
+                </div>`;
             return;
         }
 
-        const summary  = data.data.summary;
-        const history  = data.data.history || [];
-        const isDelivered = summary.status === 'DELIVERED';
+        const d         = data.data;
+        const history   = d.history || [];
+        const isDelivered = d.status === 'DELIVERED';
 
         let html = '';
 
         // Status summary
-        html += `<div style="margin-bottom:1.25rem;padding:.85rem 1rem;background:${isDelivered ? 'var(--green-light)' : 'var(--purple-light)'};border-radius:10px;">
+        html += `
+        <div style="margin-bottom:1.25rem;padding:.85rem 1rem;
+            background:${isDelivered ? 'var(--green-light)' : 'var(--purple-light)'};
+            border-radius:10px;">
             <div style="font-size:.78rem;color:var(--muted);margin-bottom:.2rem;">Status Terkini</div>
-            <div style="font-weight:700;font-size:1rem;color:${isDelivered ? 'var(--green)' : 'var(--purple)'};">
-                ${isDelivered ? '✅ TERKIRIM' : '🚚 ' + (summary.status || '-')}
+            <div style="font-weight:700;font-size:1rem;
+                color:${isDelivered ? 'var(--green)' : 'var(--purple)'};">
+                ${isDelivered ? '✅ TERKIRIM' : '🚚 ' + (d.status || '-')}
             </div>
-            <div style="font-size:.78rem;color:var(--muted);margin-top:.2rem;">${summary.courier} · ${summary.service}</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:.2rem;">
+                ${d.kurir} · ${d.service || '-'}
+            </div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:.1rem;">
+                ${d.origin || '-'} → ${d.destination || '-'}
+            </div>
         </div>`;
 
-        // Timeline
+        // Timeline riwayat
         if (history.length > 0) {
             html += '<div class="timeline">';
             history.forEach((h, i) => {
-                const isLatest    = i === 0;
+                const isLatest       = i === 0;
                 const isDeliveredItem = h.desc && h.desc.toLowerCase().includes('delivered');
-                html += `<div class="timeline-item ${isLatest ? 'latest' : ''} ${isDeliveredItem ? 'delivered' : ''}">
+                html += `
+                <div class="timeline-item ${isLatest ? 'latest' : ''} ${isDeliveredItem ? 'delivered' : ''}">
                     <div class="timeline-dot">${isDeliveredItem ? '✓' : ''}</div>
-                    <div class="timeline-date">${h.date} ${h.time || ''}</div>
-                    <div class="timeline-desc">${h.desc}</div>
+                    <div class="timeline-date">${h.date || ''} ${h.time || ''}</div>
+                    <div class="timeline-desc">${h.desc || '-'}</div>
                     ${h.location ? `<div class="timeline-loc">📍 ${h.location}</div>` : ''}
                 </div>`;
             });
             html += '</div>';
         } else {
-            html += '<p style="color:var(--muted);font-size:.88rem;">Belum ada data perjalanan paket.</p>';
+            html += `<p style="color:var(--muted);font-size:.88rem;">
+                Belum ada data perjalanan paket.
+            </p>`;
         }
 
         area.innerHTML = html;
+
     } catch(e) {
-        document.getElementById('trackingArea').innerHTML = `<div class="no-resi-box"><div class="icon">⚠️</div><p>Gagal memuat tracking. Coba refresh halaman.</p></div>`;
+        area.innerHTML = `
+            <div class="no-resi-box">
+                <div class="icon">⚠️</div>
+                <p>Gagal memuat tracking. Coba refresh halaman.</p>
+            </div>`;
     }
 }
 
+// Otomatis load saat halaman dibuka
 loadTracking();
 </script>
 <?php endif; ?>

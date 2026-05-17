@@ -24,6 +24,8 @@ if (isset($_GET['delete'])) {
         $path = "../uploads/produk/" . $r['foto_utama'];
         if ($r['foto_utama'] && file_exists($path)) unlink($path);
     }
+    // Hapus pesanan terkait dulu sebelum hapus produk
+    $conn->query("DELETE FROM pesanan WHERE produk_id=$id");
     $conn->query("DELETE FROM produk WHERE id=$id");
     header("Location: produk.php?msg=deleted"); exit;
 }

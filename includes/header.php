@@ -288,15 +288,7 @@ if (isset($conn)) {
                     <a href="../pages/pesanan.php" class="dd-item">
                         <i class="bi bi-bag-check"></i> Pesanan Saya
                     </a>
-                    <a href="../pages/wishlist.php" class="dd-item">
-                        <i class="bi bi-heart"></i> Wishlist
-                    </a>
-                    <a href="../pages/chat.php" class="dd-item">
-                        <i class="bi bi-chat-dots"></i> Pesan
-                        <?php if ($unread_msg > 0): ?>
-                        <span style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;"><?= $unread_msg ?></span>
-                        <?php endif; ?>
-                    </a>
+                   
                     <div class="dd-sep"></div>
                     <a href="../auth/logout.php" class="dd-item danger">
                         <i class="bi bi-box-arrow-right"></i> Keluar

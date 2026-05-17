@@ -64,7 +64,7 @@ if (!$pesanan) { echo "Pesanan tidak ditemukan."; exit; }
     <?php endif; ?>
 
     <a href="../pages/home.php" class="btn btn-primary">Kembali Belanja</a>
-    <a href="../pages/home.php?tab=pesanan" class="btn btn-outline">Lihat Pesanan Saya</a>
+    <a href="../pages/pesanan.php" class="btn btn-outline">Lihat Pesanan Saya</a>
 </div>
 </body>
 </html>
