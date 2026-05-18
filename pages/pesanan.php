@@ -11,6 +11,25 @@ function formatRupiah($angka) { return 'Rp ' . number_format($angka, 0, ',', '.'
 
 $user_id = $_SESSION['user_id'];
 
+// ── HANDLE: Pembeli konfirmasi pesanan diterima ──────────────────────────────
+if (isset($_POST['aksi']) && $_POST['aksi'] === 'pesanan_diterima') {
+    $pesanan_id = (int)($_POST['pesanan_id'] ?? 0);
+    if ($pesanan_id) {
+        // Pastikan pesanan milik pembeli ini dan statusnya 'dikirim'
+        $cek = mysqli_fetch_assoc(mysqli_query($conn,
+            "SELECT id FROM pesanan WHERE id=$pesanan_id AND pembeli_id=$user_id AND status='dikirim' LIMIT 1"
+        ));
+        if ($cek) {
+            mysqli_query($conn, "UPDATE pesanan SET
+                status='selesai',
+                selesai_at=NOW(),
+                diselesaikan_oleh='pembeli'
+                WHERE id=$pesanan_id");
+        }
+    }
+   header("Location: pesanan.php?msg=diterima"); exit;
+}
+
 // Ambil semua pesanan milik pembeli ini
 $q = mysqli_query($conn, "
     SELECT p.*, pr.nama_barang, pr.foto_utama,
@@ -55,6 +74,16 @@ a { text-decoration:none; }
     font-size:26px; font-weight:700; color:var(--dark);
 }
 .page-header p { font-size:13px; color:var(--muted); margin-top:4px; }
+
+/* ── ALERT ── */
+.alert-diterima {
+    display:flex; align-items:center; gap:10px;
+    background:#d1fae5; color:#065f46;
+    border:1px solid #6ee7b7;
+    border-radius:12px; padding:12px 18px;
+    font-size:13px; font-weight:600;
+    margin-bottom:20px;
+}
 
 /* ── STATUS BADGE ── */
 .badge {
@@ -147,6 +176,29 @@ a { text-decoration:none; }
 }
 .btn-outline:hover { background:var(--pink-pale); border-color:var(--pink-deep); color:var(--pink-deep); }
 
+/* ── TOMBOL PESANAN DITERIMA ── */
+.btn-diterima {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 18px;
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:#fff; border:none; border-radius:20px;
+    font-size:12px; font-weight:700; cursor:pointer;
+    transition:opacity .2s; font-family:'DM Sans',sans-serif;
+}
+.btn-diterima:hover { opacity:.88; }
+
+/* ── NOTIF DIKIRIM ── */
+.notif-dikirim {
+    background:#ecfdf5;
+    border:1px solid #6ee7b7;
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:12px; color:#065f46;
+    margin-top:10px;
+    display:flex; align-items:center; gap:8px;
+    flex-wrap:wrap; justify-content:space-between;
+}
+
 /* ── TRANSFER INFO ── */
 .transfer-info {
     background:var(--pink-pale);
@@ -190,6 +242,13 @@ a { text-decoration:none; }
         <h1>📦 Pesanan Saya</h1>
         <p>Riwayat dan status semua pesananmu</p>
     </div>
+
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'diterima'): ?>
+    <div class="alert-diterima">
+        <i class="bi bi-check-circle-fill" style="font-size:18px;"></i>
+        Pesanan berhasil dikonfirmasi diterima! Terima kasih sudah berbelanja 🎉
+    </div>
+    <?php endif; ?>
 
     <?php if ($q && mysqli_num_rows($q) > 0): ?>
         <?php while ($p = mysqli_fetch_assoc($q)): ?>
@@ -244,7 +303,6 @@ a { text-decoration:none; }
                 <div class="prod-info">
                     <div class="prod-nama"><?= escape($p['nama_barang']) ?></div>
                     <div class="prod-meta">
-                        
                         <?php if ($p['nama_penerima']): ?>
                         👤 <?= escape($p['nama_penerima']) ?>
                         <?php endif; ?>
@@ -285,6 +343,26 @@ a { text-decoration:none; }
                         <?php endif; ?>
                     </div>
                     <?php endif; ?>
+
+                    <!-- ── TOMBOL PESANAN DITERIMA (muncul saat status = dikirim) ── -->
+                    <?php if ($p['status'] === 'dikirim'): ?>
+                    <div style="margin-top:12px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:12px 14px;">
+                        <div style="font-size:12px;color:#065f46;margin-bottom:10px;font-weight:600;">
+                            📬 Sudah menerima barangnya?
+                        </div>
+                        <div style="font-size:11px;color:#6b7280;margin-bottom:10px;line-height:1.5;">
+                            Klik tombol di bawah jika barang sudah sampai di tanganmu. Pesanan akan otomatis ditandai selesai.
+                        </div>
+                        <form method="POST" onsubmit="return confirm('Konfirmasi bahwa pesanan sudah kamu terima?');">
+                            <input type="hidden" name="aksi" value="pesanan_diterima">
+                            <input type="hidden" name="pesanan_id" value="<?= $p['id'] ?>">
+                            <button type="submit" class="btn-diterima">
+                                <i class="bi bi-check-circle-fill"></i> Pesanan Diterima
+                            </button>
+                        </form>
+                    </div>
+                    <?php endif; ?>
+
                 </div>
             </div>
 

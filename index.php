@@ -150,7 +150,7 @@ footer{background:var(--white);border-top:1px solid var(--border);margin-top:60p
         <h1 class="hero-title">Tampil Cantik<br>dengan <em>Harga Hemat</em></h1>
         <p class="hero-sub">Koleksi pakaian wanita preloved berkualitas pilihan — atasan, bawahan, dress, outer, hingga hijab.</p>
         <div class="hero-actions">
-            <a href="auth/register.php" class="hero-cta">Mulai Belanja <i class="bi bi-arrow-right"></i></a>
+            <a href="auth/login.php" class="hero-cta">Mulai Belanja <i class="bi bi-arrow-right"></i></a>
             <a href="#produk" class="hero-cta-outline">Lihat Koleksi</a>
         </div>
     </div>

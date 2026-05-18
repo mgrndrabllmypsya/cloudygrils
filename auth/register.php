@@ -83,13 +83,7 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;fon
                 <input type="email" name="email" placeholder="contoh@email.com" required>
             </div>
         </div>
-        <div class="field">
-            <label>No. HP</label>
-            <div class="field-wrap">
-                <i class="bi bi-phone icon"></i>
-                <input type="tel" name="no_hp" placeholder="08xxxxxxxxxx" required>
-            </div>
-        </div>
+       
         <div class="field">
             <label>Password</label>
             <div class="field-wrap">

@@ -9,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $nama     = trim($_POST['nama']);
 $username = trim($_POST['username']);
 $email    = trim($_POST['email']);
-$no_hp    = trim($_POST['no_hp']);
 $password = trim($_POST['password']);
 
 // Cek email
@@ -34,7 +33,7 @@ mysqli_stmt_close($stmt2);
 
 $hash = password_hash($password, PASSWORD_DEFAULT);
 
-$stmt3 = mysqli_prepare($conn, "INSERT INTO pembeli (nama, username, email, password, no_hp, created_at) VALUES (?,?,?,?,?,NOW())");
+$stmt3 = mysqli_prepare($conn, "INSERT INTO pembeli (nama, username, email, password, created_at) VALUES (?,?,?,?,?,NOW())");
 mysqli_stmt_bind_param($stmt3, "sssss", $nama, $username, $email, $hash, $no_hp);
 
 if (mysqli_stmt_execute($stmt3)) {
@@ -43,7 +42,7 @@ if (mysqli_stmt_execute($stmt3)) {
     $_SESSION['user_id'] = $user_id;
     $_SESSION['nama']    = $nama;
     $_SESSION['email']   = $email;
-    header("Location: auth/login.php"); exit;
+    header("Location: login.php"); exit;
 } else {
     header("Location: register.php?error=gagal"); exit;
 }

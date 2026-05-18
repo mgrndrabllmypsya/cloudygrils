@@ -73,6 +73,16 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'update_status') {
     header("Location: detail_pesanan.php?id=$id&msg=status"); exit;
 }
 
+// ── 5. TANDAI SELESAI oleh Admin ────────────────────────────────────────────
+if (isset($_POST['aksi']) && $_POST['aksi'] === 'tandai_selesai_admin') {
+    mysqli_query($conn, "UPDATE pesanan SET
+        status='selesai',
+        selesai_at=NOW(),
+        diselesaikan_oleh='admin'
+        WHERE id=$id AND status='dikirim'");
+    header("Location: detail_pesanan.php?id=$id&msg=selesai"); exit;
+}
+
 // ── FETCH DATA ──────────────────────────────────────────────────────────────
 $row = mysqli_fetch_assoc(mysqli_query($conn, "
     SELECT ps.*,
@@ -90,6 +100,7 @@ if (!$row) { header("Location: pesanan.php"); exit; }
 $admin_nama  = $_SESSION['admin_nama'] ?? 'Admin';
 $status      = $row['status'];
 $st_transfer = $row['status_transfer'];
+$is_cod      = ($row['metode'] === 'cod'); // ← helper COD
 
 $status_label = match($status) {
     'menunggu'     => 'Menunggu',
@@ -101,12 +112,18 @@ $status_label = match($status) {
     default        => ucfirst($status)
 };
 
-$all_status = ['menunggu','dikonfirmasi','diproses','dikirim','selesai','dibatalkan'];
+// ── STATUS LIST sesuai metode pembayaran ───────────────────────────────────
+if ($is_cod) {
+    // COD tidak perlu 'dikonfirmasi' (tidak ada transfer)
+    $all_status = ['menunggu','diproses','dikirim','selesai','dibatalkan'];
+} else {
+    $all_status = ['menunggu','dikonfirmasi','diproses','dikirim','selesai','dibatalkan'];
+}
 
-// ── TRACKING RESI via BinderByte ────────────────────────────────────────────
-$tracking_data = null;
+// ── TRACKING RESI via BinderByte (hanya non-COD) ───────────────────────────
+$tracking_data  = null;
 $tracking_error = null;
-if ($row['no_resi'] && $row['kurir'] && in_array($status, ['dikirim','selesai'])) {
+if (!$is_cod && $row['no_resi'] && $row['kurir'] && in_array($status, ['dikirim','selesai'])) {
     $kurir_kode = strtolower($row['kurir']);
     $kurir_api  = $kurir_map[$kurir_kode] ?? $kurir_kode;
     $api_url    = "https://api.binderbyte.com/v1/track?api_key=" . BINDERBYTE_KEY
@@ -245,6 +262,14 @@ a{text-decoration:none;color:inherit;}
 /* DIVIDER */
 hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
 
+/* COD INFO BOX */
+.cod-box{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.25);border-radius:10px;padding:14px;margin-bottom:14px;}
+.cod-box-title{font-size:13px;color:var(--green);font-weight:700;margin-bottom:8px;}
+.cod-box-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.5;}
+.cod-box-row:last-child{margin-bottom:0;}
+.cod-box-row strong{color:var(--white);}
+.cod-box-row i{color:var(--green);font-size:14px;flex-shrink:0;}
+
 /* TIMELINE ALUR PESANAN */
 .tl-item{display:flex;gap:14px;padding:10px 0;position:relative;}
 .tl-item:not(:last-child)::after{content:'';position:absolute;left:14px;top:34px;bottom:0;width:1px;background:var(--border);}
@@ -279,6 +304,11 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;align-items:center;justify-content:center;cursor:zoom-out;}
 .lightbox.show{display:flex;}
 .lightbox img{max-width:90vw;max-height:90vh;border-radius:10px;object-fit:contain;}
+
+/* TANDAI SELESAI BOX */
+.selesai-box{background:rgba(52,211,153,.07);border:1.5px solid rgba(52,211,153,.4);border-radius:10px;padding:16px;margin-bottom:4px;}
+.selesai-box-title{font-size:13px;color:var(--green);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.selesai-box-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -328,11 +358,13 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
             <div class="alert-msg alert-success"><i class="bi bi-truck"></i> Nomor resi berhasil disimpan. Status diperbarui ke <strong>Dikirim</strong>.</div>
             <?php elseif ($_GET['msg'] === 'status'): ?>
             <div class="alert-msg alert-success"><i class="bi bi-check-circle-fill"></i> Status berhasil diperbarui.</div>
+            <?php elseif ($_GET['msg'] === 'selesai'): ?>
+            <div class="alert-msg alert-success"><i class="bi bi-check2-all"></i> Pesanan ditandai <strong>Selesai</strong> oleh admin. Pembeli kini bisa memberi ulasan.</div>
             <?php endif; ?>
         <?php endif; ?>
 
-        <!-- AKSI: Bukti Transfer Menunggu Konfirmasi -->
-        <?php if ($row['metode'] === 'transfer' && $st_transfer === 'menunggu' && $row['bukti_transfer']): ?>
+        <!-- AKSI: Bukti Transfer Menunggu Konfirmasi (hanya non-COD) -->
+        <?php if (!$is_cod && $st_transfer === 'menunggu' && $row['bukti_transfer']): ?>
         <div class="card" style="border-color:rgba(251,191,36,.4);">
             <div class="card-head" style="background:rgba(251,191,36,.07);">
                 <div class="icon" style="background:rgba(251,191,36,.2);color:var(--yellow);"><i class="bi bi-exclamation-triangle"></i></div>
@@ -372,8 +404,8 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
         </div>
         <?php endif; ?>
 
-        <!-- AKSI: Tandai Diproses -->
-        <?php if ($status === 'dikonfirmasi'): ?>
+        <!-- AKSI: Tandai Diproses (hanya non-COD setelah dikonfirmasi) -->
+        <?php if (!$is_cod && $status === 'dikonfirmasi'): ?>
         <div class="card" style="border-color:rgba(251,146,60,.4);">
             <div class="card-head" style="background:rgba(251,146,60,.07);">
                 <div class="icon" style="background:rgba(251,146,60,.2);color:var(--orange);"><i class="bi bi-arrow-repeat"></i></div>
@@ -388,6 +420,66 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     <input type="hidden" name="status" value="diproses">
                     <button type="submit" class="btn btn-accent"><i class="bi bi-arrow-repeat"></i> Tandai Sedang Diproses</button>
                 </form>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- AKSI: COD menunggu — siapkan barang langsung -->
+        <?php if ($is_cod && $status === 'menunggu'): ?>
+        <div class="card" style="border-color:rgba(52,211,153,.4);">
+            <div class="card-head" style="background:rgba(52,211,153,.07);">
+                <div class="icon" style="background:rgba(52,211,153,.2);color:var(--green);"><i class="bi bi-cash-coin"></i></div>
+                <h3 style="color:var(--green);">Pesanan COD Masuk — Siapkan Barang</h3>
+            </div>
+            <div class="card-body">
+                <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
+                    Pesanan ini menggunakan metode <strong style="color:var(--green);">COD (Bayar di Tempat)</strong>.
+                    Tidak ada konfirmasi transfer. Langsung siapkan barang dan hubungi pembeli untuk koordinasi pengantaran.
+                </p>
+                <form method="POST">
+                    <input type="hidden" name="aksi" value="update_status">
+                    <input type="hidden" name="status" value="diproses">
+                    <button type="submit" class="btn btn-accent"><i class="bi bi-arrow-repeat"></i> Tandai Sedang Diproses</button>
+                </form>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- ── AKSI: TANDAI SELESAI oleh Admin (muncul saat status = dikirim) ── -->
+        <?php if ($status === 'dikirim'): ?>
+        <div class="card" style="border-color:rgba(52,211,153,.5);">
+            <div class="card-head" style="background:rgba(52,211,153,.08);">
+                <div class="icon" style="background:rgba(52,211,153,.2);color:var(--green);"><i class="bi bi-check2-all"></i></div>
+                <h3 style="color:var(--green);">
+                    <?= $is_cod ? 'Konfirmasi Penerimaan COD' : 'Konfirmasi Barang Diterima' ?>
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="selesai-box">
+                    <div class="selesai-box-title">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <?= $is_cod ? 'Barang sudah diantar & uang COD diterima?' : 'Barang sudah sampai ke pembeli?' ?>
+                    </div>
+                    <div class="selesai-box-desc">
+                        <?php if ($is_cod): ?>
+                            Klik <strong style="color:var(--white);">Tandai Selesai</strong> setelah kamu mengantar barang dan menerima pembayaran COD dari pembeli.
+                            Atau tunggu pembeli menekan tombol <em>"Pesanan Diterima"</em> di halaman pesanan mereka.
+                        <?php else: ?>
+                            Klik <strong style="color:var(--white);">Tandai Selesai</strong> jika kamu sudah memastikan barang diterima pembeli.
+                            Atau tunggu pembeli menekan tombol <em>"Pesanan Diterima"</em> di halaman pesanan mereka.
+                        <?php endif; ?>
+                    </div>
+                    <form method="POST" onsubmit="return confirm('Tandai pesanan ini sebagai Selesai?');">
+                        <input type="hidden" name="aksi" value="tandai_selesai_admin">
+                        <button type="submit" class="btn btn-green" style="font-size:13px;padding:10px 22px;">
+                            <i class="bi bi-check2-all"></i> Tandai Selesai
+                        </button>
+                    </form>
+                </div>
+                <div style="font-size:11px;color:var(--muted);margin-top:10px;">
+                    <i class="bi bi-shield-check" style="color:var(--accent);"></i>
+                    Pesanan juga otomatis selesai jika pembeli mengkonfirmasi penerimaan sendiri.
+                </div>
             </div>
         </div>
         <?php endif; ?>
@@ -417,10 +509,24 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             <span class="info-label">Status</span>
                             <span class="info-val"><span class="badge badge-<?= $status ?>"><?= $status_label ?></span></span>
                         </div>
+                        <?php if (!empty($row['diselesaikan_oleh']) && $status === 'selesai'): ?>
+                        <div class="info-row">
+                            <span class="info-label">Diselesaikan Oleh</span>
+                            <span class="info-val" style="color:var(--green);">
+                                <?= $row['diselesaikan_oleh'] === 'admin' ? '👤 Admin' : '🙋 Pembeli' ?>
+                            </span>
+                        </div>
+                        <?php endif; ?>
+                        <?php if (!empty($row['selesai_at']) && $status === 'selesai'): ?>
+                        <div class="info-row">
+                            <span class="info-label">Selesai Pada</span>
+                            <span class="info-val"><?= date('d M Y, H:i', strtotime($row['selesai_at'])) ?></span>
+                        </div>
+                        <?php endif; ?>
                         <div class="info-row">
                             <span class="info-label">Metode Bayar</span>
                             <span class="info-val">
-                                <?php if ($row['metode'] === 'cod'): ?>
+                                <?php if ($is_cod): ?>
                                     <i class="bi bi-cash" style="color:var(--green);"></i> COD (Bayar di Tempat)
                                 <?php else: ?>
                                     <i class="bi bi-credit-card" style="color:var(--accent);"></i>
@@ -429,22 +535,23 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             </span>
                         </div>
 
-                        <!-- ✅ EKSPEDISI YANG DIPILIH PEMBELI -->
+                        <!-- Ekspedisi: hanya tampil untuk non-COD -->
+                        <?php if (!$is_cod): ?>
                         <div class="info-row">
                             <span class="info-label">Ekspedisi</span>
                             <span class="info-val">
                                 <?php if (!empty($row['kurir'])): ?>
                                     <i class="bi bi-truck" style="color:var(--green);"></i>
                                     <strong style="color:var(--white);"><?= strtoupper(escape($row['kurir'])) ?></strong>
-                                <?php elseif ($row['metode'] === 'cod'): ?>
-                                    <span style="color:var(--muted);">COD — ambil langsung</span>
                                 <?php else: ?>
                                     <span style="color:var(--yellow);">⚠ Belum dipilih</span>
                                 <?php endif; ?>
                             </span>
                         </div>
+                        <?php endif; ?>
 
-                        <?php if ($row['metode'] === 'transfer' && $st_transfer): ?>
+                        <!-- Status transfer: hanya untuk non-COD -->
+                        <?php if (!$is_cod && $st_transfer): ?>
                         <div class="info-row">
                             <span class="info-label">Status Transfer</span>
                             <span class="info-val">
@@ -466,18 +573,20 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                         <?php endif; ?>
                         <?php endif; ?>
 
-                        <?php if ($row['dikonfirmasi_at']): ?>
+                        <?php if (!$is_cod && $row['dikonfirmasi_at']): ?>
                         <div class="info-row">
                             <span class="info-label">Dikonfirmasi Pada</span>
                             <span class="info-val"><?= date('d M Y, H:i', strtotime($row['dikonfirmasi_at'])) ?></span>
                         </div>
                         <?php endif; ?>
-                        <?php if ($row['no_resi']): ?>
+
+                        <?php if (!$is_cod && $row['no_resi']): ?>
                         <div class="info-row">
                             <span class="info-label">No. Resi</span>
                             <span class="info-val" style="font-family:monospace;color:var(--green);"><?= escape($row['no_resi']) ?></span>
                         </div>
                         <?php endif; ?>
+
                         <?php if ($row['catatan']): ?>
                         <div class="info-row">
                             <span class="info-label">Catatan Pembeli</span>
@@ -519,7 +628,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             <span class="info-val" style="color:var(--green);">- <?= formatRupiah($row['diskon']) ?></span>
                         </div>
                         <?php endif; ?>
-                        <?php if ($row['ongkir'] > 0): ?>
+                        <?php if (!$is_cod && $row['ongkir'] > 0): ?>
                         <div class="info-row">
                             <span class="info-label">Ongkos Kirim</span>
                             <span class="info-val">+ <?= formatRupiah($row['ongkir']) ?></span>
@@ -532,8 +641,8 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     </div>
                 </div>
 
-                <!-- ALAMAT PENGIRIMAN -->
-                <?php if ($row['metode'] !== 'cod' && ($row['nama_penerima'] || $row['kota_tujuan'])): ?>
+                <!-- ALAMAT PENGIRIMAN: hanya non-COD -->
+                <?php if (!$is_cod && ($row['nama_penerima'] || $row['kota_tujuan'])): ?>
                 <div class="card">
                     <div class="card-head">
                         <div class="icon" style="background:rgba(52,211,153,.15);color:var(--green);"><i class="bi bi-geo-alt"></i></div>
@@ -576,53 +685,87 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                 </div>
                 <?php endif; ?>
 
-                <!-- RESI & INPUT -->
-                <?php if ($status === 'diproses' || $status === 'dikirim' || $status === 'selesai'): ?>
+                <!-- PENGIRIMAN & RESI / INFO COD -->
+                <?php if (in_array($status, ['diproses','dikirim','selesai'])): ?>
                 <div class="card">
                     <div class="card-head">
-                        <div class="icon" style="background:rgba(52,211,153,.15);color:var(--green);"><i class="bi bi-truck"></i></div>
-                        <h3>Pengiriman & Resi</h3>
+                        <div class="icon" style="background:rgba(52,211,153,.15);color:var(--green);">
+                            <i class="bi bi-<?= $is_cod ? 'cash-coin' : 'truck' ?>"></i>
+                        </div>
+                        <h3><?= $is_cod ? 'Info Pengantaran COD' : 'Pengiriman & Resi' ?></h3>
                     </div>
                     <div class="card-body">
-                        <div class="info-row">
-                            <span class="info-label">Kurir Dipilih Pembeli</span>
-                            <span class="info-val" style="color:var(--accent);font-weight:700;">
-                                <?= !empty($row['kurir']) ? strtoupper(escape($row['kurir'])) : '<span style="color:var(--muted);">Belum dipilih</span>' ?>
-                            </span>
-                        </div>
-                        <?php if ($row['no_resi']): ?>
-                            <div class="info-row">
-                                <span class="info-label">No. Resi</span>
-                                <span class="info-val" style="font-family:monospace;letter-spacing:1px;color:var(--green);"><?= escape($row['no_resi']) ?></span>
+
+                        <?php if ($is_cod): ?>
+                            <!-- ── INFO COD ── -->
+                            <div class="cod-box">
+                                <div class="cod-box-title"><i class="bi bi-cash-coin"></i> Metode: COD (Bayar di Tempat)</div>
+                                <div class="cod-box-row"><i class="bi bi-geo-alt-fill"></i> Area pengantaran: <strong>Banyuwangi Kota</strong></div>
+                                <div class="cod-box-row"><i class="bi bi-cash"></i> Pembayaran dilakukan saat barang tiba di tangan pembeli</div>
+                                <div class="cod-box-row"><i class="bi bi-telephone-fill"></i> Hubungi pembeli untuk konfirmasi lokasi & jadwal pengantaran</div>
                             </div>
-                            <hr>
-                            <form method="POST">
-                                <input type="hidden" name="aksi" value="simpan_resi">
-                                <input type="hidden" name="kurir" value="<?= escape($row['kurir']) ?>">
-                                <div class="form-group">
-                                    <label>Update No. Resi</label>
-                                    <input type="text" name="no_resi" class="form-input" value="<?= escape($row['no_resi']) ?>" placeholder="Nomor resi pengiriman">
-                                </div>
-                                <button type="submit" class="btn btn-accent"><i class="bi bi-save"></i> Update Resi</button>
-                            </form>
+                            <div class="info-row">
+                                <span class="info-label">No. HP Pembeli</span>
+                                <span class="info-val">
+                                    <a href="https://wa.me/62<?= ltrim(escape($row['hp_pembeli'] ?? ''), '0') ?>" target="_blank" style="color:var(--green);display:flex;align-items:center;gap:5px;">
+                                        <i class="bi bi-whatsapp"></i> <?= escape($row['hp_pembeli'] ?? '-') ?>
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Nama Pembeli</span>
+                                <span class="info-val"><?= escape($row['nama_pembeli']) ?></span>
+                            </div>
+                            <?php if ($row['catatan']): ?>
+                            <div class="info-row">
+                                <span class="info-label">Catatan Lokasi</span>
+                                <span class="info-val" style="color:var(--yellow);font-style:italic;">"<?= escape($row['catatan']) ?>"</span>
+                            </div>
+                            <?php endif; ?>
+
                         <?php else: ?>
-                            <p style="font-size:13px;color:var(--muted);margin:12px 0;">Input nomor resi untuk mengubah status menjadi <strong style="color:var(--green);">Dikirim</strong>.</p>
-                            <form method="POST">
-                                <input type="hidden" name="aksi" value="simpan_resi">
-                                <input type="hidden" name="kurir" value="<?= escape($row['kurir']) ?>">
-                                <div class="form-group">
-                                    <label>Nomor Resi</label>
-                                    <input type="text" name="no_resi" class="form-input" placeholder="Masukkan nomor resi pengiriman" required>
+                            <!-- ── FORM RESI (non-COD) ── -->
+                            <div class="info-row">
+                                <span class="info-label">Kurir Dipilih Pembeli</span>
+                                <span class="info-val" style="color:var(--accent);font-weight:700;">
+                                    <?= !empty($row['kurir']) ? strtoupper(escape($row['kurir'])) : '<span style="color:var(--muted);">Belum dipilih</span>' ?>
+                                </span>
+                            </div>
+                            <?php if ($row['no_resi']): ?>
+                                <div class="info-row">
+                                    <span class="info-label">No. Resi</span>
+                                    <span class="info-val" style="font-family:monospace;letter-spacing:1px;color:var(--green);"><?= escape($row['no_resi']) ?></span>
                                 </div>
-                                <button type="submit" class="btn btn-accent"><i class="bi bi-truck"></i> Simpan & Kirim</button>
-                            </form>
+                                <hr>
+                                <form method="POST">
+                                    <input type="hidden" name="aksi" value="simpan_resi">
+                                    <input type="hidden" name="kurir" value="<?= escape($row['kurir']) ?>">
+                                    <div class="form-group">
+                                        <label>Update No. Resi</label>
+                                        <input type="text" name="no_resi" class="form-input" value="<?= escape($row['no_resi']) ?>" placeholder="Nomor resi pengiriman">
+                                    </div>
+                                    <button type="submit" class="btn btn-accent"><i class="bi bi-save"></i> Update Resi</button>
+                                </form>
+                            <?php else: ?>
+                                <p style="font-size:13px;color:var(--muted);margin:12px 0;">Input nomor resi untuk mengubah status menjadi <strong style="color:var(--green);">Dikirim</strong>.</p>
+                                <form method="POST">
+                                    <input type="hidden" name="aksi" value="simpan_resi">
+                                    <input type="hidden" name="kurir" value="<?= escape($row['kurir']) ?>">
+                                    <div class="form-group">
+                                        <label>Nomor Resi</label>
+                                        <input type="text" name="no_resi" class="form-input" placeholder="Masukkan nomor resi pengiriman" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-accent"><i class="bi bi-truck"></i> Simpan & Kirim</button>
+                                </form>
+                            <?php endif; ?>
                         <?php endif; ?>
+
                     </div>
                 </div>
                 <?php endif; ?>
 
-                <!-- ✅ TRACKING RESI via BinderByte -->
-                <?php if (in_array($status, ['dikirim','selesai']) && $row['no_resi']): ?>
+                <!-- TRACKING RESI via BinderByte (hanya non-COD) -->
+                <?php if (!$is_cod && in_array($status, ['dikirim','selesai']) && $row['no_resi']): ?>
                 <div class="card">
                     <div class="card-head">
                         <div class="icon" style="background:rgba(167,139,250,.15);color:var(--accent);"><i class="bi bi-radar"></i></div>
@@ -641,7 +784,6 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                                 default => 'track-status-pending'
                             };
                             ?>
-                            <!-- Summary -->
                             <span class="track-status-badge <?= $status_class ?>">
                                 <i class="bi bi-circle-fill" style="font-size:6px;"></i>
                                 <?= escape($track_status) ?>
@@ -658,7 +800,6 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                                     <div style="font-size:11px;color:var(--muted);margin-top:2px;"><?= escape($detail['destination'] ?? '-') ?></div>
                                 </div>
                             </div>
-                            <!-- History -->
                             <?php if (!empty($history)): ?>
                             <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px;">Riwayat Pengiriman</div>
                             <?php foreach ($history as $i => $h): ?>
@@ -717,7 +858,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             <span class="info-label">No. HP</span>
                             <span class="info-val"><?= escape($row['hp_pembeli'] ?? '-') ?></span>
                         </div>
-                        <?php if ($row['metode'] === 'cod'): ?>
+                        <?php if ($is_cod): ?>
                         <div style="margin-top:12px;padding:10px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:8px;font-size:12px;color:var(--green);">
                             <i class="bi bi-geo-alt-fill"></i> Metode COD — hanya area Banyuwangi Kota
                         </div>
@@ -725,8 +866,8 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     </div>
                 </div>
 
-                <!-- BUKTI TRANSFER (ringkas, kalau sudah dikonfirmasi/ditolak) -->
-                <?php if ($row['metode'] === 'transfer' && ($st_transfer !== 'menunggu' || !$row['bukti_transfer'])): ?>
+                <!-- BUKTI TRANSFER: hanya non-COD -->
+                <?php if (!$is_cod && ($st_transfer !== 'menunggu' || !$row['bukti_transfer'])): ?>
                 <div class="card">
                     <div class="card-head">
                         <div class="icon" style="background:rgba(167,139,250,.15);color:var(--accent);"><i class="bi bi-receipt"></i></div>
@@ -767,7 +908,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                                             'menunggu'     => 'Menunggu',
                                             'dikonfirmasi' => 'Dikonfirmasi',
                                             'diproses'     => 'Diproses',
-                                            'dikirim'      => 'Dikirim',
+                                            'dikirim'      => $is_cod ? 'Dalam Pengantaran' : 'Dikirim',
                                             'selesai'      => 'Selesai',
                                             'dibatalkan'   => 'Dibatalkan',
                                             default        => ucfirst($s)
@@ -781,7 +922,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     </div>
                 </div>
 
-                <!-- ✅ ALUR PESANAN (TIMELINE FIX) -->
+                <!-- ALUR PESANAN (TIMELINE) -->
                 <div class="card">
                     <div class="card-head">
                         <div class="icon" style="background:rgba(167,139,250,.15);color:var(--accent);"><i class="bi bi-clock-history"></i></div>
@@ -789,21 +930,30 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     </div>
                     <div class="card-body">
                         <?php
-                        $flow = [
-                            'menunggu'     => ['label'=>'Pesanan Masuk',        'sub'=>'Pembeli sudah checkout'],
-                            'dikonfirmasi' => ['label'=>'Transfer Dikonfirmasi','sub'=>'Pembayaran valid'],
-                            'diproses'     => ['label'=>'Sedang Diproses',      'sub'=>'Barang disiapkan'],
-                            'dikirim'      => ['label'=>'Dikirim',              'sub'=>$row['no_resi'] ? 'Resi: '.$row['no_resi'] : 'Menunggu resi'],
-                            'selesai'      => ['label'=>'Selesai',              'sub'=>'Pesanan diterima'],
-                        ];
+                        $flow = [];
+                        $flow['menunggu'] = ['label'=>'Pesanan Masuk', 'sub'=>'Pembeli sudah checkout'];
+
+                        if ($is_cod) {
+                            $flow['diproses'] = ['label'=>'Sedang Diproses',      'sub'=>'Barang disiapkan'];
+                            $flow['dikirim']  = ['label'=>'Dalam Pengantaran',    'sub'=>'Admin mengantar ke pembeli'];
+                            $flow['selesai']  = ['label'=>'Selesai',              'sub'=>'COD lunas, pesanan selesai'];
+                        } else {
+                            $flow['dikonfirmasi'] = ['label'=>'Transfer Dikonfirmasi','sub'=>'Pembayaran valid'];
+                            $flow['diproses']     = ['label'=>'Sedang Diproses',      'sub'=>'Barang disiapkan'];
+                            $flow['dikirim']      = ['label'=>'Dikirim',              'sub'=>$row['no_resi'] ? 'Resi: '.$row['no_resi'] : 'Menunggu resi'];
+                            $flow['selesai']      = ['label'=>'Selesai',              'sub'=>'Pesanan diterima'];
+                        }
+
                         if ($status === 'dibatalkan') {
                             $flow['dibatalkan'] = ['label'=>'Dibatalkan','sub'=>'Pesanan dibatalkan'];
                         }
 
-                        // ✅ FIX: urutan tetap tanpa pengaruh 'dibatalkan'
-                        $status_order = ['menunggu','dikonfirmasi','diproses','dikirim','selesai'];
-                        $current_idx  = array_search($status, $status_order);
-                        if ($current_idx === false) $current_idx = -1; // dibatalkan
+                        $status_order = $is_cod
+                            ? ['menunggu','diproses','dikirim','selesai']
+                            : ['menunggu','dikonfirmasi','diproses','dikirim','selesai'];
+
+                        $current_idx = array_search($status, $status_order);
+                        if ($current_idx === false) $current_idx = -1;
 
                         foreach ($flow as $s => $f):
                             $idx = array_search($s, $status_order);
@@ -849,7 +999,8 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
     </div>
 </div>
 
-<!-- MODAL TOLAK TRANSFER -->
+<!-- MODAL TOLAK TRANSFER (hanya untuk non-COD) -->
+<?php if (!$is_cod): ?>
 <div class="overlay" id="modalTolak">
     <div class="modal-box">
         <h4><i class="bi bi-x-circle" style="color:var(--red);margin-right:6px;"></i> Tolak Transfer</h4>
@@ -867,6 +1018,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
         </form>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="this.classList.remove('show')">
@@ -878,9 +1030,11 @@ function openLightbox(src) {
     document.getElementById('lightboxImg').src = src;
     document.getElementById('lightbox').classList.add('show');
 }
+<?php if (!$is_cod): ?>
 document.getElementById('modalTolak').addEventListener('click', function(e){
     if (e.target === this) this.classList.remove('show');
 });
+<?php endif; ?>
 </script>
 </body>
 </html>

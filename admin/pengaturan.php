@@ -13,27 +13,55 @@ $msg_type = '';
 
 // Handle update pengaturan toko
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_toko'])) {
-    $nama_toko    = mysqli_real_escape_string($conn, $_POST['nama_toko'] ?? '');
-    $deskripsi    = mysqli_real_escape_string($conn, $_POST['deskripsi'] ?? '');
-    $no_hp        = mysqli_real_escape_string($conn, $_POST['no_hp'] ?? '');
-    $alamat       = mysqli_real_escape_string($conn, $_POST['alamat'] ?? '');
-    $instagram    = mysqli_real_escape_string($conn, $_POST['instagram'] ?? '');
+    $nama_toko  = mysqli_real_escape_string($conn, $_POST['nama_toko']  ?? '');
+    $deskripsi  = mysqli_real_escape_string($conn, $_POST['deskripsi']  ?? '');
+    $no_hp      = mysqli_real_escape_string($conn, $_POST['no_hp']      ?? '');
+    $alamat     = mysqli_real_escape_string($conn, $_POST['alamat']     ?? '');
+    $instagram  = mysqli_real_escape_string($conn, $_POST['instagram']  ?? '');
 
-    // Cek apakah row settings sudah ada
-    $exist = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pengaturan"));
-    if ($exist && $exist[0] > 0) {
-        mysqli_query($conn, "UPDATE pengaturan SET nama_toko='$nama_toko', deskripsi='$deskripsi', no_hp='$no_hp', alamat='$alamat', instagram='$instagram' WHERE id=1");
-    } else {
-        mysqli_query($conn, "INSERT INTO pengaturan (nama_toko,deskripsi,no_hp,alamat,instagram) VALUES ('$nama_toko','$deskripsi','$no_hp','$alamat','$instagram')");
+    // Handle upload logo
+    $logo_sql = '';
+    if (!empty($_FILES['logo']['name'])) {
+        $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+        $ftype   = $_FILES['logo']['type'];
+        if (in_array($ftype, $allowed)) {
+            $ext      = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+            $filename = 'logo_toko_' . time() . '.' . $ext;
+            $upload_dir = '../uploads/toko/';
+            if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+            if (move_uploaded_file($_FILES['logo']['tmp_name'], $upload_dir . $filename)) {
+                $logo_sql = ", logo='$filename'";
+            }
+        } else {
+            $msg = 'Format gambar tidak didukung. Gunakan JPG, PNG, atau WEBP.';
+            $msg_type = 'error';
+        }
     }
-    $msg = 'Pengaturan toko berhasil disimpan.';
-    $msg_type = 'success';
+
+    if ($msg_type !== 'error') {
+        $exist = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pengaturan_toko"));
+        if ($exist && $exist[0] > 0) {
+            mysqli_query($conn, "UPDATE pengaturan_toko SET
+                nama_toko='$nama_toko',
+                deskripsi='$deskripsi',
+                no_hp='$no_hp',
+                alamat='$alamat',
+                instagram='$instagram'
+                $logo_sql
+                WHERE id=1");
+        } else {
+            mysqli_query($conn, "INSERT INTO pengaturan_toko (nama_toko, deskripsi, no_hp, alamat, instagram)
+                VALUES ('$nama_toko','$deskripsi','$no_hp','$alamat','$instagram')");
+        }
+        $msg = 'Pengaturan toko berhasil disimpan.';
+        $msg_type = 'success';
+    }
 }
 
 // Handle ganti password
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ganti_password'])) {
-    $pw_lama  = $_POST['pw_lama'] ?? '';
-    $pw_baru  = $_POST['pw_baru'] ?? '';
+    $pw_lama  = $_POST['pw_lama']  ?? '';
+    $pw_baru  = $_POST['pw_baru']  ?? '';
     $pw_ulang = $_POST['pw_ulang'] ?? '';
 
     $admin_id = $_SESSION['admin_id'] ?? 0;
@@ -54,10 +82,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ganti_password'])) {
 
 // Load settings
 $settings = [];
-$q_set = mysqli_query($conn, "SELECT * FROM pengaturan WHERE id=1");
+$q_set = mysqli_query($conn, "SELECT * FROM pengaturan_toko WHERE id=1");
 if ($q_set) $settings = mysqli_fetch_assoc($q_set) ?? [];
 
 $admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
+$logo_path = !empty($settings['logo']) ? '../uploads/toko/' . $settings['logo'] : null;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -78,25 +107,78 @@ $admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
 body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
 a { text-decoration:none; color:inherit; }
 
+/* ── SIDEBAR ── */
 .sidebar { width:240px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:50; }
 .sidebar-logo { padding:24px 24px 20px; border-bottom:1px solid var(--border); }
 .sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:var(--white); }
 .sidebar-logo .logo span { color:var(--accent); }
 .sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:2px; }
-.sidebar-nav { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:2px; }
+.sidebar-nav { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
 .nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:500; color:var(--muted); transition:all .2s; }
 .nav-item:hover { background:var(--surface2); color:var(--text); }
 .nav-item.active { background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(236,72,153,.15)); color:var(--accent); }
 .nav-item i { font-size:16px; width:20px; }
 .nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); padding:14px 14px 6px; font-weight:600; }
+
+/* ── ADMIN CARD + DROPDOWN ── */
 .sidebar-footer { padding:16px 12px; border-top:1px solid var(--border); }
-.admin-card { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--surface2); border-radius:10px; margin-bottom:10px; }
-.admin-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--accent2),var(--pink2)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; }
+.admin-card-wrap { position:relative; margin-bottom:10px; }
+.admin-card {
+    display:flex; align-items:center; gap:10px; padding:10px 12px;
+    background:var(--surface2); border-radius:10px;
+    cursor:pointer; user-select:none;
+    border:1px solid transparent; transition:border-color .2s;
+}
+.admin-card:hover { border-color:var(--accent); }
+.admin-avatar {
+    width:34px; height:34px; border-radius:50%;
+    background:linear-gradient(135deg,var(--accent2),var(--pink2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:13px; color:#fff; flex-shrink:0;
+    overflow:hidden;
+}
+.admin-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.admin-info { flex:1; }
 .admin-info .name { font-size:13px; font-weight:600; color:var(--text); }
 .admin-info .role { font-size:10px; color:var(--muted); }
+.admin-card .chevron { font-size:12px; color:var(--muted); transition:transform .2s; }
+.admin-card.open .chevron { transform:rotate(180deg); }
+
+/* Dropdown */
+.admin-dropdown {
+    display:none; position:absolute; bottom:calc(100% + 8px); left:0; right:0;
+    background:var(--surface2); border:1px solid var(--border); border-radius:12px;
+    overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.4);
+    z-index:100;
+}
+.admin-dropdown.show { display:block; }
+.dropdown-header {
+    padding:12px 14px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:10px;
+}
+.dropdown-header .dh-avatar {
+    width:40px; height:40px; border-radius:50%;
+    background:linear-gradient(135deg,var(--accent2),var(--pink2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:15px; color:#fff; flex-shrink:0; overflow:hidden;
+}
+.dropdown-header .dh-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.dropdown-header .dh-name { font-size:13px; font-weight:600; color:var(--white); }
+.dropdown-header .dh-role { font-size:11px; color:var(--muted); }
+.dropdown-item {
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    font-size:13px; color:var(--text); transition:background .15s; cursor:pointer;
+}
+.dropdown-item:hover { background:rgba(167,139,250,.1); color:var(--accent); }
+.dropdown-item i { font-size:15px; width:18px; }
+.dropdown-item.danger { color:var(--red); }
+.dropdown-item.danger:hover { background:rgba(248,113,113,.1); color:var(--red); }
+.dropdown-divider { height:1px; background:var(--border); margin:2px 0; }
+
 .btn-logout { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:8px; font-size:12px; color:var(--red); transition:background .2s; width:100%; }
 .btn-logout:hover { background:rgba(248,113,113,.1); }
 
+/* ── MAIN ── */
 .main { margin-left:240px; flex:1; display:flex; flex-direction:column; }
 .topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 32px; height:64px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:40; }
 .topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; }
@@ -125,6 +207,28 @@ a { text-decoration:none; color:inherit; }
 .form-textarea { resize:vertical; min-height:80px; }
 .form-input::placeholder, .form-textarea::placeholder { color:var(--muted); }
 
+/* ── LOGO UPLOAD ── */
+.logo-upload-wrap { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+.logo-preview {
+    width:80px; height:80px; border-radius:12px; flex-shrink:0;
+    background:var(--surface2); border:2px dashed var(--border);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden; position:relative; cursor:pointer; transition:border-color .2s;
+}
+.logo-preview:hover { border-color:var(--accent); }
+.logo-preview img { width:100%; height:100%; object-fit:cover; border-radius:10px; }
+.logo-preview .logo-placeholder { font-size:28px; color:var(--muted); }
+.logo-upload-info { flex:1; }
+.logo-upload-info p { font-size:12px; color:var(--muted); line-height:1.5; }
+.btn-upload-logo {
+    display:inline-flex; align-items:center; gap:6px; margin-top:8px;
+    padding:7px 14px; border-radius:7px; background:var(--surface2);
+    border:1px solid var(--border); font-size:12px; color:var(--accent);
+    cursor:pointer; font-family:'DM Sans',sans-serif; transition:border-color .2s;
+}
+.btn-upload-logo:hover { border-color:var(--accent); background:rgba(167,139,250,.08); }
+#inputLogo { display:none; }
+
 .btn-save {
     display:inline-flex; align-items:center; gap:8px;
     padding:10px 22px; border-radius:8px;
@@ -142,7 +246,6 @@ a { text-decoration:none; color:inherit; }
 .alert.error   { background:rgba(248,113,113,.15); color:var(--red);   border:1px solid rgba(248,113,113,.3); }
 
 .divider { height:1px; background:var(--border); margin:20px 0; }
-
 .info-box { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; font-size:12px; color:var(--muted); line-height:1.6; }
 .info-box i { color:var(--accent); margin-right:4px; }
 
@@ -158,23 +261,67 @@ a { text-decoration:none; color:inherit; }
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
-        <a href="dashboard.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
-        <a href="produk.php" class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
-        <a href="pesanan.php" class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="pembeli.php" class="nav-item"><i class="bi bi-people"></i> Pembeli</a>
+        <a href="dashboard.php"  class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+        <a href="produk.php"     class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
+        <a href="pesanan.php"    class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
+        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat</a>
+        <a href="nego.php" class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
         <div class="nav-section">Lainnya</div>
-        <a href="ulasan.php" class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
+        <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
         <a href="pengaturan.php" class="nav-item active"><i class="bi bi-gear"></i> Pengaturan</a>
     </nav>
+
     <div class="sidebar-footer">
-        <div class="admin-card">
-            <div class="admin-avatar"><?= strtoupper(substr($admin_nama, 0, 1)) ?></div>
-            <div class="admin-info">
-                <div class="name"><?= escape($admin_nama) ?></div>
-                <div class="role">Administrator</div>
+
+        <!-- ADMIN CARD (CLICKABLE) -->
+        <div class="admin-card-wrap">
+            <!-- Dropdown (muncul di atas) -->
+            <div class="admin-dropdown" id="adminDropdown">
+                <div class="dropdown-header">
+                    <div class="dh-avatar">
+                        <?php if ($logo_path && file_exists($logo_path)): ?>
+                            <img src="<?= escape($logo_path) ?>" alt="logo">
+                        <?php else: ?>
+                            <?= strtoupper(substr($admin_nama, 0, 1)) ?>
+                        <?php endif; ?>
+                    </div>
+                    <div>
+                        <div class="dh-name"><?= escape($admin_nama) ?></div>
+                        <div class="dh-role">Administrator</div>
+                    </div>
+                </div>
+                <a href="pengaturan.php" class="dropdown-item">
+                    <i class="bi bi-gear"></i> Pengaturan Akun
+                </a>
+                <a href="../pages/home.php" class="dropdown-item" target="_blank">
+                    <i class="bi bi-shop"></i> Lihat Toko
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="../auth/logout_admin.php" class="dropdown-item danger">
+                    <i class="bi bi-box-arrow-left"></i> Keluar
+                </a>
+            </div>
+
+            <!-- Card yang diklik -->
+            <div class="admin-card" id="adminCardBtn" onclick="toggleDropdown()">
+                <div class="admin-avatar">
+                    <?php if ($logo_path && file_exists($logo_path)): ?>
+                        <img src="<?= escape($logo_path) ?>" alt="logo">
+                    <?php else: ?>
+                        <?= strtoupper(substr($admin_nama, 0, 1)) ?>
+                    <?php endif; ?>
+                </div>
+                <div class="admin-info">
+                    <div class="name"><?= escape($admin_nama) ?></div>
+                    <div class="role">Administrator</div>
+                </div>
+                <i class="bi bi-chevron-up chevron"></i>
             </div>
         </div>
-        <a href="../auth/logout_admin.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+
+        <a href="../auth/logout_admin.php" class="btn-logout">
+            <i class="bi bi-box-arrow-left"></i> Keluar
+        </a>
     </div>
 </aside>
 
@@ -183,7 +330,7 @@ a { text-decoration:none; color:inherit; }
         <div class="topbar-title">Pengaturan</div>
         <div class="topbar-right">
             <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
-            <a href="../index.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
+            <a href="../pages/home.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
         </div>
     </div>
 
@@ -205,11 +352,35 @@ a { text-decoration:none; color:inherit; }
                     <p>Atur tampilan dan info toko Anda</p>
                 </div>
                 <div class="card-body">
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="update_toko" value="1">
+
+                        <!-- LOGO UPLOAD -->
+                        <div class="form-group">
+                            <label class="form-label">Logo / Foto Toko</label>
+                            <div class="logo-upload-wrap">
+                                <div class="logo-preview" onclick="document.getElementById('inputLogo').click()" title="Klik untuk ganti logo">
+                                    <?php if ($logo_path && file_exists($logo_path)): ?>
+                                        <img src="<?= escape($logo_path) ?>" alt="Logo Toko" id="logoImg">
+                                    <?php else: ?>
+                                        <i class="bi bi-shop logo-placeholder" id="logoPlaceholder"></i>
+                                        <img src="" alt="" id="logoImg" style="display:none;">
+                                    <?php endif; ?>
+                                </div>
+                                <div class="logo-upload-info">
+                                    <p>Ukuran disarankan <strong>300×300px</strong>.<br>Format: JPG, PNG, atau WEBP.<br>Maks. ukuran file 2MB.</p>
+                                    <label class="btn-upload-logo" for="inputLogo">
+                                        <i class="bi bi-upload"></i> Pilih Gambar
+                                    </label>
+                                </div>
+                            </div>
+                            <input type="file" name="logo" id="inputLogo" accept="image/*" onchange="previewLogo(this)">
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label">Nama Toko</label>
-                            <input type="text" name="nama_toko" class="form-input" placeholder="Cloudy Girls" value="<?= escape($settings['nama_toko'] ?? '') ?>">
+                            <input type="text" name="nama_toko" class="form-input" placeholder="Cloudy Girls"
+                                value="<?= escape($settings['nama_toko'] ?? '') ?>">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Deskripsi Toko</label>
@@ -217,7 +388,8 @@ a { text-decoration:none; color:inherit; }
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nomor WhatsApp / HP</label>
-                            <input type="text" name="no_hp" class="form-input" placeholder="08xxxxxxxxxx" value="<?= escape($settings['no_hp'] ?? '') ?>">
+                            <input type="text" name="no_hp" class="form-input" placeholder="08xxxxxxxxxx"
+                                value="<?= escape($settings['no_hp'] ?? '') ?>">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Alamat Toko</label>
@@ -225,7 +397,8 @@ a { text-decoration:none; color:inherit; }
                         </div>
                         <div class="form-group">
                             <label class="form-label">Instagram</label>
-                            <input type="text" name="instagram" class="form-input" placeholder="@cloudygirls" value="<?= escape($settings['instagram'] ?? '') ?>">
+                            <input type="text" name="instagram" class="form-input" placeholder="@cloudygirls"
+                                value="<?= escape($settings['instagram'] ?? '') ?>">
                         </div>
                         <button type="submit" class="btn-save">
                             <i class="bi bi-floppy"></i> Simpan Pengaturan
@@ -277,19 +450,48 @@ a { text-decoration:none; color:inherit; }
                             <div style="margin-top:6px;"><i class="bi bi-person-badge"></i> <strong>Admin:</strong> <?= escape($admin_nama) ?></div>
                             <div style="margin-top:6px;"><i class="bi bi-server"></i> <strong>PHP:</strong> <?= phpversion() ?></div>
                         </div>
-                        <div class="divider"></div>
-                        <div class="info-box" style="color:var(--yellow);background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.2);">
-                            <i class="bi bi-exclamation-triangle"></i>
-                            Pastikan tabel <strong>pengaturan</strong> memiliki kolom: <code>id, nama_toko, deskripsi, no_hp, alamat, instagram</code>
-                        </div>
                     </div>
                 </div>
 
-            </div>
+            </div><!-- end kanan -->
 
-        </div>
-    </div>
-</div>
+        </div><!-- end grid-2 -->
+    </div><!-- end content -->
+</div><!-- end main -->
+
+<script>
+// ── Preview logo sebelum upload ──
+function previewLogo(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('logoImg');
+            const placeholder = document.getElementById('logoPlaceholder');
+            img.src = e.target.result;
+            img.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// ── Toggle dropdown admin ──
+function toggleDropdown() {
+    const dropdown = document.getElementById('adminDropdown');
+    const card     = document.getElementById('adminCardBtn');
+    dropdown.classList.toggle('show');
+    card.classList.toggle('open');
+}
+
+// Tutup dropdown kalau klik di luar
+document.addEventListener('click', function(e) {
+    const wrap = document.querySelector('.admin-card-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('adminDropdown').classList.remove('show');
+        document.getElementById('adminCardBtn').classList.remove('open');
+    }
+});
+</script>
 
 </body>
 </html>

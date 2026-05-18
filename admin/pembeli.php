@@ -12,6 +12,9 @@ function formatRupiah($angka) { return 'Rp ' . number_format($angka, 0, ',', '.'
 // Handle delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     $id = (int)$_POST['delete_id'];
+    mysqli_query($conn, "DELETE FROM ulasan WHERE pembeli_id=$id");
+    mysqli_query($conn, "DELETE FROM wishlist WHERE pembeli_id=$id");
+    mysqli_query($conn, "DELETE FROM pesanan WHERE pembeli_id=$id");
     mysqli_query($conn, "DELETE FROM pembeli WHERE id=$id");
     header("Location: pembeli.php?msg=deleted"); exit;
 }
@@ -145,7 +148,7 @@ tr:hover td { background:var(--surface2); }
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
-        <a href="dashboard.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+        <a href="dashboard_admin.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <a href="produk.php" class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
         <a href="pesanan.php" class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
         <a href="pembeli.php" class="nav-item active"><i class="bi bi-people"></i> Pembeli</a>

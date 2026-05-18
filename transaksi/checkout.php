@@ -38,8 +38,21 @@ $stmt2->close();
 
 // Nego belum tersedia
 $nego = null;
+$nego_id = (int)($_GET['nego_id'] ?? 0);
 
-$harga_produk   = $produk['harga'];
+if ($nego_id) {
+    $stmt_nego = $conn->prepare("
+        SELECT * FROM nego_harga 
+        WHERE id = ? AND pembeli_id = ? AND produk_id = ? AND status = 'disetujui'
+        LIMIT 1
+    ");
+    $stmt_nego->bind_param("iii", $nego_id, $pembeli_id, $produk_id);
+    $stmt_nego->execute();
+    $nego = $stmt_nego->get_result()->fetch_assoc();
+    $stmt_nego->close();
+}
+
+$harga_produk   = $nego ? (float)$nego['harga_deal'] : (float)$produk['harga'];
 $ada_diskon     = $harga_produk > 50000;
 $diskon_nominal = $ada_diskon ? 10000 : 0;
 ?>
@@ -445,10 +458,10 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             <div class="cj-desc">Sepakati lokasi temu</div>
           </div>
           <div class="cod-jenis-card" onclick="pilihCODJenis('antar')">
-            <div class="cj-icon">🏠</div>
-            <div class="cj-label">Antar ke Rumah</div>
-            <div class="cj-desc">Diantar ke alamatmu</div>
-          </div>
+  <div class="cj-icon">🏪</div>
+  <div class="cj-label">Beli ke Rumah Penjual</div>
+  <div class="cj-desc">Datang langsung ke tempat kami</div>
+</div>
         </div>
 
         <div class="form-group">
@@ -457,7 +470,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
         </div>
         <div class="form-group">
           <label>Catatan untuk Penjual</label>
-          <textarea name="catatan" placeholder="Waktu yang diinginkan, patokan, dll."></textarea>
+          <textarea name="catatan" placeholder="Contoh: jam berapa kamu akan datang, patokan, dll."></textarea>
         </div>
       </div>
 

@@ -226,11 +226,6 @@ if (isset($conn)) {
         Cloudy <span>Girls</span>
     </a>
 
-    <!-- LINKS TENGAH -->
-    <div class="navbar-links">
-        <a href="../pages/home.php" class="<?= (basename($_SERVER['PHP_SELF']) === 'home.php') ? 'active' : '' ?>">Beranda</a>
-        <a href="../pages/katalog.php" class="<?= (basename($_SERVER['PHP_SELF']) === 'katalog.php') ? 'active' : '' ?>">Katalog</a>
-    </div>
 
     <!-- AKSI KANAN -->
     <div class="navbar-actions">
