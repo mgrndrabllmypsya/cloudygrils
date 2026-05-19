@@ -3,7 +3,7 @@ session_start();
 require_once '../config/koneksi.php';
 
 if (!isset($_SESSION['admin_login']) || !$_SESSION['admin_login']) {
-    header("Location: ../auth/login_admin.php"); exit;
+     header("Location: ../auth/login.php"); exit;
 }
 
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
@@ -46,41 +46,91 @@ $admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --bg:#0F0E17; --surface:#1A1825; --surface2:#232136; --border:#2E2B3D;
-    --accent:#A78BFA; --accent2:#7C3AED; --pink:#F9A8D4; --pink2:#EC4899;
-    --green:#34D399; --yellow:#FBBF24; --red:#F87171;
-    --text:#E2E0F0; --muted:#6B6880; --white:#FFFFFF;
+    --bg:       #FFF5F8;
+    --surface:  #FFFFFF;
+    --surface2: #FFF0F5;
+    --border:   #FFB6D0;
+    --accent:   #FF4081;
+    --accent2:  #F50057;
+    --pink:     #FF80AB;
+    --pink2:    #FF4081;
+    --green:    #00BFA5;
+    --yellow:   #FFB300;
+    --red:      #FF1744;
+    --text:     #1A1A1A;
+    --text2:    #444444;
+    --muted:    #AAAAAA;
+    --white:    #FFFFFF;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
-a { text-decoration:none; color:inherit; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+}
+body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle, #FFB6D0 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: .15;
+    pointer-events: none;
+    z-index: 0;
+}
+a { text-decoration: none; color: inherit; }
 
-.sidebar { width:240px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:50; }
-.sidebar-logo { padding:24px 24px 20px; border-bottom:1px solid var(--border); }
-.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:var(--white); }
-.sidebar-logo .logo span { color:var(--accent); }
-.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:2px; }
-.sidebar-nav { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:2px; }
-.nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:500; color:var(--muted); transition:all .2s; }
-.nav-item:hover { background:var(--surface2); color:var(--text); }
-.nav-item.active { background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(236,72,153,.15)); color:var(--accent); }
-.nav-item i { font-size:16px; width:20px; }
-.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); padding:14px 14px 6px; font-weight:600; }
-.sidebar-footer { padding:16px 12px; border-top:1px solid var(--border); }
-.admin-card { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--surface2); border-radius:10px; margin-bottom:10px; }
-.admin-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--accent2),var(--pink2)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; }
-.admin-info .name { font-size:13px; font-weight:600; color:var(--text); }
-.admin-info .role { font-size:10px; color:var(--muted); }
-.btn-logout { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:8px; font-size:12px; color:var(--red); transition:background .2s; width:100%; }
-.btn-logout:hover { background:rgba(248,113,113,.1); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+    width: 240px;
+    background: linear-gradient(180deg, #FF80AB 0%, #FF4081 45%, #F50057 100%);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+    box-shadow: 4px 0 28px rgba(255,64,129,.3);
+}
+.sidebar-logo {
+    padding: 24px 24px 20px;
+    border-bottom: 1.5px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.12);
+}
+.sidebar-logo .logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #fff; }
+.sidebar-logo .logo span { color: #FFE4EE; }
+.sidebar-logo small { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 2px; }
+.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.8); transition: all .2s; }
+.nav-item:hover { background: rgba(255,255,255,.2); color: #fff; }
+.nav-item.active { background: rgba(255,255,255,.28); color: #fff; font-weight: 600; border-left: 3px solid #fff; }
+.nav-item i { font-size: 16px; width: 20px; }
+.nav-section { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.55); padding: 14px 14px 6px; font-weight: 600; }
+.sidebar-footer { padding: 16px 12px; border-top: 1.5px solid rgba(255,255,255,.2); background: rgba(0,0,0,.1); }
+.admin-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,.18); border-radius: 10px; margin-bottom: 10px; border: 1.5px solid rgba(255,255,255,.3); }
+.admin-avatar { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; border: 2px solid rgba(255,255,255,.5); overflow: hidden; }
+.admin-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.admin-info .name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-info .role { font-size: 10px; color: rgba(255,255,255,.65); }
+.btn-logout { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; font-size: 12px; color: rgba(255,255,255,.85); transition: background .2s; width: 100%; }
+.btn-logout:hover { background: rgba(255,255,255,.2); color: #fff; }
+
 
 .main { margin-left:240px; flex:1; display:flex; flex-direction:column; }
-.topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 32px; height:64px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:40; }
-.topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; }
-.topbar-right { display:flex; align-items:center; gap:12px; }
-.topbar-date { font-size:12px; color:var(--muted); }
-.btn-toko { display:flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); font-size:12px; font-weight:500; color:var(--text); transition:border-color .2s; }
-.btn-toko:hover { border-color:var(--accent); color:var(--accent); }
+/* ── TOPBAR ── */
+.topbar {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 32px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 40;
+    box-shadow: 0 2px 12px rgba(255,64,129,.07);
+}
+.topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-date { font-size: 12px; color: var(--muted); }
+.btn-toko { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: linear-gradient(135deg,#FF80AB,#FF4081); font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 3px 12px rgba(255,64,129,.35); transition: opacity .2s; }
+.btn-toko:hover { opacity: .88; }
+
 
 .content { padding:28px 32px; flex:1; }
 

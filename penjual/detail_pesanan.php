@@ -3,7 +3,7 @@ session_start();
 require_once '../config/koneksi.php';
 
 if (!isset($_SESSION['admin_login']) || !$_SESSION['admin_login']) {
-    header("Location: ../auth/login_admin.php"); exit;
+     header("Location: ../auth/login.php"); exit;
 }
 
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
@@ -14,6 +14,40 @@ if (!$id) { header("Location: pesanan.php"); exit; }
 
 // ── BINDERBYTE API KEY ──────────────────────────────────────────────────────
 define('BINDERBYTE_KEY', '490283e20418abefb57d61aac39b1d4f7753f97d3f7dd3c3aba9c9c98bdcd7a5');
+
+// ── FUNGSI RESOLVE NAMA WILAYAH dari BinderByte ─────────────────────────────
+function getWilayahName($type, $id, $parent_id = null) {
+    if (!$id) return '-';
+
+    $key = BINDERBYTE_KEY;
+    $url = match($type) {
+        'provinsi'  => "https://api.binderbyte.com/wilayah/provinsi?api_key=$key",
+        'kabupaten' => "https://api.binderbyte.com/wilayah/kabupaten?api_key=$key&id_provinsi=" . urlencode($parent_id),
+        'kecamatan' => "https://api.binderbyte.com/wilayah/kecamatan?api_key=$key&id_kabupaten=" . urlencode($parent_id),
+        default     => null
+    };
+
+    if (!$url) return $id;
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    if (!$response) return $id; // fallback ke ID jika koneksi gagal
+
+    $json = json_decode($response, true);
+    if (!isset($json['value']) || !is_array($json['value'])) return $id;
+
+    foreach ($json['value'] as $item) {
+        if ((string)$item['id'] === (string)$id) {
+            return $item['name'];
+        }
+    }
+
+    return $id; // fallback jika tidak ditemukan
+}
 
 // Mapping nama kurir ke kode BinderByte
 $kurir_map = [
@@ -97,10 +131,39 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, "
 
 if (!$row) { header("Location: pesanan.php"); exit; }
 
+// ── RESOLVE NAMA WILAYAH via BinderByte ────────────────────────────────────
+// Hanya resolve jika nilainya tampak seperti ID numerik (bukan sudah berupa nama)
+function isWilayahId($val) {
+    return $val && preg_match('/^\d[\d\.]*$/', trim($val));
+}
+
+$nama_provinsi  = '-';
+$nama_kota      = '-';
+$nama_kecamatan = '-';
+
+if (!empty($row['provinsi'])) {
+    $nama_provinsi = isWilayahId($row['provinsi'])
+        ? getWilayahName('provinsi', $row['provinsi'])
+        : $row['provinsi'];
+}
+
+if (!empty($row['kota_tujuan'])) {
+    $nama_kota = isWilayahId($row['kota_tujuan'])
+        ? getWilayahName('kabupaten', $row['kota_tujuan'], $row['provinsi'])
+        : $row['kota_tujuan'];
+}
+
+if (!empty($row['kecamatan'])) {
+    $nama_kecamatan = isWilayahId($row['kecamatan'])
+        ? getWilayahName('kecamatan', $row['kecamatan'], $row['kota_tujuan'])
+        : $row['kecamatan'];
+}
+
+// ── VARIABEL HALAMAN ────────────────────────────────────────────────────────
 $admin_nama  = $_SESSION['admin_nama'] ?? 'Admin';
 $status      = $row['status'];
 $st_transfer = $row['status_transfer'];
-$is_cod      = ($row['metode'] === 'cod'); // ← helper COD
+$is_cod      = ($row['metode'] === 'cod');
 
 $status_label = match($status) {
     'menunggu'     => 'Menunggu',
@@ -114,7 +177,6 @@ $status_label = match($status) {
 
 // ── STATUS LIST sesuai metode pembayaran ───────────────────────────────────
 if ($is_cod) {
-    // COD tidak perlu 'dikonfirmasi' (tidak ada transfer)
     $all_status = ['menunggu','diproses','dikirim','selesai','dibatalkan'];
 } else {
     $all_status = ['menunggu','dikonfirmasi','diproses','dikirim','selesai','dibatalkan'];
@@ -309,6 +371,11 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
 .selesai-box{background:rgba(52,211,153,.07);border:1.5px solid rgba(52,211,153,.4);border-radius:10px;padding:16px;margin-bottom:4px;}
 .selesai-box-title{font-size:13px;color:var(--green);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .selesai-box-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;}
+
+/* WILAYAH LOADING */
+.wilayah-loading{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-style:italic;}
+.wilayah-loading i{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -445,7 +512,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
         </div>
         <?php endif; ?>
 
-        <!-- ── AKSI: TANDAI SELESAI oleh Admin (muncul saat status = dikirim) ── -->
+        <!-- AKSI: TANDAI SELESAI oleh Admin (muncul saat status = dikirim) -->
         <?php if ($status === 'dikirim'): ?>
         <div class="card" style="border-color:rgba(52,211,153,.5);">
             <div class="card-head" style="background:rgba(52,211,153,.08);">
@@ -535,7 +602,6 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             </span>
                         </div>
 
-                        <!-- Ekspedisi: hanya tampil untuk non-COD -->
                         <?php if (!$is_cod): ?>
                         <div class="info-row">
                             <span class="info-label">Ekspedisi</span>
@@ -550,7 +616,6 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                         </div>
                         <?php endif; ?>
 
-                        <!-- Status transfer: hanya untuk non-COD -->
                         <?php if (!$is_cod && $st_transfer): ?>
                         <div class="info-row">
                             <span class="info-label">Status Transfer</span>
@@ -641,7 +706,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     </div>
                 </div>
 
-                <!-- ALAMAT PENGIRIMAN: hanya non-COD -->
+                <!-- ── ALAMAT PENGIRIMAN (hanya non-COD) ── -->
                 <?php if (!$is_cod && ($row['nama_penerima'] || $row['kota_tujuan'])): ?>
                 <div class="card">
                     <div class="card-head">
@@ -658,16 +723,49 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             <span class="info-val"><?= escape($row['no_hp_penerima'] ?? '-') ?></span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Kota</span>
-                            <span class="info-val"><?= escape($row['kota_tujuan'] ?? '-') ?></span>
+                            <span class="info-label">Provinsi</span>
+                            <span class="info-val">
+                                <?php if ($nama_provinsi && $nama_provinsi !== $row['provinsi']): ?>
+                                    <?= escape($nama_provinsi) ?>
+                                <?php elseif ($nama_provinsi === $row['provinsi'] && isWilayahId($row['provinsi'])): ?>
+                                    <span style="color:var(--yellow);font-size:11px;">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        ID: <?= escape($row['provinsi']) ?> (gagal resolve)
+                                    </span>
+                                <?php else: ?>
+                                    <?= escape($nama_provinsi) ?>
+                                <?php endif; ?>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Kota / Kabupaten</span>
+                            <span class="info-val">
+                                <?php if ($nama_kota && $nama_kota !== $row['kota_tujuan']): ?>
+                                    <?= escape($nama_kota) ?>
+                                <?php elseif ($nama_kota === $row['kota_tujuan'] && isWilayahId($row['kota_tujuan'])): ?>
+                                    <span style="color:var(--yellow);font-size:11px;">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        ID: <?= escape($row['kota_tujuan']) ?> (gagal resolve)
+                                    </span>
+                                <?php else: ?>
+                                    <?= escape($nama_kota) ?>
+                                <?php endif; ?>
+                            </span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Kecamatan</span>
-                            <span class="info-val"><?= escape($row['kecamatan'] ?? '-') ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Provinsi</span>
-                            <span class="info-val"><?= escape($row['provinsi'] ?? '-') ?></span>
+                            <span class="info-val">
+                                <?php if ($nama_kecamatan && $nama_kecamatan !== $row['kecamatan']): ?>
+                                    <?= escape($nama_kecamatan) ?>
+                                <?php elseif ($nama_kecamatan === $row['kecamatan'] && isWilayahId($row['kecamatan'])): ?>
+                                    <span style="color:var(--yellow);font-size:11px;">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        ID: <?= escape($row['kecamatan']) ?> (gagal resolve)
+                                    </span>
+                                <?php else: ?>
+                                    <?= escape($nama_kecamatan) ?>
+                                <?php endif; ?>
+                            </span>
                         </div>
                         <?php if ($row['detail_alamat']): ?>
                         <div class="info-row">
@@ -697,7 +795,6 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     <div class="card-body">
 
                         <?php if ($is_cod): ?>
-                            <!-- ── INFO COD ── -->
                             <div class="cod-box">
                                 <div class="cod-box-title"><i class="bi bi-cash-coin"></i> Metode: COD (Bayar di Tempat)</div>
                                 <div class="cod-box-row"><i class="bi bi-geo-alt-fill"></i> Area pengantaran: <strong>Banyuwangi Kota</strong></div>
@@ -724,7 +821,6 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             <?php endif; ?>
 
                         <?php else: ?>
-                            <!-- ── FORM RESI (non-COD) ── -->
                             <div class="info-row">
                                 <span class="info-label">Kurir Dipilih Pembeli</span>
                                 <span class="info-val" style="color:var(--accent);font-weight:700;">
@@ -999,7 +1095,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
     </div>
 </div>
 
-<!-- MODAL TOLAK TRANSFER (hanya untuk non-COD) -->
+<!-- MODAL TOLAK TRANSFER -->
 <?php if (!$is_cod): ?>
 <div class="overlay" id="modalTolak">
     <div class="modal-box">

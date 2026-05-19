@@ -33,8 +33,8 @@ mysqli_stmt_close($stmt2);
 
 $hash = password_hash($password, PASSWORD_DEFAULT);
 
-$stmt3 = mysqli_prepare($conn, "INSERT INTO pembeli (nama, username, email, password, created_at) VALUES (?,?,?,?,?,NOW())");
-mysqli_stmt_bind_param($stmt3, "sssss", $nama, $username, $email, $hash, $no_hp);
+$stmt3 = mysqli_prepare($conn, "INSERT INTO pembeli (nama, username, email, password, created_at) VALUES (?,?,?,?,NOW())");
+mysqli_stmt_bind_param($stmt3, "ssss", $nama, $username, $email, $hash);
 
 if (mysqli_stmt_execute($stmt3)) {
     $user_id = mysqli_insert_id($conn);

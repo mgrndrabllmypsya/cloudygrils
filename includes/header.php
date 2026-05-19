@@ -271,7 +271,7 @@ if (isset($conn)) {
                     </div>
                     <div class="dd-info">
                         <div class="dd-name"><?= htmlspecialchars($nama_user, ENT_QUOTES) ?></div>
-                        <div class="dd-role">Pembeli</div>
+                     
                     </div>
                 </div>
 

@@ -3,7 +3,7 @@ session_start();
 require_once '../config/koneksi.php';
 
 if (!isset($_SESSION['admin_login']) || !$_SESSION['admin_login']) {
-    header("Location: ../auth/login_admin.php"); exit;
+      header("Location: ../auth/login.php"); exit;
 }
 
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_toko'])) {
     $no_hp      = mysqli_real_escape_string($conn, $_POST['no_hp']      ?? '');
     $alamat     = mysqli_real_escape_string($conn, $_POST['alamat']     ?? '');
     $instagram  = mysqli_real_escape_string($conn, $_POST['instagram']  ?? '');
+    $maps_url   = mysqli_real_escape_string($conn, $_POST['maps_url']   ?? '');
 
     // Handle upload logo
     $logo_sql = '';
@@ -42,16 +43,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_toko'])) {
         $exist = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pengaturan_toko"));
         if ($exist && $exist[0] > 0) {
             mysqli_query($conn, "UPDATE pengaturan_toko SET
-                nama_toko='$nama_toko',
-                deskripsi='$deskripsi',
-                no_hp='$no_hp',
-                alamat='$alamat',
-                instagram='$instagram'
-                $logo_sql
-                WHERE id=1");
+            nama_toko='$nama_toko',
+            deskripsi='$deskripsi',
+            no_hp='$no_hp',
+            alamat='$alamat',
+            instagram='$instagram',
+            maps_url='$maps_url'
+            $logo_sql
+         WHERE id=1");
         } else {
-            mysqli_query($conn, "INSERT INTO pengaturan_toko (nama_toko, deskripsi, no_hp, alamat, instagram)
-                VALUES ('$nama_toko','$deskripsi','$no_hp','$alamat','$instagram')");
+            mysqli_query($conn, "INSERT INTO pengaturan_toko (nama_toko, deskripsi, no_hp, alamat, instagram, maps_url)
+                VALUES ('$nama_toko','$deskripsi','$no_hp','$alamat','$instagram','$maps_url')");
         }
         $msg = 'Pengaturan toko berhasil disimpan.';
         $msg_type = 'success';
@@ -400,6 +402,23 @@ a { text-decoration:none; color:inherit; }
                             <input type="text" name="instagram" class="form-input" placeholder="@cloudygirls"
                                 value="<?= escape($settings['instagram'] ?? '') ?>">
                         </div>
+                        <div class="form-group">
+    <label class="form-label">Link Google Maps Toko</label>
+    <input type="url" name="maps_url" class="form-input"
+           placeholder="https://maps.app.goo.gl/xxxxx"
+           value="<?= escape($settings['maps_url'] ?? '') ?>">
+    <div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);border-radius:8px;padding:10px 12px;margin-top:6px;">
+        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:4px;">
+            <i class="bi bi-question-circle"></i> Cara dapat link Google Maps:
+        </div>
+        <ol style="font-size:11px;color:var(--muted);padding-left:14px;line-height:1.9;margin:0;">
+            <li>Buka <strong>Google Maps</strong> di HP</li>
+            <li>Cari atau tandai lokasi toko/rumahmu</li>
+            <li>Tap <strong>Bagikan</strong> → <strong>Salin link</strong></li>
+            <li>Tempel link di kolom di atas</li>
+        </ol>
+    </div>
+</div>
                         <button type="submit" class="btn-save">
                             <i class="bi bi-floppy"></i> Simpan Pengaturan
                         </button>

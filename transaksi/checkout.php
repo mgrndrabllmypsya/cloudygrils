@@ -23,7 +23,7 @@ $stmt->bind_param("i", $produk_id);
 $stmt->execute();
 $produk = $stmt->get_result()->fetch_assoc();
 $stmt->close();
-
+$toko = mysqli_fetch_assoc(mysqli_query($conn, "SELECT alamat, maps_url FROM pengaturan_toko WHERE id=1"));
 if (!$produk) {
     echo "Produk tidak ditemukan.";
     exit;
@@ -465,9 +465,28 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
         </div>
 
         <div class="form-group">
-          <label>Lokasi / Titik Temu <span class="req">*</span></label>
-          <input type="text" name="lokasi_cod" id="lokasi_cod" placeholder="Contoh: Alfamart Jl. Gajah Mada / Alamat lengkap rumah">
-        </div>
+  <label>Lokasi / Titik Temu <span class="req">*</span></label>
+  <input type="text" name="lokasi_cod" id="lokasi_cod" placeholder="Contoh: Alfamart Jl. Gajah Mada / Alamat lengkap rumah">
+</div>
+
+<!-- TAMBAH INI -->
+<div id="maps-btn-wrap" style="display:none; margin-top:8px; margin-bottom:12px;">
+    <a id="maps-link" href="#" target="_blank"
+       style="display:flex;align-items:center;justify-content:center;gap:8px;
+              width:100%;padding:11px;border-radius:10px;
+              background:linear-gradient(135deg,#1A73E8,#1557B0);
+              color:#fff;font-size:13px;font-weight:600;text-decoration:none;
+              box-shadow:0 3px 10px rgba(26,115,232,.25);transition:opacity .2s;"
+       onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+        Buka Lokasi di Google Maps
+    </a>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px;">
+        <i>Area Banyuwangi Kota</i>
+    </div>
+</div>
         <div class="form-group">
           <label>Catatan untuk Penjual</label>
           <textarea name="catatan" placeholder="Contoh: jam berapa kamu akan datang, patokan, dll."></textarea>
@@ -664,13 +683,32 @@ function pilihMetode(m) {
 }
 
 // ── COD Jenis ──
+// GANTI fungsi pilihCODJenis yang lama dengan ini:
 function pilihCODJenis(j) {
   document.getElementById('inp_cod_jenis').value = j;
   document.querySelectorAll('.cod-jenis-card').forEach(el => el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
-  document.getElementById('lokasi_cod').placeholder = j === 'temu'
-    ? 'Contoh: Alfamart Jl. Gajah Mada (dekat SPBU)'
-    : 'Alamat lengkap rumah + patokan';
+
+  if (j === 'temu') {
+    document.getElementById('lokasi_cod').placeholder = 'Contoh: Alfamart Jl. Gajah Mada (dekat SPBU)';
+    document.getElementById('lokasi_cod').readOnly = false;
+    document.getElementById('lokasi_cod').value = '';
+    document.getElementById('maps-btn-wrap').style.display = 'none';
+  } else {
+    // Rumah penjual — isi otomatis dari data toko
+    const alamat = <?= json_encode($toko['alamat'] ?? '') ?>;
+    const mapsUrl = <?= json_encode($toko['maps_url'] ?? '') ?>;
+    document.getElementById('lokasi_cod').value = alamat || 'Rumah Penjual';
+    document.getElementById('lokasi_cod').readOnly = true;
+    // Tampilkan tombol maps kalau ada
+    const mapsWrap = document.getElementById('maps-btn-wrap');
+    if (mapsUrl) {
+      document.getElementById('maps-link').href = mapsUrl;
+      mapsWrap.style.display = 'block';
+    } else {
+      mapsWrap.style.display = 'none';
+    }
+  }
   cekSubmit();
 }
 

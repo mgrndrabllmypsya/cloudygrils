@@ -56,16 +56,22 @@ if (!$user) {
 
 // ── Simpan session ────────────────────────────────────
 session_regenerate_id(true);
-$_SESSION['user_id']    = $user['id'];
-$_SESSION['user_nama']  = $user['nama'];
-$_SESSION['user_email'] = $user['email'];
-$_SESSION['user_role']  = $role;
-$_SESSION['login']      = true;
 
 if ($role === 'penjual') {
-    $_SESSION['admin_login']   = true;
-    $_SESSION['penjual_id']    = $user['id'];
-    $_SESSION['penjual_nama']  = $user['nama'];
+    // Session khusus penjual
+    $_SESSION['admin_login']  = true;
+    $_SESSION['penjual_id']   = $user['id'];
+    $_SESSION['penjual_nama'] = $user['nama'];
+    $_SESSION['user_role']    = 'penjual';
+    // JANGAN timpa user_id dan login pembeli
+} else {
+    // Session khusus pembeli
+    $_SESSION['user_id']    = $user['id'];
+    $_SESSION['user_nama']  = $user['nama'];
+    $_SESSION['user_email'] = $user['email'];
+    $_SESSION['user_role']  = 'pembeli';
+    $_SESSION['login']      = true;
+    $_SESSION['nama']       = $user['nama'];
 }
 
 // ── Redirect sesuai role ──────────────────────────────

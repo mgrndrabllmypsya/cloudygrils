@@ -34,7 +34,7 @@ if (!$pesanan) { echo "Pesanan tidak ditemukan."; exit; }
         .info-box { background: var(--bg); border-radius: 12px; padding: 1rem 1.25rem; text-align: left; margin-bottom: 1.5rem; }
         .info-row { display: flex; justify-content: space-between; font-size: .88rem; margin-bottom: .45rem; }
         .info-row:last-child { margin-bottom: 0; }
-        .info-row span:last-child { font-weight: 600; }
+        .info-row span:last-child { font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; }
         .info-row.total span:last-child { color: var(--pink); font-size: 1rem; }
         .note { font-size: .82rem; color: #6b7280; margin-bottom: 1.5rem; }
         .btn { display: block; padding: .85rem; border-radius: 10px; font-family: inherit; font-weight: 600; font-size: .95rem; cursor: pointer; text-decoration: none; margin-bottom: .6rem; transition: all .2s; }
@@ -52,7 +52,7 @@ if (!$pesanan) { echo "Pesanan tidak ditemukan."; exit; }
         <div class="info-row"><span>Produk</span><span><?= htmlspecialchars($pesanan['nama_produk']) ?></span></div>
         <div class="info-row"><span>Metode</span><span><?= strtoupper($pesanan['metode']) ?></span></div>
         <?php if ($pesanan['metode'] === 'transfer'): ?>
-        <div class="info-row"><span>Ekspedisi</span><span><?= htmlspecialchars($pesanan['catatan'] ?? '-') ?></span></div>
+        <div class="info-row"><span>Ekspedisi</span><span><?= htmlspecialchars($pesanan['kurir'] ?? '-') ?></span></div>
         <?php endif; ?>
         <div class="info-row total"><span>Total Bayar</span><span>Rp <?= number_format($pesanan['total_bayar'], 0, ',', '.') ?></span></div>
     </div>

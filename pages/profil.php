@@ -2,14 +2,14 @@
 session_start();
 require_once '../config/koneksi.php';
 
-if (!isset($_SESSION['login']) || !$_SESSION['login']) {
+if (!isset($_SESSION['login']) || $_SESSION['user_role'] !== 'pembeli') {
     header("Location: ../auth/login.php"); exit;
 }
+$user_id = $_SESSION['user_id'];
 
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
 
 $user_id = $_SESSION['user_id'];
-
 $stmt = $conn->prepare("SELECT * FROM pembeli WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
