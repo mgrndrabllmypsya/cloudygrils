@@ -23,5 +23,5 @@ $_SESSION['admin_login'] = true;
 $_SESSION['admin_id']    = $data['id'];
 $_SESSION['admin_nama']  = $data['nama'];
 
-header("Location: ../admin/dashboard_admin.php"); exit;
+header("Location: ../admin/dashboard.php"); exit;
 ?>

@@ -52,10 +52,6 @@ $q_ulasan = mysqli_query($conn, "
 $ulasan_list = $q_ulasan ? mysqli_fetch_all($q_ulasan, MYSQLI_ASSOC) : [];
 $avg_rating  = count($ulasan_list) ? array_sum(array_column($ulasan_list,'rating')) / count($ulasan_list) : 0;
 
-// Toko
-$q_toko = mysqli_query($conn, "SELECT * FROM pengaturan_toko LIMIT 1");
-$toko   = $q_toko ? mysqli_fetch_assoc($q_toko) : [];
-
 // Cek apakah sudah ada pesanan aktif
 $q_pesan = mysqli_query($conn, "SELECT id FROM pesanan WHERE produk_id=$id AND pembeli_id=$user_id AND status NOT IN ('dibatalkan','selesai') LIMIT 1");
 $sudah_pesan = $q_pesan && mysqli_num_rows($q_pesan) > 0;
@@ -79,7 +75,7 @@ include '../includes/header.php';
 .harga-asli{font-size:16px;color:var(--muted);text-decoration:line-through;margin-bottom:16px;}
 .produk-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
 .meta-tag{font-size:12px;padding:5px 12px;border-radius:20px;background:var(--cream);border:1px solid var(--border);color:var(--muted);}
-.produk-desc{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:24px;}
+.produk-desc{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:0;}
 .divider{height:1px;background:var(--border);margin:20px 0;}
 .btn-beli{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
 .btn-beli:hover{opacity:.88;}
@@ -88,8 +84,6 @@ include '../includes/header.php';
 .btn-nego:hover{background:rgba(124,58,237,.06);}
 .btn-chat{width:100%;padding:13px;background:var(--white);color:var(--dark);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .btn-chat:hover{border-color:var(--dark);}
-.toko-info{margin-top:20px;padding:16px;background:var(--cream);border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.toko-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;font-family:'Playfair Display',serif;}
 
 /* STATUS NEGO */
 .nego-status{border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:13px;}
@@ -147,16 +141,12 @@ include '../includes/header.php';
         <h1 class="produk-nama"><?= escape($produk['nama_barang']) ?></h1>
 
         <?php
-        // Tentukan harga yang ditampilkan berdasarkan status nego
         $harga_tampil  = $produk['harga'];
         $nego_checkout = null;
-
         if ($nego) {
             if ($nego['status'] === 'disetujui') {
                 $harga_tampil  = $nego['harga_deal'];
                 $nego_checkout = $nego['id'];
-            } elseif ($nego['status'] === 'counter') {
-                // Harga tampil tetap normal, counter ditampilkan di status box
             }
         }
         ?>
@@ -169,6 +159,7 @@ include '../includes/header.php';
         <div class="produk-harga"><?= formatRupiah($harga_tampil) ?></div>
         <?php endif; ?>
 
+        <!-- Meta -->
         <div class="produk-meta">
             <span class="meta-tag"><i class="bi bi-patch-check"></i> <?= escape($produk['kondisi']) ?></span>
             <?php if ($produk['ukuran']): ?>
@@ -178,10 +169,6 @@ include '../includes/header.php';
             <span class="meta-tag"><i class="bi bi-star-fill" style="color:#f5a623"></i> <?= number_format($avg_rating,1) ?> (<?= count($ulasan_list) ?> ulasan)</span>
             <?php endif; ?>
         </div>
-
-        <?php if ($produk['deskripsi']): ?>
-        <p class="produk-desc"><?= nl2br(escape($produk['deskripsi'])) ?></p>
-        <?php endif; ?>
 
         <?php if ($produk['harga'] > 50000): ?>
         <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--accent2);margin-bottom:16px;">
@@ -242,21 +229,17 @@ include '../includes/header.php';
             <?php endif; ?>
         <?php endif; ?>
 
-        <div class="divider"></div>
-
+        <!-- TOMBOL AKSI -->
         <?php if ($produk['status'] === 'aktif' && !$sudah_pesan): ?>
             <?php if ($nego_checkout): ?>
-            <!-- Beli pakai harga nego yang sudah deal -->
             <button class="btn-beli" onclick="window.location='../transaksi/checkout.php?produk_id=<?= $id ?>&nego_id=<?= $nego_checkout ?>'">
                 <i class="bi bi-bag-check"></i> Beli dengan Harga Nego
             </button>
             <?php elseif ($nego && in_array($nego['status'], ['menunggu','counter'])): ?>
-            <!-- Nego sedang berjalan, sembunyikan tombol nego baru -->
             <button class="btn-beli" onclick="window.location='../transaksi/checkout.php?produk_id=<?= $id ?>'">
                 <i class="bi bi-bag-check"></i> Beli Sekarang (Harga Normal)
             </button>
             <?php else: ?>
-            <!-- Belum nego / nego ditolak → tampilkan tombol nego -->
             <button class="btn-beli" onclick="window.location='../transaksi/checkout.php?produk_id=<?= $id ?>'">
                 <i class="bi bi-bag-check"></i> Beli Sekarang
             </button>
@@ -270,23 +253,20 @@ include '../includes/header.php';
         <button class="btn-beli" disabled><i class="bi bi-x-circle"></i> Produk Tidak Tersedia</button>
         <?php endif; ?>
 
+        <!-- Tanya Penjual -->
         <a href="../pages/chat.php?produk_id=<?= $id ?>" class="btn-chat">
             <i class="bi bi-chat-dots"></i> Tanya Penjual
         </a>
 
-        <!-- INFO TOKO -->
-        <div class="toko-info">
-            <div class="toko-avatar">CG</div>
-            <div>
-                <div style="font-size:14px;font-weight:600;"><?= escape($toko['nama_toko'] ?? 'Cloudy Girls') ?></div>
-                <div style="font-size:12px;color:var(--muted);">📍 <?= escape($toko['kota'] ?? 'Banyuwangi') ?></div>
-                <?php if (!empty($toko['link_maps'])): ?>
-                <a href="<?= escape($toko['link_maps']) ?>" target="_blank" style="font-size:12px;color:var(--accent2);">
-                    <i class="bi bi-map"></i> Lihat di Maps
-                </a>
-                <?php endif; ?>
-            </div>
+        <!-- DIVIDER + DESKRIPSI di bawah Tanya Penjual -->
+        <?php if ($produk['deskripsi']): ?>
+        <div class="divider"></div>
+        <div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dark);margin-bottom:8px;">Deskripsi</div>
+            <p class="produk-desc"><?= nl2br(escape($produk['deskripsi'])) ?></p>
         </div>
+        <?php endif; ?>
+
     </div>
 </div>
 
