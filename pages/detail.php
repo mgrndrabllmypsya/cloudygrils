@@ -170,12 +170,7 @@ include '../includes/header.php';
             <?php endif; ?>
         </div>
 
-        <?php if ($produk['harga'] > 50000): ?>
-        <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--accent2);margin-bottom:16px;">
-            <i class="bi bi-tag-fill"></i> <strong>Diskon Rp10.000</strong> untuk pengiriman (harga di atas Rp50.000)
-        </div>
-        <?php endif; ?>
-
+       
         <!-- STATUS NEGO -->
         <?php if ($nego): ?>
             <?php if ($nego['status'] === 'menunggu'): ?>

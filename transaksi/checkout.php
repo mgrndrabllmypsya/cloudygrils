@@ -587,8 +587,8 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
 
       <div class="produk-mini">
         <?php
-          $foto = $produk['foto'] ?? '';
-          $fotoSrc = $foto ? '../uploads/produk/' . $foto : 'https://via.placeholder.com/64x64?text=Foto';
+        $foto = $produk['foto_utama'] ?? '';
+        $fotoSrc = $foto ? '../uploads/produk/' . $foto : 'https://via.placeholder.com/64x64?text=Foto';
         ?>
         <img src="<?= htmlspecialchars($fotoSrc) ?>" alt="foto_produk">
         <div>
