@@ -110,7 +110,7 @@ a { text-decoration: none !important; }
 .section { max-width: 1280px; margin: 0 auto; padding: 28px 40px 60px; }
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
 .section-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--dark); }
-.product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.product-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
 
 /* ── CARD ── */
 .product-card {
@@ -177,6 +177,7 @@ footer { background: var(--white); border-top: 1px solid var(--border); margin-t
 .footer-bottom { max-width: 1280px; margin: 0 auto; padding: 16px 40px; border-top: 1px solid var(--border); }
 
 /* ── RESPONSIVE ── */
+@media(max-width:1280px) { .product-grid { grid-template-columns: repeat(4,1fr); } }
 @media(max-width:1024px) { .product-grid { grid-template-columns: repeat(3,1fr); } }
 @media(max-width:768px) {
     .section, .search-bar, .footer-inner { padding-left: 16px; padding-right: 16px; }
@@ -281,8 +282,21 @@ footer { background: var(--white); border-top: 1px solid var(--border); margin-t
     <div class="footer-inner">
         <div>
             <span class="footer-logo">Cloudy <span>Girls</span></span>
-            <p style="font-size:13px;color:var(--muted);line-height:1.7;max-width:220px;">Toko preloved pakaian wanita berkualitas dari Banyuwangi.</p>
+            <?php
+            $q_toko = mysqli_query($conn, "SELECT deskripsi FROM pengaturan_toko LIMIT 1");
+            $toko   = mysqli_fetch_assoc($q_toko);
+            ?>
+            <p style="font-size:13px;color:var(--muted);line-height:1.7;max-width:220px;">
+            <?= escape($toko['deskripsi'] ?? 'Toko preloved pakaian wanita berkualitas dari Banyuwangi.') ?>
+            </p>
+            <a href="https://instagram.com/cloudygrils" target="_blank" 
+   style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;color:var(--muted);font-size:13px;transition:color .2s;"
+   onmouseover="this.style.color='var(--pink-deep)'" 
+   onmouseout="this.style.color='var(--muted)'">
+    <i class="bi bi-instagram" style="font-size:20px;"></i>
+</a>
         </div>
+
         <div>
             <h4 style="font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:14px;">Kategori</h4>
             <div class="footer-links">

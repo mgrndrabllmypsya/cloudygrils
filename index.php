@@ -88,7 +88,7 @@ header{background:var(--white);border-bottom:1px solid var(--border);position:st
 /* PRODUCTS */
 .section{max-width:1280px;margin:0 auto;padding:40px 40px 60px;}
 .section-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:24px !important;}
-.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+.product-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;}
 .product-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .25s,box-shadow .25s;}
 .product-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.1);}
 .card-img{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--cream);}
@@ -118,6 +118,7 @@ footer{background:var(--white);border-top:1px solid var(--border);margin-top:60p
 .footer-links a:hover{color:var(--dark);}
 .footer-bottom{max-width:1280px;margin:0 auto;padding:16px 40px;border-top:1px solid var(--border);}
 /* RESPONSIVE */
+@media(max-width:1280px){.product-grid{grid-template-columns:repeat(4,1fr);}}
 @media(max-width:1024px){.product-grid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:768px){
     .header-inner,.section,.footer-inner{padding-left:16px;padding-right:16px;}

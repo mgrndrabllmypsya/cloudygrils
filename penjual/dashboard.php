@@ -3,7 +3,7 @@ session_start();
 require_once '../config/koneksi.php';
 
 if (!isset($_SESSION['admin_login']) || !$_SESSION['admin_login']) {
-    header("Location: ../auth/login_admin.php"); exit;
+    header("Location: ../auth/login.php"); exit;
 }
 
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
@@ -211,7 +211,6 @@ tr:hover td { background:var(--surface2); }
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
-        <small>Admin Panel</small>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
