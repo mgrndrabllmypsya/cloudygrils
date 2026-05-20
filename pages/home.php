@@ -43,18 +43,20 @@ include '../includes/header.php';
 
 <style>
 :root {
-    --bg:      #FFF5F8;
+    --bg:      #FFF0F4;
     --surface: #FFFFFF;
-    --surface2:#FFF0F5;
-    --border:  #FFB6D0;
-    --accent:  #FF4081;
-    --accent2: #F50057;
-    --pink:    #FF80AB;
-    --muted:   #AAAAAA;
-    --text:    #1A1A1A;
-    --text2:   #444444;
+    --surface2:#FFF5F8;
+    --border:  #FFB3C6;
+    --accent:  #D94F6E;
+    --accent2: #C43860;
+    --pink:    #FF8FAB;
+    --pink2:   #FFB3C6;
+    --pink3:   #FFD6E0;
+    --muted:   #C48899;
+    --text:    #2D1520;
+    --text2:   #6B3A4A;
     --yellow:  #FFB300;
-    --red:     #FF1744;
+    --red:     #D94F6E;
     --green:   #00BFA5;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -62,9 +64,9 @@ body { font-family: 'DM Sans', sans-serif; color: var(--text); background: var(-
 body::before {
     content: '';
     position: fixed; inset: 0;
-    background-image: radial-gradient(circle, #FFB6D0 1px, transparent 1px);
+    background-image: radial-gradient(circle, #FFB3C6 1px, transparent 1px);
     background-size: 28px 28px;
-    opacity: .1;
+    opacity: .10;
     pointer-events: none;
     z-index: 0;
 }
@@ -89,12 +91,12 @@ a { text-decoration: none !important; color: inherit; }
     white-space: nowrap; transition: all .2s;
     border: 1px solid transparent;
 }
-.cat-link:hover { color: var(--accent); background: rgba(255,64,129,.06); border-color: var(--border); }
+.cat-link:hover { color: var(--accent); background: rgba(217,79,110,.06); border-color: var(--border); }
 .cat-link.active {
     color: #fff;
-    background: linear-gradient(135deg, var(--pink), var(--accent2));
+    background: #FF6FA3;
     font-weight: 600; border-color: transparent;
-    box-shadow: 0 3px 10px rgba(255,64,129,.3);
+    box-shadow: 0 3px 10px rgba(255,111,163,.35);
 }
 
 /* ── SEARCH ── */
@@ -106,27 +108,28 @@ a { text-decoration: none !important; color: inherit; }
 .search-form { display: flex; gap: 10px; }
 .search-input {
     flex: 1; padding: 11px 20px;
-    border: 1.5px solid var(--border); border-radius: 40px;
+    border: 2px solid #F48FB1; border-radius: 40px;
     font-family: 'DM Sans', sans-serif; font-size: 13px;
     outline: none; transition: border-color .2s, box-shadow .2s;
-    background: var(--surface);
+    background: #FFF0F4;
     color: var(--text);
 }
 .search-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(255,64,129,.1);
+    border-color: #FF6FA3;
+    box-shadow: 0 0 0 4px rgba(255,111,163,.15);
+    background: #FFFFFF;
 }
-.search-input::placeholder { color: var(--muted); }
+.search-input::placeholder { color: #D4809A; }
 .search-btn {
     padding: 11px 24px;
-    background: linear-gradient(135deg, var(--pink), var(--accent2));
+    background: #FF6FA3;
     color: #fff; border: none; border-radius: 40px;
     font-size: 13px; font-weight: 600; cursor: pointer;
-    transition: opacity .2s, transform .15s;
-    box-shadow: 0 4px 14px rgba(255,64,129,.35);
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 14px rgba(255,111,163,.40);
     white-space: nowrap;
 }
-.search-btn:hover { opacity: .88; transform: translateY(-1px); }
+.search-btn:hover { background: #FF4F90; transform: translateY(-1px); }
 
 /* ── SECTION ── */
 .section {
@@ -155,19 +158,19 @@ a { text-decoration: none !important; color: inherit; }
     border-radius: 16px; overflow: hidden;
     transition: transform .25s, box-shadow .25s, border-color .25s;
     position: relative; display: block; color: var(--text);
-    box-shadow: 0 2px 10px rgba(255,64,129,.05);
+    box-shadow: 0 2px 10px rgba(255,143,171,.08);
 }
 .product-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 48px rgba(255,64,129,.15);
-    border-color: var(--accent);
+    box-shadow: 0 20px 48px rgba(255,111,163,.18);
+    border-color: var(--pink);
 }
 .card-img { position: relative; aspect-ratio: 3/4; overflow: hidden; background: var(--surface2); }
 .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
 .product-card:hover .card-img img { transform: scale(1.06); }
 .card-kondisi {
     position: absolute; top: 10px; left: 10px;
-    background: rgba(255,64,129,.85); backdrop-filter: blur(6px);
+    background: rgba(255,111,163,.88); backdrop-filter: blur(6px);
     color: #fff; font-size: 10px; font-weight: 600;
     letter-spacing: 1px; text-transform: uppercase;
     padding: 4px 10px; border-radius: 20px;
@@ -183,11 +186,11 @@ a { text-decoration: none !important; color: inherit; }
     display: flex; align-items: center; justify-content: center;
     font-size: 16px; color: var(--muted);
     transition: all .2s; z-index: 2;
-    box-shadow: 0 2px 10px rgba(255,64,129,.15);
+    box-shadow: 0 2px 10px rgba(255,143,171,.18);
     text-decoration: none !important;
 }
-.btn-love:hover { transform: scale(1.18); border-color: var(--accent); color: var(--red); }
-.btn-love.liked { color: var(--red); border-color: rgba(255,23,68,.3); }
+.btn-love:hover { transform: scale(1.18); border-color: var(--pink); color: var(--red); }
+.btn-love.liked { color: var(--red); border-color: rgba(217,79,110,.3); }
 
 .card-body { padding: 14px 16px 16px; }
 .card-nama {
@@ -240,7 +243,7 @@ footer {
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; color: var(--muted); transition: all .2s;
 }
-.footer-socials a:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.footer-socials a:hover { background: #FF6FA3; border-color: #FF6FA3; color: #fff; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 1280px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -289,9 +292,9 @@ footer {
     <div class="section-head">
         <div class="section-title">
             <?php
-            if ($cari)             echo 'Hasil: <span>"' . escape($cari) . '"</span>';
+            if ($cari)                echo 'Hasil: <span>"' . escape($cari) . '"</span>';
             elseif ($filter_kategori) echo 'Kategori: <span>' . escape($filter_kategori) . '</span>';
-            else                   echo 'Koleksi <span>Terbaru</span>';
+            else                      echo 'Koleksi <span>Terbaru</span>';
             ?>
         </div>
         <span class="section-count"><?= $total_produk ?> produk tersedia</span>
@@ -317,7 +320,7 @@ footer {
                     <span class="card-kondisi"><?= escape($row['kondisi'] ?? '') ?></span>
                     <img src="../uploads/produk/<?= escape($row['foto_utama'] ?? '') ?>"
                          alt="<?= escape($row['nama_barang'] ?? '') ?>"
-                         onerror="this.src='https://placehold.co/400x500/FFF0F5/FF4081?text=Cloudy+Girls'"
+                         onerror="this.src='https://placehold.co/400x500/FFF0F4/D94F6E?text=Cloudy+Girls'"
                          loading="lazy">
                 </div>
                 <div class="card-body">

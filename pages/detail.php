@@ -19,7 +19,7 @@ function formatTanggal($datetime) {
 function renderStars($rating) {
     $html = '';
     for ($i = 1; $i <= 5; $i++) {
-        $color = $i <= $rating ? '#f5a623' : '#ddd';
+        $color = $i <= $rating ? '#E8607A' : '#F9C8D4';
         $html .= "<i class='bi bi-star-fill' style='color:$color;font-size:12px;'></i>";
     }
     return $html;
@@ -66,64 +66,138 @@ $page_title = escape($produk['nama_barang']);
 include '../includes/header.php';
 ?>
 <style>
+/* ── PINK SOFT GRADIENT PALETTE ──
+   Top:    #FF8FAB  (pink medium)
+   Mid:    #FFB3C6  (pink soft)
+   Bottom: #FFD6E0  (pink pastel lembut)
+   Accent: #E8607A  (pink deep untuk teks/aksi)
+   Dark:   #3D1A24  (gelap hangat)
+*/
+
 .container-detail{max-width:1100px;margin:40px auto;padding:0 40px;display:grid;grid-template-columns:1fr 1fr;gap:48px;}
-.foto-utama{aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--cream);border:1px solid var(--border);}
+
+/* Foto */
+.foto-utama{aspect-ratio:3/4;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#FFD6E0,#FFF0F4);border:1.5px solid #FFB3C6;}
 .foto-utama img{width:100%;height:100%;object-fit:cover;}
+
+/* Info produk */
 .produk-info{}
-.produk-kategori{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:8px;}
-.produk-nama{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;line-height:1.2;margin-bottom:12px !important;}
-.produk-harga{font-size:28px;font-weight:700;color:var(--accent2);margin-bottom:4px;}
-.harga-asli{font-size:16px;color:var(--muted);text-decoration:line-through;margin-bottom:16px;}
+.produk-kategori{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#E8607A;margin-bottom:8px;}
+.produk-nama{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;line-height:1.2;margin-bottom:12px !important;color:#3D1A24;}
+.produk-harga{font-size:28px;font-weight:700;color:#E8607A;margin-bottom:4px;}
+.harga-asli{font-size:16px;color:#C48899;text-decoration:line-through;margin-bottom:16px;}
+
 .produk-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
-.meta-tag{font-size:12px;padding:5px 12px;border-radius:20px;background:var(--cream);border:1px solid var(--border);color:var(--muted);}
-.produk-desc{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:0;}
-.divider{height:1px;background:var(--border);margin:20px 0;}
-.btn-beli{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-beli:hover{opacity:.88;}
-.btn-beli:disabled{opacity:.5;cursor:not-allowed;}
-.btn-nego{width:100%;padding:13px;background:var(--white);color:var(--accent2);border:1.5px solid var(--accent2);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
-.btn-nego:hover{background:rgba(124,58,237,.06);}
-.btn-chat{width:100%;padding:13px;background:var(--white);color:var(--dark);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-chat:hover{border-color:var(--dark);}
+.meta-tag{font-size:12px;padding:5px 14px;border-radius:20px;background:#FFF0F4;border:1.5px solid #FFB3C6;color:#C48899;}
 
-/* STATUS NEGO */
+.produk-desc{font-size:14px;line-height:1.7;color:#C48899;margin-bottom:0;}
+.divider{height:1px;background:#FFB3C6;margin:20px 0;}
+
+/* Tombol Beli */
+.btn-beli{
+    width:100%;padding:14px;
+    background:#FF6FA3;
+    color:#fff;border:none;border-radius:12px;
+    font-size:15px;font-weight:700;cursor:pointer;
+    transition:background .2s, transform .1s;
+    margin-bottom:10px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    letter-spacing:.3px;
+}
+.btn-beli:hover{background:#E8607A;transform:translateY(-1px);}
+.btn-beli:disabled{background:#F9C8D4;cursor:not-allowed;transform:none;}
+
+/* Tombol Nego */
+.btn-nego{
+    width:100%;padding:13px;
+    background:#FFF0F4;
+    color:#E8607A;
+    border:1.5px solid #FF8FAB;
+    border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;
+    transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    margin-bottom:10px;
+}
+.btn-nego:hover{background:#FFD6E0;border-color:#E8607A;}
+
+/* Tombol Chat */
+.btn-chat{
+    width:100%;padding:13px;
+    background:#fff;
+    color:#3D1A24;
+    border:1.5px solid #FFB3C6;
+    border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;
+    transition:border-color .2s, background .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    text-decoration:none;
+}
+.btn-chat:hover{border-color:#FF8FAB;background:#FFF8FA;}
+
+/* ── STATUS NEGO ── */
 .nego-status{border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:13px;}
-.nego-menunggu{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);color:#92400e;}
-.nego-disetujui{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);color:#065f46;}
-.nego-ditolak{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:#991b1b;}
-.nego-counter{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.3);color:#4c1d95;}
+.nego-menunggu{background:rgba(255,179,198,.15);border:1.5px solid #FFB3C6;color:#A0465A;}
+.nego-disetujui{background:rgba(232,96,122,.08);border:1.5px solid #FF8FAB;color:#7A2036;}
+.nego-ditolak{background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.3);color:#991b1b;}
+.nego-counter{background:rgba(255,143,171,.1);border:1.5px solid #FF8FAB;color:#9B2C42;}
 .nego-status-title{font-weight:700;margin-bottom:4px;}
-.nego-status-harga{font-size:18px;font-weight:700;margin:6px 0;}
+.nego-status-harga{font-size:18px;font-weight:700;margin:6px 0;color:#E8607A;}
 
-/* MODAL NEGO */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .25s;}
+/* ── MODAL NEGO ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(61,26,36,.45);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .25s;}
 .modal-overlay.open{opacity:1;visibility:visible;}
-.modal-box{background:var(--white);border-radius:20px;padding:32px;width:100%;max-width:420px;margin:20px;transform:translateY(16px);transition:transform .25s;}
+.modal-box{
+    background:#fff;
+    border-radius:20px;padding:32px;
+    width:100%;max-width:420px;margin:20px;
+    transform:translateY(16px);transition:transform .25s;
+    border:1.5px solid #FFB3C6;
+}
 .modal-overlay.open .modal-box{transform:translateY(0);}
-.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;}
-.modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;color:#3D1A24;}
+.modal-sub{font-size:13px;color:#C48899;margin-bottom:24px;}
 .modal-field{margin-bottom:16px;}
-.modal-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--dark);margin-bottom:6px;}
-.modal-field input,.modal-field textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;color:var(--dark);}
-.modal-field input:focus,.modal-field textarea:focus{border-color:var(--accent2);}
+.modal-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#3D1A24;margin-bottom:6px;}
+.modal-field input,.modal-field textarea{
+    width:100%;padding:10px 14px;
+    border:1.5px solid #FFB3C6;
+    border-radius:10px;
+    font-family:'DM Sans',sans-serif;font-size:14px;outline:none;
+    transition:border-color .2s;color:#3D1A24;
+    background:#FFF8FA;
+}
+.modal-field input:focus,.modal-field textarea:focus{border-color:#FF8FAB;background:#fff;}
 .modal-field textarea{resize:vertical;min-height:80px;}
 .modal-actions{display:flex;gap:10px;margin-top:20px;}
-.modal-btn-batal{flex:1;padding:12px;background:var(--cream);border:1px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;color:var(--dark);}
-.modal-btn-kirim{flex:2;padding:12px;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s;}
-.modal-btn-kirim:hover{opacity:.88;}
-.harga-ref{font-size:12px;color:var(--muted);margin-bottom:4px;}
+.modal-btn-batal{flex:1;padding:12px;background:#FFF0F4;border:1.5px solid #FFB3C6;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;color:#C48899;}
+.modal-btn-batal:hover{background:#FFD6E0;}
+.modal-btn-kirim{flex:2;padding:12px;background:#FF6FA3;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
+.modal-btn-kirim:hover{background:#E8607A;}
+.harga-ref{font-size:12px;color:#C48899;margin-bottom:4px;}
 
-/* ULASAN */
+/* ── ULASAN ── */
 .ulasan-section{max-width:1100px;margin:40px auto 60px;padding:0 40px;}
-.ulasan-section h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px !important;}
-.ulasan-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+.ulasan-section h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px !important;color:#3D1A24;}
+.ulasan-card{
+    background:#fff;
+    border:1.5px solid #FFB3C6;
+    border-radius:14px;padding:18px;margin-bottom:14px;
+}
 .ulasan-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.ulasan-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),#EC4899);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;overflow:hidden;}
+.ulasan-avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,#FF8FAB,#FFD6E0);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;overflow:hidden;
+}
 .ulasan-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.ulasan-nama{font-size:13px;font-weight:600;}
-.ulasan-tgl{font-size:11px;color:var(--muted);margin-top:2px;}
-.ulasan-text{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px;}
-@media(max-width:768px){.container-detail{grid-template-columns:1fr;gap:24px;padding:0 16px;}.ulasan-section{padding:0 16px;}}
+.ulasan-nama{font-size:13px;font-weight:600;color:#3D1A24;}
+.ulasan-tgl{font-size:11px;color:#C48899;margin-top:2px;}
+.ulasan-text{font-size:13px;color:#C48899;line-height:1.6;margin-top:8px;}
+
+@media(max-width:768px){
+    .container-detail{grid-template-columns:1fr;gap:24px;padding:0 16px;}
+    .ulasan-section{padding:0 16px;}
+}
 </style>
 
 <div class="container-detail">
@@ -132,7 +206,7 @@ include '../includes/header.php';
         <div class="foto-utama">
             <img src="../uploads/produk/<?= escape($foto_utama) ?>"
                  alt="<?= escape($produk['nama_barang']) ?>"
-                 onerror="this.src='https://placehold.co/400x500/FAF7F2/A78BFA?text=Cloudy+Girls'">
+                 onerror="this.src='https://placehold.co/400x500/FFD6E0/E8607A?text=Cloudy+Girls'">
         </div>
     </div>
 
@@ -167,11 +241,10 @@ include '../includes/header.php';
             <span class="meta-tag"><i class="bi bi-tag"></i> Ukuran <?= escape($produk['ukuran']) ?></span>
             <?php endif; ?>
             <?php if (count($ulasan_list) > 0): ?>
-            <span class="meta-tag"><i class="bi bi-star-fill" style="color:#f5a623"></i> <?= number_format($avg_rating,1) ?> (<?= count($ulasan_list) ?> ulasan)</span>
+            <span class="meta-tag"><i class="bi bi-star-fill" style="color:#E8607A"></i> <?= number_format($avg_rating,1) ?> (<?= count($ulasan_list) ?> ulasan)</span>
             <?php endif; ?>
         </div>
 
-       
         <!-- STATUS NEGO -->
         <?php if ($nego): ?>
             <?php if ($nego['status'] === 'menunggu'): ?>
@@ -209,14 +282,14 @@ include '../includes/header.php';
                     <form method="POST" action="../transaksi/proses_nego.php" style="flex:1;">
                         <input type="hidden" name="nego_id" value="<?= $nego['id'] ?>">
                         <input type="hidden" name="aksi" value="terima_counter">
-                        <button type="submit" style="width:100%;padding:9px;background:#7C3AED;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+                        <button type="submit" style="width:100%;padding:9px;background:#FF6FA3;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
                             Terima Counter
                         </button>
                     </form>
                     <form method="POST" action="../transaksi/proses_nego.php" style="flex:1;">
                         <input type="hidden" name="nego_id" value="<?= $nego['id'] ?>">
                         <input type="hidden" name="aksi" value="tolak_counter">
-                        <button type="submit" style="width:100%;padding:9px;background:var(--white);color:var(--dark);border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+                        <button type="submit" style="width:100%;padding:9px;background:#FFF0F4;color:#C48899;border:1.5px solid #FFB3C6;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
                             Tolak Counter
                         </button>
                     </form>
@@ -254,11 +327,11 @@ include '../includes/header.php';
             <i class="bi bi-chat-dots"></i> Tanya Penjual
         </a>
 
-        <!-- DIVIDER + DESKRIPSI di bawah Tanya Penjual -->
+        <!-- DIVIDER + DESKRIPSI -->
         <?php if ($produk['deskripsi']): ?>
         <div class="divider"></div>
         <div>
-            <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dark);margin-bottom:8px;">Deskripsi</div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#3D1A24;margin-bottom:8px;">Deskripsi</div>
             <p class="produk-desc"><?= nl2br(escape($produk['deskripsi'])) ?></p>
         </div>
         <?php endif; ?>
@@ -275,7 +348,7 @@ include '../includes/header.php';
             <input type="hidden" name="produk_id" value="<?= $id ?>">
             <input type="hidden" name="aksi" value="ajukan">
             <div class="modal-field">
-                <div class="harga-ref">Harga asli: <strong><?= formatRupiah($produk['harga']) ?></strong></div>
+                <div class="harga-ref">Harga asli: <strong style="color:#E8607A;"><?= formatRupiah($produk['harga']) ?></strong></div>
                 <label>Harga Tawarmu (Rp)</label>
                 <input type="number"
                        name="harga_tawar"

@@ -7,7 +7,7 @@ function formatRupiah($angka) { return 'Rp ' . number_format($angka, 0, ',', '.'
 function renderStars($rating) {
     $html = '';
     for ($i = 1; $i <= 5; $i++) {
-        $color = $i <= $rating ? '#FFB300' : '#FFB6D0';
+        $color = $i <= $rating ? '#E05C7A' : '#FFD6E0';
         $html .= '<i class="bi bi-star-fill" style="color:' . $color . ';font-size:13px;"></i>';
     }
     return $html;
@@ -42,28 +42,30 @@ $kategori_list = ['Atasan','Bawahan','Dress/Gamis','Outer','Hijab & Aksesoris'];
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --bg:      #FFF5F8;
-    --surface: #FFFFFF;
-    --surface2:#FFF0F5;
-    --border:  #FFB6D0;
-    --accent:  #FF4081;
-    --accent2: #F50057;
-    --pink:    #FF80AB;
-    --pink2:   #FF4081;
-    --muted:   #AAAAAA;
-    --text:    #1A1A1A;
-    --text2:   #444444;
-    --yellow:  #FFB300;
-    --green:   #00BFA5;
+    /* === PINK SOFT GRADIENT PALETTE === */
+    /* Diambil dari gambar: pink cerah (#FF8FAB) → soft (#FFB3C6) → pastel (#FFD6E0) */
+    --bg:      #FFF0F4;          /* latar halaman, pink pastel sangat lembut */
+    --surface: #FFFFFF;          /* kartu / panel putih bersih */
+    --surface2:#FFF0F4;          /* surface sekunder, sedikit pink */
+    --border:  #FFB3C6;          /* border: pink soft tengah gradient */
+    --accent:  #D94F6E;          /* aksen utama: pink tua elegan */
+    --accent2: #C0395A;          /* aksen hover/deep */
+    --pink:    #FF8FAB;          /* pink cerah (warna atas gradient) */
+    --pink2:   #FFB3C6;          /* pink soft (warna tengah gradient) */
+    --muted:   #C48899;          /* teks abu-abu bernuansa pink */
+    --text:    #2D1520;          /* teks utama, gelap kecoklatan */
+    --text2:   #5C3244;          /* teks sekunder */
+    --yellow:  #E8956D;          /* bintang rating: peach-oranye lembut */
+    --green:   #5BAF9E;          /* whatsapp / CTA hijau soft */
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--bg); overflow-x: hidden; }
 body::before {
     content: '';
     position: fixed; inset: 0;
-    background-image: radial-gradient(circle, #FFB6D0 1px, transparent 1px);
+    background-image: radial-gradient(circle, #FFB3C6 1px, transparent 1px);
     background-size: 28px 28px;
-    opacity: .12;
+    opacity: .10;
     pointer-events: none;
     z-index: 0;
 }
@@ -71,11 +73,11 @@ a { text-decoration: none !important; color: inherit; }
 
 /* HEADER */
 header {
-    background: rgba(255,255,255,.96);
+    background: rgba(255,255,255,.97);
     backdrop-filter: blur(12px);
     border-bottom: 1.5px solid var(--border);
     position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 16px rgba(255,64,129,.08);
+    box-shadow: 0 2px 16px rgba(255,143,171,.10);
 }
 .header-inner {
     max-width: 1280px; margin: 0 auto; padding: 0 40px;
@@ -94,27 +96,27 @@ header {
     font-size: 13px; font-weight: 600; color: #fff;
     padding: 8px 18px; border-radius: 20px;
     background: linear-gradient(135deg, var(--pink), var(--accent2));
-    box-shadow: 0 4px 14px rgba(255,64,129,.35);
+    box-shadow: 0 4px 14px rgba(217,79,110,.30);
     transition: opacity .2s;
 }
 .btn-daftar:hover { opacity: .88; color: #fff; }
 
-/* HERO */
+/* HERO — menggunakan gradien persis seperti gambar */
 .hero {
     min-height: 560px;
     display: flex; align-items: center; justify-content: center;
     text-align: center; position: relative; overflow: hidden;
-    background: linear-gradient(135deg, #FF80AB 0%, #FF4081 45%, #F50057 100%);
+    background: linear-gradient(180deg, #FF8FAB 0%, #FFB3C6 55%, #FFD6E0 100%);
     z-index: 1;
 }
 .hero-dots {
     position: absolute; inset: 0;
-    background-image: radial-gradient(circle, rgba(255,255,255,.25) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(255,255,255,.30) 1px, transparent 1px);
     background-size: 24px 24px; pointer-events: none;
 }
 .hero-blob { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
-.hero-blob-1 { width: 400px; height: 400px; background: rgba(255,255,255,.15); top: -100px; right: -80px; }
-.hero-blob-2 { width: 300px; height: 300px; background: rgba(245,0,87,.3); bottom: -80px; left: -60px; }
+.hero-blob-1 { width: 400px; height: 400px; background: rgba(255,255,255,.20); top: -100px; right: -80px; }
+.hero-blob-2 { width: 300px; height: 300px; background: rgba(255,143,171,.25); bottom: -80px; left: -60px; }
 .hero-content {
     position: relative; z-index: 2; color: #fff;
     padding: 80px 40px; max-width: 680px;
@@ -123,34 +125,36 @@ header {
 @keyframes heroIn { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
 .hero-eyebrow {
     display: inline-block; font-size: 11px; letter-spacing: 3px;
-    text-transform: uppercase; color: #fff;
-    background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.35);
+    text-transform: uppercase; color: var(--text);
+    background: rgba(255,255,255,.45); border: 1px solid rgba(255,255,255,.60);
     padding: 6px 16px; border-radius: 20px; margin-bottom: 20px;
 }
 .hero-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(36px, 5vw, 62px);
     font-weight: 900; line-height: 1.08; margin-bottom: 16px;
+    color: var(--text);
+    text-shadow: 0 2px 12px rgba(255,255,255,.5);
 }
-.hero-title em { font-style: italic; color: #FFE4EE; }
-.hero-sub { font-size: 15px; color: rgba(255,255,255,.85); line-height: 1.7; margin-bottom: 32px; }
+.hero-title em { font-style: italic; color: var(--accent2); }
+.hero-sub { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 32px; }
 .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .hero-cta {
     display: inline-flex; align-items: center; gap: 8px;
-    background: #fff; color: var(--accent);
+    background: var(--accent); color: #fff;
     padding: 14px 30px; border-radius: 40px;
     font-weight: 700; font-size: 14px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.15); transition: all .2s;
+    box-shadow: 0 8px 24px rgba(217,79,110,.35); transition: all .2s;
 }
-.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,.2); color: var(--accent2); }
+.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(217,79,110,.45); color: #fff; background: var(--accent2); }
 .hero-cta-outline {
     display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(255,255,255,.15); backdrop-filter: blur(8px);
-    color: #fff; padding: 14px 30px; border-radius: 40px;
-    border: 1.5px solid rgba(255,255,255,.4);
+    background: rgba(255,255,255,.50); backdrop-filter: blur(8px);
+    color: var(--text); padding: 14px 30px; border-radius: 40px;
+    border: 1.5px solid rgba(255,255,255,.70);
     font-weight: 500; font-size: 14px; transition: background .2s;
 }
-.hero-cta-outline:hover { background: rgba(255,255,255,.28); color: #fff; }
+.hero-cta-outline:hover { background: rgba(255,255,255,.70); color: var(--text); }
 
 /* STATS STRIP */
 .stats-strip { background: var(--surface); border-bottom: 1.5px solid var(--border); position: relative; z-index: 2; }
@@ -175,7 +179,8 @@ header {
 
 /* CATEGORY BAR */
 .cat-bar {
-    background: var(--surface2); border-bottom: 1.5px solid var(--border);
+    background: #FFF5F8;
+    border-bottom: 1.5px solid var(--border);
     position: sticky; top: 68px; z-index: 99;
 }
 .cat-inner {
@@ -188,11 +193,12 @@ header {
     padding: 6px 16px; border-radius: 20px; white-space: nowrap;
     transition: all .2s; border: 1px solid transparent;
 }
-.cat-link:hover { color: var(--accent); background: rgba(255,64,129,.06); border-color: var(--border); }
+.cat-link:hover { color: var(--accent); background: rgba(217,79,110,.06); border-color: var(--border); }
 .cat-link.active {
-    color: #fff; background: linear-gradient(135deg, var(--pink), var(--accent2));
+    color: #fff;
+    background: linear-gradient(135deg, var(--pink), var(--accent));
     font-weight: 600; border-color: transparent;
-    box-shadow: 0 3px 10px rgba(255,64,129,.3);
+    box-shadow: 0 3px 10px rgba(217,79,110,.25);
 }
 
 /* SECTION */
@@ -207,11 +213,11 @@ header {
     background: var(--surface); border: 1.5px solid var(--border);
     border-radius: 14px; overflow: hidden;
     transition: transform .25s, box-shadow .25s;
-    box-shadow: 0 2px 10px rgba(255,64,129,.06);
+    box-shadow: 0 2px 10px rgba(255,179,198,.15);
 }
 .product-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(255,64,129,.15);
+    box-shadow: 0 16px 40px rgba(217,79,110,.18);
     border-color: var(--accent);
 }
 .card-img { position: relative; aspect-ratio: 3/4; overflow: hidden; background: var(--surface2); }
@@ -219,7 +225,7 @@ header {
 .product-card:hover .card-img img { transform: scale(1.06); }
 .card-kondisi {
     position: absolute; top: 10px; left: 10px;
-    background: rgba(255,64,129,.85); backdrop-filter: blur(6px);
+    background: rgba(217,79,110,.82); backdrop-filter: blur(6px);
     color: #fff; font-size: 10px; font-weight: 600;
     letter-spacing: 1px; text-transform: uppercase;
     padding: 4px 10px; border-radius: 20px;
@@ -235,25 +241,26 @@ header {
 
 /* TESTIMONIAL */
 .testi-section {
-    background: linear-gradient(135deg, #FF80AB 0%, #FF4081 60%, #F50057 100%);
+    /* gradient persis mengikuti gambar: atas gelap → bawah lembut */
+    background: linear-gradient(180deg, #FF8FAB 0%, #FFB3C6 55%, #FFD6E0 100%);
     padding: 64px 40px; position: relative; overflow: hidden; z-index: 1;
 }
 .testi-section::before {
     content: ''; position: absolute; inset: 0;
-    background-image: radial-gradient(circle, rgba(255,255,255,.2) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(255,255,255,.22) 1px, transparent 1px);
     background-size: 24px 24px; pointer-events: none;
 }
 .testi-section-header { text-align: center; margin-bottom: 40px; position: relative; z-index: 2; }
-.testi-section-header h2 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #fff; }
-.testi-section-header p { font-size: 14px; color: rgba(255,255,255,.8); margin-top: 6px; }
+.testi-section-header h2 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text); }
+.testi-section-header p { font-size: 14px; color: var(--text2); margin-top: 6px; }
 .testi-grid {
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 24px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2;
 }
 .testi-card {
-    background: rgba(255,255,255,.95); border: 1.5px solid rgba(255,255,255,.5);
+    background: rgba(255,255,255,.90); border: 1.5px solid rgba(255,255,255,.60);
     border-radius: 16px; padding: 24px; position: relative;
-    box-shadow: 0 8px 32px rgba(0,0,0,.1);
+    box-shadow: 0 8px 32px rgba(217,79,110,.10);
 }
 .testi-quote {
     font-size: 48px; line-height: 1; color: var(--accent); opacity: .15;
@@ -264,7 +271,7 @@ header {
 .testi-name { font-size: 13px; font-weight: 600; color: var(--text); }
 .testi-avatar {
     width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--pink), var(--accent2));
+    background: linear-gradient(135deg, var(--pink), var(--accent));
     color: #fff; display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 14px; flex-shrink: 0;
 }
@@ -382,7 +389,7 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
                 <span class="card-kondisi"><?= escape($row['kondisi'] ?? '') ?></span>
                 <img src="uploads/produk/<?= escape($row['foto_utama'] ?? '') ?>"
                      alt="<?= escape($row['nama_barang'] ?? '') ?>"
-                     onerror="this.src='https://placehold.co/400x500/FFF0F5/FF4081?text=Cloudy+Girls'"
+                     onerror="this.src='https://placehold.co/400x500/FFD6E0/D94F6E?text=Cloudy+Girls'"
                      loading="lazy">
             </div>
             <div class="card-body">

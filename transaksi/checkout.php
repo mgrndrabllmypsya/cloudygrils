@@ -68,29 +68,33 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --purple:   #7c3aed;
-            --purple-light: #ede9fe;
-            --pink:     #db2777;
-            --pink-light: #fce7f3;
-            --bg:       #f5f3ff;
+            --pink-1:   #FF8FAB;
+            --pink-2:   #FFB3C6;
+            --pink-3:   #FFD6E0;
+            --pink-4:   #FFF0F5;
+            --pink-deep:#FF6FA3;
+            --pink-dark:#e05c8a;
+            --bg:       #FFF5F8;
             --card:     #ffffff;
-            --text:     #1e1b2e;
-            --muted:    #6b7280;
-            --border:   #e5e7eb;
+            --text:     #3a1a28;
+            --muted:    #b07898;
+            --border:   #f0c8d8;
             --radius:   14px;
-            --shadow:   0 2px 16px rgba(124,58,237,.08);
+            --shadow:   0 2px 16px rgba(255,111,163,.10);
         }
 
         body {
             font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
+            background: linear-gradient(160deg, var(--pink-3) 0%, var(--bg) 40%, #fff 100%);
+            background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
         }
 
         /* ── NAVBAR ── */
         nav {
-            background: #fff;
+            background: rgba(255,255,255,.90);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
             padding: 0 2rem;
             height: 60px;
@@ -99,8 +103,8 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             justify-content: space-between;
             position: sticky; top: 0; z-index: 100;
         }
-        .brand { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--purple); }
-        .brand span { color: var(--pink); }
+        .brand { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--pink-1); }
+        .brand span { color: var(--pink-deep); }
 
         /* ── LAYOUT ── */
         .container {
@@ -121,6 +125,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             background: var(--card);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
+            border: 1px solid var(--border);
             padding: 1.5rem;
         }
         .card-title {
@@ -130,10 +135,11 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             display: flex;
             align-items: center;
             gap: .5rem;
+            color: var(--text);
         }
         .card-title .num {
             width: 26px; height: 26px;
-            background: var(--purple);
+            background: linear-gradient(135deg, var(--pink-1), var(--pink-deep));
             color: #fff;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -148,6 +154,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             background: var(--card);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
+            border: 1px solid var(--border);
             overflow: hidden;
         }
         .step-item {
@@ -161,13 +168,13 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             transition: all .3s;
         }
         .step-item.active {
-            color: var(--purple);
-            border-bottom-color: var(--purple);
-            background: var(--purple-light);
+            color: var(--pink-deep);
+            border-bottom-color: var(--pink-deep);
+            background: var(--pink-4);
         }
         .step-item.done {
-            color: var(--pink);
-            border-bottom-color: var(--pink);
+            color: var(--pink-1);
+            border-bottom-color: var(--pink-1);
         }
 
         /* ── FORM ELEMENTS ── */
@@ -179,7 +186,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             margin-bottom: .35rem;
             color: var(--text);
         }
-        label .req { color: var(--pink); }
+        label .req { color: var(--pink-deep); }
         input[type=text], input[type=tel], input[type=number],
         select, textarea {
             width: 100%;
@@ -190,12 +197,12 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             font-size: .9rem;
             color: var(--text);
             background: #fff;
-            transition: border-color .2s;
+            transition: border-color .2s, box-shadow .2s;
             outline: none;
         }
         input:focus, select:focus, textarea:focus {
-            border-color: var(--purple);
-            box-shadow: 0 0 0 3px rgba(124,58,237,.1);
+            border-color: var(--pink-1);
+            box-shadow: 0 0 0 3px rgba(255,143,171,.15);
         }
         textarea { resize: vertical; min-height: 80px; }
 
@@ -215,10 +222,10 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             transition: all .2s;
             background: #fff;
         }
-        .metode-tab:hover { border-color: var(--purple); }
+        .metode-tab:hover { border-color: var(--pink-1); background: var(--pink-4); }
         .metode-tab.selected {
-            border-color: var(--purple);
-            background: var(--purple-light);
+            border-color: var(--pink-deep);
+            background: linear-gradient(135deg, var(--pink-4), #fff8fa);
         }
         .metode-tab .icon { font-size: 1.6rem; display: block; margin-bottom: .35rem; }
         .metode-tab .label { font-weight: 600; font-size: .9rem; color: var(--text); }
@@ -242,8 +249,8 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             cursor: pointer;
             transition: all .2s;
         }
-        .rek-card:hover { border-color: var(--purple); }
-        .rek-card.selected { border-color: var(--purple); background: var(--purple-light); }
+        .rek-card:hover { border-color: var(--pink-1); }
+        .rek-card.selected { border-color: var(--pink-deep); background: var(--pink-4); }
         .rek-card .rek-name { font-weight: 600; font-size: .9rem; }
         .rek-card .rek-no { font-size: .8rem; color: var(--muted); margin-top: .2rem; }
 
@@ -257,7 +264,10 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             transition: all .2s;
             position: relative;
         }
-        .upload-area:hover, .upload-area.dragover { border-color: var(--purple); background: var(--purple-light); }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--pink-1);
+            background: var(--pink-4);
+        }
         .upload-area input[type=file] {
             position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
         }
@@ -283,12 +293,13 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             width: 64px; height: 64px;
             border-radius: 8px;
             object-fit: cover;
+            border: 2px solid var(--pink-3);
         }
         .produk-mini .pname { font-weight: 600; font-size: .9rem; }
         .produk-mini .pbadge {
             display: inline-block;
-            background: var(--purple-light);
-            color: var(--purple);
+            background: var(--pink-3);
+            color: var(--pink-deep);
             font-size: .72rem;
             border-radius: 99px;
             padding: .15rem .6rem;
@@ -301,18 +312,19 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             font-size: .87rem;
             margin-bottom: .5rem;
         }
-        .row-price.diskon { color: var(--pink); }
+        .row-price.diskon { color: var(--pink-deep); }
         .row-price.total {
             font-weight: 700;
             font-size: 1rem;
             border-top: 1px solid var(--border);
             padding-top: .75rem;
             margin-top: .5rem;
+            color: var(--pink-deep);
         }
 
         .nego-badge {
-            background: var(--pink-light);
-            color: var(--pink);
+            background: var(--pink-3);
+            color: var(--pink-deep);
             font-size: .78rem;
             border-radius: 8px;
             padding: .5rem .75rem;
@@ -336,8 +348,8 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             cursor: pointer;
             transition: all .2s;
         }
-        .eks-card:hover { border-color: var(--purple); }
-        .eks-card.selected { border-color: var(--purple); background: var(--purple-light); }
+        .eks-card:hover { border-color: var(--pink-1); }
+        .eks-card.selected { border-color: var(--pink-deep); background: var(--pink-4); }
         .eks-card .eks-name { font-weight: 600; font-size: .88rem; }
         .eks-card .eks-ongkir { font-size: .78rem; color: var(--muted); margin-top: .15rem; }
         .eks-card.loading { opacity: .5; pointer-events: none; }
@@ -352,7 +364,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             gap: .5rem;
             align-items: flex-start;
         }
-        .alert-info { background: var(--purple-light); color: var(--purple); }
+        .alert-info { background: var(--pink-3); color: var(--pink-deep); }
         .alert-warn { background: #fef3c7; color: #92400e; }
 
         /* ── BTN ── */
@@ -369,14 +381,12 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             transition: all .2s;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--purple), var(--pink));
+            background: linear-gradient(135deg, var(--pink-1), var(--pink-deep));
             color: #fff;
+            box-shadow: 0 4px 14px rgba(255,111,163,.30);
         }
-        .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
-        .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-
-        /* ── HIDDEN INPUT ── */
-        input[type=hidden] {}
+        .btn-primary:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,111,163,.35); }
+        .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* ── COD JENIS ── */
         .cod-jenis-grid {
@@ -393,10 +403,10 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             text-align: center;
             transition: all .2s;
         }
-        .cod-jenis-card:hover { border-color: var(--purple); }
-        .cod-jenis-card.selected { border-color: var(--purple); background: var(--purple-light); }
+        .cod-jenis-card:hover { border-color: var(--pink-1); background: var(--pink-4); }
+        .cod-jenis-card.selected { border-color: var(--pink-deep); background: var(--pink-4); }
         .cod-jenis-card .cj-icon { font-size: 1.4rem; }
-        .cod-jenis-card .cj-label { font-weight: 600; font-size: .85rem; margin-top: .3rem; }
+        .cod-jenis-card .cj-label { font-weight: 600; font-size: .85rem; margin-top: .3rem; color: var(--text); }
         .cod-jenis-card .cj-desc { font-size: .75rem; color: var(--muted); margin-top: .2rem; }
     </style>
 </head>
@@ -450,43 +460,43 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
 
       <!-- COD section -->
       <div class="section-body" id="secCOD">
-        <div class="card-title" style="font-size:.95rem; margin-bottom:.75rem;"><span class="num" style="background:var(--pink)">▸</span> Jenis COD</div>
+        <div class="card-title" style="font-size:.95rem; margin-bottom:.75rem;"><span class="num" style="background:linear-gradient(135deg,var(--pink-1),var(--pink-deep))">▸</span> Jenis COD</div>
         <div class="cod-jenis-grid">
           <div class="cod-jenis-card" onclick="pilihCODJenis('antar_pembeli')">
-  <div class="cj-icon">🛵</div>
-  <div class="cj-label">Antar ke Rumah</div>
-  <div class="cj-desc">Penjual antar ke alamatmu<br>(area Banyuwangi Kota)</div>
-</div>
+            <div class="cj-icon">🛵</div>
+            <div class="cj-label">Antar ke Rumah</div>
+            <div class="cj-desc">Penjual antar ke alamatmu<br>(area Banyuwangi Kota)</div>
+          </div>
           <div class="cod-jenis-card" onclick="pilihCODJenis('antar')">
-  <div class="cj-icon">🏪</div>
-  <div class="cj-label">Beli ke Rumah Penjual</div>
-  <div class="cj-desc">Datang langsung ke tempat kami</div>
-</div>
+            <div class="cj-icon">🏪</div>
+            <div class="cj-label">Beli ke Rumah Penjual</div>
+            <div class="cj-desc">Datang langsung ke tempat kami</div>
+          </div>
         </div>
 
         <div class="form-group">
- <label>Alamat Lengkap <span class="req">*</span></label>
-<input type="text" name="lokasi_cod" id="lokasi_cod" placeholder="Contoh: Jl. Ahmad Yani No. 10, RT 02/03, Kel. Sobo">
-</div>
+          <label>Alamat Lengkap <span class="req">*</span></label>
+          <input type="text" name="lokasi_cod" id="lokasi_cod" placeholder="Contoh: Jl. Ahmad Yani No. 10, RT 02/03, Kel. Sobo">
+        </div>
 
-<!-- TAMBAH INI -->
-<div id="maps-btn-wrap" style="display:none; margin-top:8px; margin-bottom:12px;">
-    <a id="maps-link" href="#" target="_blank"
-       style="display:flex;align-items:center;justify-content:center;gap:8px;
-              width:100%;padding:11px;border-radius:10px;
-              background:linear-gradient(135deg,#1A73E8,#1557B0);
-              color:#fff;font-size:13px;font-weight:600;text-decoration:none;
-              box-shadow:0 3px 10px rgba(26,115,232,.25);transition:opacity .2s;"
-       onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-        </svg>
-        Buka Lokasi di Google Maps
-    </a>
-    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px;">
-        <i>Area Banyuwangi Kota</i>
-    </div>
-</div>
+        <div id="maps-btn-wrap" style="display:none; margin-top:8px; margin-bottom:12px;">
+          <a id="maps-link" href="#" target="_blank"
+             style="display:flex;align-items:center;justify-content:center;gap:8px;
+                    width:100%;padding:11px;border-radius:10px;
+                    background:linear-gradient(135deg,#1A73E8,#1557B0);
+                    color:#fff;font-size:13px;font-weight:600;text-decoration:none;
+                    box-shadow:0 3px 10px rgba(26,115,232,.25);transition:opacity .2s;"
+             onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              Buka Lokasi di Google Maps
+          </a>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px;">
+              <i>Area Banyuwangi Kota</i>
+          </div>
+        </div>
+
         <div class="form-group">
           <label>Catatan untuk Penjual</label>
           <textarea name="catatan" placeholder="Contoh: jam berapa kamu akan datang, patokan, dll."></textarea>
@@ -614,7 +624,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
           <div class="pnama"><?= htmlspecialchars($produk['nama_barang']) ?></div>
           <span class="pbadge"><?= htmlspecialchars($produk['kategori'] ?? '') ?></span>
           <?php if ($produk['ukuran'] ?? ''): ?>
-          <span class="pbadge" style="background:var(--pink-light);color:var(--pink);">Ukuran <?= htmlspecialchars($produk['ukuran']) ?></span>
+          <span class="pbadge" style="background:var(--pink-2);color:#fff;"><?= htmlspecialchars($produk['ukuran']) ?></span>
           <?php endif; ?>
         </div>
       </div>
@@ -671,7 +681,6 @@ function pilihMetode(m) {
   document.getElementById('secTransfer').classList.toggle('visible', m === 'transfer');
   document.getElementById('sectionTransferDetail').style.display = m === 'transfer' ? 'block' : 'none';
 
-  // Step bar
   document.getElementById('step2').classList.add('active');
   if (m === 'cod') {
     ongkir = 0;
@@ -683,20 +692,17 @@ function pilihMetode(m) {
 }
 
 // ── COD Jenis ──
-// GANTI fungsi pilihCODJenis yang lama dengan ini:
 function pilihCODJenis(j) {
   document.getElementById('inp_cod_jenis').value = j;
   document.querySelectorAll('.cod-jenis-card').forEach(el => el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
 
   if (j === 'antar_pembeli') {
-    // Penjual antar ke pembeli — input alamat bebas diisi
     document.getElementById('lokasi_cod').placeholder = 'Contoh: Jl. Ahmad Yani No. 10, RT 02/03, Kel. Sobo';
     document.getElementById('lokasi_cod').readOnly = false;
     document.getElementById('lokasi_cod').value = '';
     document.getElementById('maps-btn-wrap').style.display = 'none';
   } else {
-    // Beli ke Rumah Penjual — isi otomatis dari data toko
     const alamat  = <?= json_encode($toko['alamat'] ?? '') ?>;
     const mapsUrl = <?= json_encode($toko['maps_url'] ?? '') ?>;
     document.getElementById('lokasi_cod').value    = alamat || 'Rumah Penjual';
@@ -791,9 +797,7 @@ ua.addEventListener('drop', e => {
   }
 });
 
-// ── RajaOngkir Wilayah ──
 // ── BinderByte Wilayah & Ongkir ──
-
 async function loadProvinsi() {
   try {
     const res  = await fetch('../ajax/get_provinsi.php');
@@ -864,7 +868,7 @@ async function onKecamatanChange() {
   kecamatanSel = true;
 
   document.getElementById('areaEkspedisi').style.display = 'block';
-  await hitungOngkir(optKec.value); // ← kirim ID kecamatan, bukan nama
+  await hitungOngkir(optKec.value);
   cekSubmit();
 }
 
