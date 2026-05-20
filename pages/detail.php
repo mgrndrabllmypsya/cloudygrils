@@ -143,7 +143,7 @@ include '../includes/header.php';
 .nego-status-harga{font-size:18px;font-weight:700;margin:6px 0;color:#E8607A;}
 
 /* ── MODAL NEGO ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(61,26,36,.45);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .25s;}
+.modal-overlay{position:fixed;inset:0;background:rgba(61,26,36,0.45);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .25s;}
 .modal-overlay.open{opacity:1;visibility:visible;}
 .modal-box{
     background:#fff;
