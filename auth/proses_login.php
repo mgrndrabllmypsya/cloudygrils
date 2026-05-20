@@ -2,11 +2,11 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
+// JANGAN session_start() di sini dulu
 require '../config/koneksi.php';
 
-// Kalau bukan POST, balik ke login
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Untuk redirect saja, session belum perlu dibuka
     header('Location: login.php');
     exit;
 }
@@ -28,7 +28,6 @@ mysqli_stmt_bind_param($stmt, "s", $email);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $row    = mysqli_fetch_assoc($result);
-
 if ($row && password_verify($password, $row['password'])) {
     $user = $row;
     $role = 'pembeli';
@@ -41,40 +40,44 @@ if (!$user) {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     $row    = mysqli_fetch_assoc($result);
-
     if ($row && password_verify($password, $row['password'])) {
         $user = $row;
         $role = 'penjual';
     }
 }
 
-// ── Tidak ditemukan di kedua tabel ───────────────────
+// ── Tidak ditemukan ───────────────────────────────────
 if (!$user) {
     header('Location: login.php?error=1');
     exit;
 }
 
-// ── Simpan session ────────────────────────────────────
-session_regenerate_id(true);
-
+// ── Simpan session SETELAH tahu role ─────────────────
 if ($role === 'penjual') {
-    // Session khusus penjual
-    $_SESSION['admin_login']  = true;
+    session_name('session_penjual');
+    session_start();
+    session_regenerate_id(true);
+
+    $_SESSION['login']        = true;
+    $_SESSION['user_id']      = $user['id'];
+    $_SESSION['user_role']    = 'penjual';
     $_SESSION['penjual_id']   = $user['id'];
     $_SESSION['penjual_nama'] = $user['nama'];
-    $_SESSION['user_role']    = 'penjual';
-    // JANGAN timpa user_id dan login pembeli
+    $_SESSION['admin_nama']   = $user['nama'];
+
 } else {
-    // Session khusus pembeli
-    $_SESSION['user_id']    = $user['id'];
-    $_SESSION['user_nama']  = $user['nama'];
-    $_SESSION['user_email'] = $user['email'];
-    $_SESSION['user_role']  = 'pembeli';
-    $_SESSION['login']      = true;
-    $_SESSION['nama']       = $user['nama'];
+    session_name('session_pembeli');
+    session_start();
+    session_regenerate_id(true);
+
+    $_SESSION['login']        = true;
+    $_SESSION['user_id']      = $user['id'];
+    $_SESSION['user_role']    = 'pembeli';
+    $_SESSION['pembeli_id']   = $user['id'];
+    $_SESSION['pembeli_nama'] = $user['nama'];
 }
 
-// ── Redirect sesuai role ──────────────────────────────
+// ── Redirect ──────────────────────────────────────────
 if ($role === 'penjual') {
     header('Location: ../penjual/dashboard.php');
 } else {

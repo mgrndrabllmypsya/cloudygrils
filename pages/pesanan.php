@@ -1,4 +1,5 @@
 <?php
+session_name('session_pembeli');
 session_start();
 require_once '../config/koneksi.php';
 
@@ -370,7 +371,7 @@ a { text-decoration:none; }
             <div class="card-foot">
                 <div class="info-row">
                     <?php if ($p['metode'] === 'transfer' && $p['bukti_transfer']): ?>
-                    <a href="../uploads/bukti/<?= escape($p['bukti_transfer']) ?>" target="_blank" class="btn-outline">
+                  <a href="../uploads/bukti_transfer/<?= escape($p['bukti_transfer']) ?>" target="_blank" class="btn-outline">
                         <i class="bi bi-image"></i> Lihat Bukti
                     </a>
                     <?php endif; ?>

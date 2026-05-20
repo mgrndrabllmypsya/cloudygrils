@@ -1,11 +1,11 @@
 <?php
+session_name('session_penjual');
 session_start();
 require_once '../config/koneksi.php';
 
-if (!isset($_SESSION['admin_login']) || !$_SESSION['admin_login']) {
-      header("Location: ../auth/login.php"); exit;
+if (!isset($_SESSION['login']) || $_SESSION['user_role'] !== 'penjual') {
+    header("Location: ../auth/login.php"); exit;
 }
-
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
 function formatRupiah($angka) { return 'Rp ' . number_format($angka, 0, ',', '.'); }
 

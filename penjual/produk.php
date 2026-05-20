@@ -1,9 +1,10 @@
 <?php
+session_name('session_penjual');
 session_start();
 require_once '../config/koneksi.php';
 
-if (!isset($_SESSION['admin_login']) || !$_SESSION['admin_login']) {
-     header("Location: ../auth/login.php"); exit;
+if (!isset($_SESSION['login']) || $_SESSION['user_role'] !== 'penjual') {
+    header("Location: ../auth/login.php"); exit;
 }
 
 function escape($str) {
@@ -376,7 +377,6 @@ select.form-control option { background:var(--surface2); }
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
-        <small>Dashboard Penjual</small>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>

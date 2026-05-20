@@ -1,4 +1,5 @@
 <?php
+session_name('session_penjual');
 session_start();
 require_once '../config/koneksi.php';
 
@@ -452,7 +453,6 @@ select.form-ctrl option { background:#fff; }
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
-        <small>Dashboard Penjual</small>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
@@ -484,7 +484,7 @@ select.form-ctrl option { background:#fff; }
                 <a href="pengaturan.php" class="dropdown-item"><i class="bi bi-gear"></i> Pengaturan Akun</a>
                 <a href="../pages/home.php" class="dropdown-item" target="_blank"><i class="bi bi-shop"></i> Lihat Toko</a>
                 <div class="dropdown-divider"></div>
-                <a href="../auth/logout_admin.php" class="dropdown-item danger"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+                <a href="../auth/logout_penjual.php" class="dropdown-item danger"><i class="bi bi-box-arrow-left"></i> Keluar</a>
             </div>
             <div class="admin-card" id="adminCardBtn" onclick="toggleDropdown()">
                 <div class="admin-avatar">
@@ -501,7 +501,7 @@ select.form-ctrl option { background:#fff; }
                 <i class="bi bi-chevron-up chevron"></i>
             </div>
         </div>
-        <a href="../auth/logout_admin.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
     </div>
 </aside>
 

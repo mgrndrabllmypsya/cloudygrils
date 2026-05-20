@@ -1,4 +1,5 @@
 <?php
+session_name('session_pembeli');
 session_start();
 require_once '../config/koneksi.php';
 

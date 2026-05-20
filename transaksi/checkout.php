@@ -1,5 +1,5 @@
 <?php
-
+session_name('session_pembeli');
 session_start();
 include '../config/koneksi.php';
 
@@ -452,11 +452,11 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
       <div class="section-body" id="secCOD">
         <div class="card-title" style="font-size:.95rem; margin-bottom:.75rem;"><span class="num" style="background:var(--pink)">▸</span> Jenis COD</div>
         <div class="cod-jenis-grid">
-          <div class="cod-jenis-card" onclick="pilihCODJenis('temu')">
-            <div class="cj-icon">🤝</div>
-            <div class="cj-label">Temu di Titik</div>
-            <div class="cj-desc">Sepakati lokasi temu</div>
-          </div>
+          <div class="cod-jenis-card" onclick="pilihCODJenis('antar_pembeli')">
+  <div class="cj-icon">🛵</div>
+  <div class="cj-label">Antar ke Rumah</div>
+  <div class="cj-desc">Penjual antar ke alamatmu<br>(area Banyuwangi Kota)</div>
+</div>
           <div class="cod-jenis-card" onclick="pilihCODJenis('antar')">
   <div class="cj-icon">🏪</div>
   <div class="cj-label">Beli ke Rumah Penjual</div>
@@ -465,8 +465,8 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
         </div>
 
         <div class="form-group">
-  <label>Lokasi / Titik Temu <span class="req">*</span></label>
-  <input type="text" name="lokasi_cod" id="lokasi_cod" placeholder="Contoh: Alfamart Jl. Gajah Mada / Alamat lengkap rumah">
+ <label>Alamat Lengkap <span class="req">*</span></label>
+<input type="text" name="lokasi_cod" id="lokasi_cod" placeholder="Contoh: Jl. Ahmad Yani No. 10, RT 02/03, Kel. Sobo">
 </div>
 
 <!-- TAMBAH INI -->
@@ -689,18 +689,18 @@ function pilihCODJenis(j) {
   document.querySelectorAll('.cod-jenis-card').forEach(el => el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
 
-  if (j === 'temu') {
-    document.getElementById('lokasi_cod').placeholder = 'Contoh: Alfamart Jl. Gajah Mada (dekat SPBU)';
+  if (j === 'antar_pembeli') {
+    // Penjual antar ke pembeli — input alamat bebas diisi
+    document.getElementById('lokasi_cod').placeholder = 'Contoh: Jl. Ahmad Yani No. 10, RT 02/03, Kel. Sobo';
     document.getElementById('lokasi_cod').readOnly = false;
     document.getElementById('lokasi_cod').value = '';
     document.getElementById('maps-btn-wrap').style.display = 'none';
   } else {
-    // Rumah penjual — isi otomatis dari data toko
-    const alamat = <?= json_encode($toko['alamat'] ?? '') ?>;
+    // Beli ke Rumah Penjual — isi otomatis dari data toko
+    const alamat  = <?= json_encode($toko['alamat'] ?? '') ?>;
     const mapsUrl = <?= json_encode($toko['maps_url'] ?? '') ?>;
-    document.getElementById('lokasi_cod').value = alamat || 'Rumah Penjual';
+    document.getElementById('lokasi_cod').value    = alamat || 'Rumah Penjual';
     document.getElementById('lokasi_cod').readOnly = true;
-    // Tampilkan tombol maps kalau ada
     const mapsWrap = document.getElementById('maps-btn-wrap');
     if (mapsUrl) {
       document.getElementById('maps-link').href = mapsUrl;

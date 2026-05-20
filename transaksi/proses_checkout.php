@@ -1,4 +1,5 @@
 <?php
+session_name('session_pembeli');
 session_start();
 include '../config/koneksi.php';
 
@@ -7,8 +8,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Paksa dari session, abaikan $_POST['pembeli_id']
+$pembeli_id = (int)$_SESSION['pembeli_id'];
+
+if (!$pembeli_id) {
+    header("Location: ../auth/login.php");
+    exit;
+}
+
 $produk_id    = (int)$_POST['produk_id'];
-$pembeli_id   = (int)$_POST['pembeli_id'];
 $nego_id      = !empty($_POST['nego_id']) ? (int)$_POST['nego_id'] : null;
 $metode       = $_POST['metode'];
 $harga_produk = (float)$_POST['harga_produk'];
@@ -116,7 +124,7 @@ VALUES (
 if ($conn->query($sql)) {
     // Tandai produk sebagai terjual
     $conn->query("UPDATE produk SET status = 'terjual' WHERE id = $produk_id");
-    
+
     header("Location: ../transaksi/sukses.php?kode={$kode_pesanan}");
     exit;
 } else {

@@ -1,15 +1,16 @@
 <?php
+session_name('session_penjual');
 session_start();
 require_once '../config/koneksi.php';
 
-if (!isset($_SESSION['admin_login']) || !$_SESSION['admin_login']) {
-      header("Location: ../auth/login.php"); exit;
+if (!isset($_SESSION['login']) || $_SESSION['user_role'] !== 'penjual') {
+    header("Location: ../auth/login.php"); exit;
 }
 
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
 function formatRupiah($angka) { return 'Rp ' . number_format($angka, 0, ',', '.'); }
 
-$admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
+$penjual_nama = $_SESSION['penjual_nama'] ?? 'Penjual';
 
 $filter = $_GET['status'] ?? 'semua';
 $where  = $filter !== 'semua' ? "WHERE nh.status = '" . mysqli_real_escape_string($conn, $filter) . "'" : "";
@@ -34,7 +35,7 @@ $total_tolak    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM neg
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nego Harga — Cloudy Girls Admin</title>
+<title>Nego Harga — Cloudy Girls</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
@@ -57,147 +58,93 @@ $total_tolak    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM neg
     --white:    #FFFFFF;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{
-    font-family:'DM Sans',sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    display:flex;
-    min-height:100vh;
-}
-body::before {
-    content:'';
-    position:fixed; inset:0;
-    background-image: radial-gradient(circle, #FFB6D0 1px, transparent 1px);
-    background-size: 28px 28px;
-    opacity:.15;
-    pointer-events:none;
-    z-index:0;
-}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,#FFB6D0 1px,transparent 1px);background-size:28px 28px;opacity:.15;pointer-events:none;z-index:0;}
 a{text-decoration:none;color:inherit;}
-
-/* SIDEBAR */
-.sidebar {
-    width:230px;
-    background: linear-gradient(180deg, #FF80AB 0%, #FF4081 45%, #F50057 100%);
-    display:flex; flex-direction:column;
-    position:fixed; top:0; left:0; bottom:0; z-index:50;
-    box-shadow: 4px 0 28px rgba(255,64,129,.3);
-}
-.sidebar-logo { padding:22px 22px 18px; border-bottom:1.5px solid rgba(255,255,255,.2); background:rgba(255,255,255,.12); }
-.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:21px; font-weight:900; color:#fff; }
-.sidebar-logo .logo span { color:#FFE4EE; }
-.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:3px; }
-.sidebar-nav { flex:1; padding:14px 10px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
-.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:12px 12px 5px; font-weight:600; }
-.nav-item { display:flex; align-items:center; gap:11px; padding:9px 13px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); transition:all .18s; }
-.nav-item:hover { background:rgba(255,255,255,.2); color:#fff; }
-.nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; }
-.nav-item i { font-size:15px; width:18px; flex-shrink:0; }
-.badge-notif { background:rgba(255,255,255,.9); color:var(--accent2); font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; margin-left:auto; }
-.sidebar-footer { padding:14px 10px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
-.admin-card { display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,.18); border-radius:10px; margin-bottom:8px; border:1.5px solid rgba(255,255,255,.3); }
-.admin-avatar { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.3); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; border:2px solid rgba(255,255,255,.5); }
-.admin-info .name { font-size:12px; font-weight:600; color:#fff; }
-.admin-info .role { font-size:10px; color:rgba(255,255,255,.65); }
-.btn-logout { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; font-size:12px; color:rgba(255,255,255,.85); transition:background .2s; width:100%; }
-.btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
-
-/* MAIN */
-.main { margin-left:230px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
-.topbar {
-    background:rgba(255,255,255,.95);
-    backdrop-filter:blur(12px);
-    border-bottom:1.5px solid var(--border);
-    padding:0 28px; height:62px;
-    display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:40;
-    box-shadow:0 2px 12px rgba(255,64,129,.07);
-}
-.topbar-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:var(--text); }
-.topbar-right { display:flex; align-items:center; gap:10px; }
-.btn-toko { display:flex; align-items:center; gap:6px; padding:7px 16px; border-radius:8px; background:linear-gradient(135deg,#FF80AB,#FF4081); font-size:12px; font-weight:600; color:#fff; box-shadow:0 3px 12px rgba(255,64,129,.35); transition:opacity .2s; }
-.btn-toko:hover { opacity:.88; }
-.content { padding:26px 28px; flex:1; }
-
-/* STATS */
-.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
-.stat-card { background:var(--white); border:1.5px solid var(--border); border-radius:16px; padding:18px; cursor:pointer; transition:all .2s; display:block; text-decoration:none; box-shadow:0 2px 12px rgba(255,64,129,.08); }
-.stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(255,64,129,.15); }
-.stat-card.active-filter { border-color:var(--accent); background:#FFE4EE; }
-.stat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; margin-bottom:12px; }
-.stat-value { font-size:24px; font-weight:700; color:var(--text); margin-bottom:3px; }
-.stat-label { font-size:12px; color:var(--muted); }
-
-/* FILTER TABS */
-.filter-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
-.filter-tab { padding:7px 16px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid var(--border); color:var(--muted); cursor:pointer; transition:all .2s; text-decoration:none; background:var(--white); }
-.filter-tab:hover { border-color:var(--accent); color:var(--accent); }
-.filter-tab.active { background:linear-gradient(135deg,#FF80AB,#FF4081); border-color:transparent; color:#fff; box-shadow:0 3px 10px rgba(255,64,129,.3); }
-
-/* NEGO CARDS */
-.nego-list { display:flex; flex-direction:column; gap:14px; }
-.nego-card { background:var(--white); border:1.5px solid var(--border); border-radius:16px; overflow:hidden; transition:border-color .2s, box-shadow .2s; box-shadow:0 2px 12px rgba(255,64,129,.07); }
-.nego-card:hover { border-color:var(--pink); box-shadow:0 6px 20px rgba(255,64,129,.12); }
-.nego-card-head { padding:14px 20px; border-bottom:1.5px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; background:linear-gradient(to right,#FFF5F8,#fff); }
-.nego-card-body { padding:16px 20px; display:flex; gap:16px; align-items:flex-start; }
-.nego-card-foot { padding:12px 20px; border-top:1.5px solid var(--border); background:#FFF8FA; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-
-.produk-thumb { width:56px; height:64px; border-radius:8px; object-fit:cover; border:1.5px solid var(--border); flex-shrink:0; }
-.nego-info { flex:1; }
-.nego-produk { font-weight:600; font-size:14px; color:var(--text); margin-bottom:4px; }
-.nego-pembeli { font-size:12px; color:var(--muted); margin-bottom:10px; }
-
-.harga-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:10px; }
-.harga-box { background:var(--surface2); border-radius:8px; padding:10px 12px; border:1px solid var(--border); }
-.harga-box .lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
-.harga-box .val { font-size:14px; font-weight:700; }
-.harga-asli   .val { color:var(--text); }
-.harga-tawar  .val { color:var(--yellow); }
-.harga-deal   .val { color:var(--green); }
-.harga-counter .val { color:var(--orange); }
-
-.nego-pesan { font-size:13px; color:var(--text2); font-style:italic; padding:10px 12px; background:var(--surface2); border-radius:8px; border-left:3px solid var(--border); }
-
-/* BADGE */
-.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
-.badge-menunggu  { background:#FFF8E1; color:#F9A825; }
-.badge-disetujui { background:#E0F2F1; color:#00897B; }
-.badge-ditolak   { background:#FFEBEE; color:#E53935; }
-.badge-counter   { background:#FBE9E7; color:#E64A19; }
-
-/* BUTTONS */
-.btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
-.btn-green  { background:#E0F2F1; color:#00695C; border:1.5px solid #80CBC4 !important; }
-.btn-green:hover  { background:#B2DFDB; }
-.btn-red    { background:#FFEBEE; color:#C62828; border:1.5px solid #EF9A9A !important; }
-.btn-red:hover    { background:#FFCDD2; }
-.btn-orange { background:#FBE9E7; color:#BF360C; border:1.5px solid #FFAB91 !important; }
-.btn-orange:hover { background:#FFCCBC; }
-
-/* FORM INPUT */
-.form-inline { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-.form-input { background:var(--surface2); border:1.5px solid var(--border); border-radius:8px; color:var(--text); font-size:13px; padding:7px 12px; outline:none; font-family:'DM Sans',sans-serif; transition:border-color .2s; width:160px; }
-.form-input:focus { border-color:var(--accent); }
-
-/* EMPTY */
-.empty-box { text-align:center; padding:60px 20px; color:var(--muted); }
-.empty-box i { font-size:3rem; display:block; margin-bottom:12px; color:var(--pink); }
-.empty-box p { font-size:14px; }
-
-/* ALERT */
-.alert { padding:12px 16px; border-radius:10px; font-size:13px; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
-.alert-success { background:#E0F2F1; color:#00695C; border:1.5px solid #80CBC4; }
-.alert-danger  { background:#FFEBEE; color:#C62828; border:1.5px solid #EF9A9A; }
-
-/* MODAL */
-.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); z-index:200; align-items:center; justify-content:center; }
-.overlay.show { display:flex; }
-.modal-box { background:var(--white); border:1.5px solid var(--border); border-radius:16px; padding:28px; width:420px; max-width:92%; box-shadow:0 25px 60px rgba(255,64,129,.2); }
-.modal-box h4 { font-size:15px; font-weight:700; color:var(--text); margin-bottom:6px; }
-.modal-box p  { font-size:13px; color:var(--muted); margin-bottom:16px; }
-.modal-btns { display:flex; gap:8px; justify-content:flex-end; }
-.btn-cancel { padding:8px 16px; border-radius:8px; background:var(--surface2); border:1.5px solid var(--border); color:var(--muted); font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif; }
-.btn-cancel:hover { color:var(--text); border-color:var(--accent); }
+.sidebar{width:230px;background:linear-gradient(180deg,#FF80AB 0%,#FF4081 45%,#F50057 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:4px 0 28px rgba(255,64,129,.3);}
+.sidebar-logo{padding:22px 22px 18px;border-bottom:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);}
+.sidebar-logo .logo{font-family:'Playfair Display',serif;font-size:21px;font-weight:900;color:#fff;}
+.sidebar-logo .logo span{color:#FFE4EE;}
+.sidebar-nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.nav-section{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.55);padding:12px 12px 5px;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:500;color:rgba(255,255,255,.8);transition:all .18s;}
+.nav-item:hover{background:rgba(255,255,255,.2);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,.28);color:#fff;font-weight:600;border-left:3px solid #fff;}
+.nav-item i{font-size:15px;width:18px;flex-shrink:0;}
+.badge-notif{background:rgba(255,255,255,.9);color:var(--accent2);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:auto;}
+.sidebar-footer{padding:14px 10px;border-top:1.5px solid rgba(255,255,255,.2);background:rgba(0,0,0,.1);}
+.admin-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.18);border-radius:10px;margin-bottom:8px;border:1.5px solid rgba(255,255,255,.3);}
+.admin-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.5);}
+.admin-info .name{font-size:12px;font-weight:600;color:#fff;}
+.admin-info .role{font-size:10px;color:rgba(255,255,255,.65);}
+.btn-logout{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:12px;color:rgba(255,255,255,.85);transition:background .2s;width:100%;}
+.btn-logout:hover{background:rgba(255,255,255,.2);color:#fff;}
+.main{margin-left:230px;flex:1;display:flex;flex-direction:column;position:relative;z-index:1;}
+.topbar{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1.5px solid var(--border);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 12px rgba(255,64,129,.07);}
+.topbar-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--text);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.btn-toko{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;background:linear-gradient(135deg,#FF80AB,#FF4081);font-size:12px;font-weight:600;color:#fff;box-shadow:0 3px 12px rgba(255,64,129,.35);transition:opacity .2s;}
+.btn-toko:hover{opacity:.88;}
+.content{padding:26px 28px;flex:1;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:all .2s;display:block;text-decoration:none;box-shadow:0 2px 12px rgba(255,64,129,.08);}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(255,64,129,.15);}
+.stat-card.active-filter{border-color:var(--accent);background:#FFE4EE;}
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px;}
+.stat-value{font-size:24px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.stat-label{font-size:12px;color:var(--muted);}
+.filter-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-tab{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s;text-decoration:none;background:var(--white);}
+.filter-tab:hover{border-color:var(--accent);color:var(--accent);}
+.filter-tab.active{background:linear-gradient(135deg,#FF80AB,#FF4081);border-color:transparent;color:#fff;box-shadow:0 3px 10px rgba(255,64,129,.3);}
+.nego-list{display:flex;flex-direction:column;gap:14px;}
+.nego-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(255,64,129,.07);}
+.nego-card:hover{border-color:var(--pink);box-shadow:0 6px 20px rgba(255,64,129,.12);}
+.nego-card-head{padding:14px 20px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:linear-gradient(to right,#FFF5F8,#fff);}
+.nego-card-body{padding:16px 20px;display:flex;gap:16px;align-items:flex-start;}
+.nego-card-foot{padding:12px 20px;border-top:1.5px solid var(--border);background:#FFF8FA;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.produk-thumb{width:56px;height:64px;border-radius:8px;object-fit:cover;border:1.5px solid var(--border);flex-shrink:0;}
+.nego-info{flex:1;}
+.nego-produk{font-weight:600;font-size:14px;color:var(--text);margin-bottom:4px;}
+.nego-pembeli{font-size:12px;color:var(--muted);margin-bottom:10px;}
+.harga-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:10px;}
+.harga-box{background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border);}
+.harga-box .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.harga-box .val{font-size:14px;font-weight:700;}
+.harga-asli .val{color:var(--text);}
+.harga-tawar .val{color:var(--yellow);}
+.harga-deal .val{color:var(--green);}
+.harga-counter .val{color:var(--orange);}
+.nego-pesan{font-size:13px;color:var(--text2);font-style:italic;padding:10px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--border);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-menunggu{background:#FFF8E1;color:#F9A825;}
+.badge-disetujui{background:#E0F2F1;color:#00897B;}
+.badge-ditolak{background:#FFEBEE;color:#E53935;}
+.badge-counter{background:#FBE9E7;color:#E64A19;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.btn-green{background:#E0F2F1;color:#00695C;border:1.5px solid #80CBC4 !important;}
+.btn-green:hover{background:#B2DFDB;}
+.btn-red{background:#FFEBEE;color:#C62828;border:1.5px solid #EF9A9A !important;}
+.btn-red:hover{background:#FFCDD2;}
+.btn-orange{background:#FBE9E7;color:#BF360C;border:1.5px solid #FFAB91 !important;}
+.btn-orange:hover{background:#FFCCBC;}
+.form-inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.form-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:7px 12px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;width:160px;}
+.form-input:focus{border-color:var(--accent);}
+.empty-box{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-box i{font-size:3rem;display:block;margin-bottom:12px;color:var(--pink);}
+.empty-box p{font-size:14px;}
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.alert-success{background:#E0F2F1;color:#00695C;border:1.5px solid #80CBC4;}
+.alert-danger{background:#FFEBEE;color:#C62828;border:1.5px solid #EF9A9A;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.modal-box{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:28px;width:420px;max-width:92%;box-shadow:0 25px 60px rgba(255,64,129,.2);}
+.modal-box h4{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.modal-box p{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;}
+.btn-cancel{padding:8px 16px;border-radius:8px;background:var(--surface2);border:1.5px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-cancel:hover{color:var(--text);border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -205,7 +152,6 @@ a{text-decoration:none;color:inherit;}
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
-        <small>Dashboard Penjual</small>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
@@ -225,13 +171,13 @@ a{text-decoration:none;color:inherit;}
     </nav>
     <div class="sidebar-footer">
         <div class="admin-card">
-            <div class="admin-avatar"><?= strtoupper(substr($admin_nama, 0, 1)) ?></div>
+            <div class="admin-avatar"><?= strtoupper(substr($penjual_nama, 0, 1)) ?></div>
             <div class="admin-info">
-                <div class="name"><?= escape($admin_nama) ?></div>
-                <div class="role">Administrator</div>
+                <div class="name"><?= escape($penjual_nama) ?></div>
+                <div class="role">Penjual</div>
             </div>
         </div>
-        <a href="../auth/logout_admin.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
     </div>
 </aside>
 
@@ -247,16 +193,15 @@ a{text-decoration:none;color:inherit;}
     <div class="content">
 
         <?php if (isset($_GET['msg'])): ?>
-        <?php if ($_GET['msg'] === 'setuju'): ?>
-        <div class="alert alert-success"><i class="bi bi-check-circle-fill"></i> Nego disetujui! Pembeli bisa langsung checkout dengan harga deal.</div>
-        <?php elseif ($_GET['msg'] === 'tolak'): ?>
-        <div class="alert alert-danger"><i class="bi bi-x-circle-fill"></i> Nego ditolak.</div>
-        <?php elseif ($_GET['msg'] === 'counter'): ?>
-        <div class="alert alert-success"><i class="bi bi-arrow-left-right"></i> Counter harga berhasil dikirim ke pembeli.</div>
-        <?php endif; ?>
+            <?php if ($_GET['msg'] === 'setuju'): ?>
+            <div class="alert alert-success"><i class="bi bi-check-circle-fill"></i> Nego disetujui!</div>
+            <?php elseif ($_GET['msg'] === 'tolak'): ?>
+            <div class="alert alert-danger"><i class="bi bi-x-circle-fill"></i> Nego ditolak.</div>
+            <?php elseif ($_GET['msg'] === 'counter'): ?>
+            <div class="alert alert-success"><i class="bi bi-arrow-left-right"></i> Counter harga berhasil dikirim.</div>
+            <?php endif; ?>
         <?php endif; ?>
 
-        <!-- STATS -->
         <div class="stats-grid">
             <a href="nego.php?status=menunggu" class="stat-card <?= $filter==='menunggu'?'active-filter':'' ?>">
                 <div class="stat-icon" style="background:#FFF8E1;color:#F9A825;"><i class="bi bi-hourglass-split"></i></div>
@@ -280,7 +225,6 @@ a{text-decoration:none;color:inherit;}
             </a>
         </div>
 
-        <!-- FILTER TABS -->
         <div class="filter-tabs">
             <a href="nego.php?status=semua"     class="filter-tab <?= $filter==='semua'    ?'active':'' ?>">Semua</a>
             <a href="nego.php?status=menunggu"  class="filter-tab <?= $filter==='menunggu' ?'active':'' ?>">⏳ Menunggu</a>
@@ -289,13 +233,11 @@ a{text-decoration:none;color:inherit;}
             <a href="nego.php?status=ditolak"   class="filter-tab <?= $filter==='ditolak'  ?'active':'' ?>">❌ Ditolak</a>
         </div>
 
-        <!-- NEGO LIST -->
         <?php if ($q && mysqli_num_rows($q) > 0): ?>
         <div class="nego-list">
         <?php while ($row = mysqli_fetch_assoc($q)): ?>
         <?php $persen_tawar = round((1 - $row['harga_tawar'] / $row['harga_asli']) * 100); ?>
         <div class="nego-card">
-            <!-- HEAD -->
             <div class="nego-card-head">
                 <div style="display:flex;align-items:center;gap:10px;">
                     <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#FF80AB,#FF4081);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;">
@@ -325,7 +267,6 @@ a{text-decoration:none;color:inherit;}
                 <span class="badge <?= $badge_class ?>"><?= $badge_label ?></span>
             </div>
 
-            <!-- BODY -->
             <div class="nego-card-body">
                 <img src="../uploads/produk/<?= escape($row['foto_utama'] ?? '') ?>"
                      class="produk-thumb"
@@ -333,7 +274,6 @@ a{text-decoration:none;color:inherit;}
                 <div class="nego-info">
                     <div class="nego-produk"><?= escape($row['nama_barang']) ?></div>
                     <div class="nego-pembeli">Penawaran turun <strong style="color:var(--yellow);"><?= $persen_tawar ?>%</strong> dari harga asli</div>
-
                     <div class="harga-row">
                         <div class="harga-box harga-asli">
                             <div class="lbl">Harga Asli</div>
@@ -350,7 +290,7 @@ a{text-decoration:none;color:inherit;}
                         </div>
                         <?php elseif ($row['harga_counter']): ?>
                         <div class="harga-box harga-counter">
-                            <div class="lbl">Counter Admin</div>
+                            <div class="lbl">Counter Penjual</div>
                             <div class="val"><?= formatRupiah($row['harga_counter']) ?></div>
                         </div>
                         <?php else: ?>
@@ -360,30 +300,27 @@ a{text-decoration:none;color:inherit;}
                         </div>
                         <?php endif; ?>
                     </div>
-
                     <?php if ($row['pesan']): ?>
                     <div class="nego-pesan">"<?= escape($row['pesan']) ?>"</div>
                     <?php endif; ?>
-
                     <?php if ($row['pesan_admin']): ?>
                     <div class="nego-pesan" style="border-left-color:var(--accent);margin-top:8px;">
-                        <span style="font-size:11px;color:var(--accent);font-style:normal;font-weight:600;">Balasan Admin:</span><br>
+                        <span style="font-size:11px;color:var(--accent);font-style:normal;font-weight:600;">Balasan Penjual:</span><br>
                         "<?= escape($row['pesan_admin']) ?>"
                     </div>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <!-- FOOT — AKSI -->
             <?php if ($row['status'] === 'menunggu'): ?>
             <div class="nego-card-foot">
-                <form method="POST" action="proses_nego_admin.php">
+                <form method="POST" action="../transaksi/proses_nego.php">
                     <input type="hidden" name="nego_id" value="<?= $row['id'] ?>">
                     <input type="hidden" name="aksi" value="setuju">
                     <input type="hidden" name="harga_deal" value="<?= $row['harga_tawar'] ?>">
                     <button type="submit" class="btn btn-green"><i class="bi bi-check-circle-fill"></i> Setuju</button>
                 </form>
-                <form method="POST" action="proses_nego_admin.php" class="form-inline">
+                <form method="POST" action="../transaksi/proses_nego.php" class="form-inline">
                     <input type="hidden" name="nego_id" value="<?= $row['id'] ?>">
                     <input type="hidden" name="aksi" value="counter">
                     <input type="number" name="harga_counter" class="form-input"
@@ -428,7 +365,7 @@ a{text-decoration:none;color:inherit;}
     <div class="modal-box">
         <h4><i class="bi bi-x-circle" style="color:var(--red);margin-right:6px;"></i> Tolak Nego</h4>
         <p>Berikan alasan penolakan kepada pembeli (opsional).</p>
-        <form method="POST" action="proses_nego_admin.php">
+        <form method="POST" action="../transaksi/proses_nego.php">
             <input type="hidden" name="nego_id" id="tolakNegoId">
             <input type="hidden" name="aksi" value="tolak">
             <div style="margin-bottom:14px;">

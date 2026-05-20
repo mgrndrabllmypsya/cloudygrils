@@ -1,9 +1,10 @@
 <?php
+session_name('session_penjual');
 session_start();
 require_once '../config/koneksi.php';
 
-if (!isset($_SESSION['admin_login']) || !$_SESSION['admin_login']) {
-      header("Location: ../auth/login.php"); exit;
+if (!isset($_SESSION['login']) || $_SESSION['user_role'] !== 'penjual') {
+    header("Location: ../auth/login.php"); exit;
 }
 
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
@@ -20,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_toko'])) {
     $instagram  = mysqli_real_escape_string($conn, $_POST['instagram']  ?? '');
     $maps_url   = mysqli_real_escape_string($conn, $_POST['maps_url']   ?? '');
 
-    // Handle upload logo
     $logo_sql = '';
     if (!empty($_FILES['logo']['name'])) {
         $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
@@ -43,14 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_toko'])) {
         $exist = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pengaturan_toko"));
         if ($exist && $exist[0] > 0) {
             mysqli_query($conn, "UPDATE pengaturan_toko SET
-            nama_toko='$nama_toko',
-            deskripsi='$deskripsi',
-            no_hp='$no_hp',
-            alamat='$alamat',
-            instagram='$instagram',
-            maps_url='$maps_url'
-            $logo_sql
-         WHERE id=1");
+                nama_toko='$nama_toko', deskripsi='$deskripsi', no_hp='$no_hp',
+                alamat='$alamat', instagram='$instagram', maps_url='$maps_url'
+                $logo_sql WHERE id=1");
         } else {
             mysqli_query($conn, "INSERT INTO pengaturan_toko (nama_toko, deskripsi, no_hp, alamat, instagram, maps_url)
                 VALUES ('$nama_toko','$deskripsi','$no_hp','$alamat','$instagram','$maps_url')");
@@ -88,7 +83,7 @@ $q_set = mysqli_query($conn, "SELECT * FROM pengaturan_toko WHERE id=1");
 if ($q_set) $settings = mysqli_fetch_assoc($q_set) ?? [];
 
 $admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
-$logo_path = !empty($settings['logo']) ? '../uploads/toko/' . $settings['logo'] : null;
+$logo_path  = !empty($settings['logo']) ? '../uploads/toko/' . $settings['logo'] : null;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -100,158 +95,193 @@ $logo_path = !empty($settings['logo']) ? '../uploads/toko/' . $settings['logo'] 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --bg:#0F0E17; --surface:#1A1825; --surface2:#232136; --border:#2E2B3D;
-    --accent:#A78BFA; --accent2:#7C3AED; --pink:#F9A8D4; --pink2:#EC4899;
-    --green:#34D399; --yellow:#FBBF24; --red:#F87171;
-    --text:#E2E0F0; --muted:#6B6880; --white:#FFFFFF;
+    --bg:       #FFF5F8;
+    --surface:  #FFFFFF;
+    --surface2: #FFF0F5;
+    --border:   #FFB6D0;
+    --accent:   #FF4081;
+    --accent2:  #F50057;
+    --pink:     #FF80AB;
+    --pink2:    #FF4081;
+    --green:    #00BFA5;
+    --yellow:   #FFB300;
+    --red:      #FF1744;
+    --text:     #1A1A1A;
+    --text2:    #444444;
+    --muted:    #AAAAAA;
+    --white:    #FFFFFF;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
-a { text-decoration:none; color:inherit; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+}
+body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle, #FFB6D0 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: .15;
+    pointer-events: none;
+    z-index: 0;
+}
+a { text-decoration: none; color: inherit; }
 
 /* ── SIDEBAR ── */
-.sidebar { width:240px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:50; }
-.sidebar-logo { padding:24px 24px 20px; border-bottom:1px solid var(--border); }
-.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:var(--white); }
-.sidebar-logo .logo span { color:var(--accent); }
-.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:2px; }
-.sidebar-nav { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
-.nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:500; color:var(--muted); transition:all .2s; }
-.nav-item:hover { background:var(--surface2); color:var(--text); }
-.nav-item.active { background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(236,72,153,.15)); color:var(--accent); }
-.nav-item i { font-size:16px; width:20px; }
-.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); padding:14px 14px 6px; font-weight:600; }
-
-/* ── ADMIN CARD + DROPDOWN ── */
-.sidebar-footer { padding:16px 12px; border-top:1px solid var(--border); }
-.admin-card-wrap { position:relative; margin-bottom:10px; }
-.admin-card {
-    display:flex; align-items:center; gap:10px; padding:10px 12px;
-    background:var(--surface2); border-radius:10px;
-    cursor:pointer; user-select:none;
-    border:1px solid transparent; transition:border-color .2s;
+.sidebar {
+    width: 240px;
+    background: linear-gradient(180deg, #FF80AB 0%, #FF4081 45%, #F50057 100%);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+    box-shadow: 4px 0 28px rgba(255,64,129,.3);
 }
-.admin-card:hover { border-color:var(--accent); }
-.admin-avatar {
-    width:34px; height:34px; border-radius:50%;
-    background:linear-gradient(135deg,var(--accent2),var(--pink2));
-    display:flex; align-items:center; justify-content:center;
-    font-weight:700; font-size:13px; color:#fff; flex-shrink:0;
-    overflow:hidden;
+.sidebar-logo {
+    padding: 24px 24px 20px;
+    border-bottom: 1.5px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.12);
 }
-.admin-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-.admin-info { flex:1; }
-.admin-info .name { font-size:13px; font-weight:600; color:var(--text); }
-.admin-info .role { font-size:10px; color:var(--muted); }
-.admin-card .chevron { font-size:12px; color:var(--muted); transition:transform .2s; }
-.admin-card.open .chevron { transform:rotate(180deg); }
-
-/* Dropdown */
-.admin-dropdown {
-    display:none; position:absolute; bottom:calc(100% + 8px); left:0; right:0;
-    background:var(--surface2); border:1px solid var(--border); border-radius:12px;
-    overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.4);
-    z-index:100;
-}
-.admin-dropdown.show { display:block; }
-.dropdown-header {
-    padding:12px 14px; border-bottom:1px solid var(--border);
-    display:flex; align-items:center; gap:10px;
-}
-.dropdown-header .dh-avatar {
-    width:40px; height:40px; border-radius:50%;
-    background:linear-gradient(135deg,var(--accent2),var(--pink2));
-    display:flex; align-items:center; justify-content:center;
-    font-weight:700; font-size:15px; color:#fff; flex-shrink:0; overflow:hidden;
-}
-.dropdown-header .dh-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-.dropdown-header .dh-name { font-size:13px; font-weight:600; color:var(--white); }
-.dropdown-header .dh-role { font-size:11px; color:var(--muted); }
-.dropdown-item {
-    display:flex; align-items:center; gap:10px; padding:10px 14px;
-    font-size:13px; color:var(--text); transition:background .15s; cursor:pointer;
-}
-.dropdown-item:hover { background:rgba(167,139,250,.1); color:var(--accent); }
-.dropdown-item i { font-size:15px; width:18px; }
-.dropdown-item.danger { color:var(--red); }
-.dropdown-item.danger:hover { background:rgba(248,113,113,.1); color:var(--red); }
-.dropdown-divider { height:1px; background:var(--border); margin:2px 0; }
-
-.btn-logout { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:8px; font-size:12px; color:var(--red); transition:background .2s; width:100%; }
-.btn-logout:hover { background:rgba(248,113,113,.1); }
+.sidebar-logo .logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #fff; }
+.sidebar-logo .logo span { color: #FFE4EE; }
+.sidebar-logo small { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 2px; }
+.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.8); transition: all .2s; }
+.nav-item:hover { background: rgba(255,255,255,.2); color: #fff; }
+.nav-item.active { background: rgba(255,255,255,.28); color: #fff; font-weight: 600; border-left: 3px solid #fff; }
+.nav-item i { font-size: 16px; width: 20px; }
+.nav-section { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.55); padding: 14px 14px 6px; font-weight: 600; }
+.sidebar-footer { padding: 16px 12px; border-top: 1.5px solid rgba(255,255,255,.2); background: rgba(0,0,0,.1); }
+.admin-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,.18); border-radius: 10px; margin-bottom: 10px; border: 1.5px solid rgba(255,255,255,.3); }
+.admin-avatar { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; border: 2px solid rgba(255,255,255,.5); overflow: hidden; }
+.admin-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.admin-info .name { font-size: 13px; font-weight: 600; color: #fff; }
+.admin-info .role { font-size: 10px; color: rgba(255,255,255,.65); }
+.btn-logout { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; font-size: 12px; color: rgba(255,255,255,.85); transition: background .2s; width: 100%; }
+.btn-logout:hover { background: rgba(255,255,255,.2); color: #fff; }
 
 /* ── MAIN ── */
-.main { margin-left:240px; flex:1; display:flex; flex-direction:column; }
-.topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 32px; height:64px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:40; }
-.topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; }
-.topbar-right { display:flex; align-items:center; gap:12px; }
-.topbar-date { font-size:12px; color:var(--muted); }
-.btn-toko { display:flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); font-size:12px; font-weight:500; color:var(--text); transition:border-color .2s; }
-.btn-toko:hover { border-color:var(--accent); color:var(--accent); }
+.main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
 
-.content { padding:28px 32px; flex:1; }
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-
-.card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
-.card-header { padding:16px 20px; border-bottom:1px solid var(--border); }
-.card-header h3 { font-size:14px; font-weight:600; color:var(--white); }
-.card-header p { font-size:12px; color:var(--muted); margin-top:2px; }
-.card-body { padding:20px; }
-
-.form-group { margin-bottom:16px; }
-.form-label { display:block; font-size:12px; font-weight:500; color:var(--muted); margin-bottom:6px; letter-spacing:.3px; }
-.form-input, .form-textarea {
-    width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px;
-    color:var(--text); font-size:13px; padding:10px 12px; outline:none;
-    font-family:'DM Sans',sans-serif; transition:border-color .2s;
+/* ── TOPBAR ── */
+.topbar {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 32px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 40;
+    box-shadow: 0 2px 12px rgba(255,64,129,.07);
 }
-.form-input:focus, .form-textarea:focus { border-color:var(--accent); }
-.form-textarea { resize:vertical; min-height:80px; }
-.form-input::placeholder, .form-textarea::placeholder { color:var(--muted); }
+.topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-date { font-size: 12px; color: var(--muted); }
+.btn-toko { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: linear-gradient(135deg,#FF80AB,#FF4081); font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 3px 12px rgba(255,64,129,.35); transition: opacity .2s; }
+.btn-toko:hover { opacity: .88; }
+
+/* ── CONTENT ── */
+.content { padding: 28px 32px; flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* ── CARD ── */
+.card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 16px rgba(255,64,129,.06); }
+.card-header { padding: 16px 20px; border-bottom: 1.5px solid var(--border); background: var(--surface2); }
+.card-header h3 { font-size: 14px; font-weight: 600; color: var(--text); }
+.card-header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.card-body { padding: 20px; }
+
+/* ── FORM ── */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: .3px; }
+.form-input, .form-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color .2s, box-shadow .2s;
+}
+.form-input:focus, .form-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,64,129,.1);
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+.form-textarea { resize: vertical; min-height: 80px; }
 
 /* ── LOGO UPLOAD ── */
-.logo-upload-wrap { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+.logo-upload-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
 .logo-preview {
-    width:80px; height:80px; border-radius:12px; flex-shrink:0;
-    background:var(--surface2); border:2px dashed var(--border);
-    display:flex; align-items:center; justify-content:center;
-    overflow:hidden; position:relative; cursor:pointer; transition:border-color .2s;
+    width: 80px; height: 80px; border-radius: 12px; flex-shrink: 0;
+    background: var(--surface2); border: 2px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; cursor: pointer; transition: border-color .2s;
 }
-.logo-preview:hover { border-color:var(--accent); }
-.logo-preview img { width:100%; height:100%; object-fit:cover; border-radius:10px; }
-.logo-preview .logo-placeholder { font-size:28px; color:var(--muted); }
-.logo-upload-info { flex:1; }
-.logo-upload-info p { font-size:12px; color:var(--muted); line-height:1.5; }
+.logo-preview:hover { border-color: var(--accent); }
+.logo-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+.logo-placeholder { font-size: 28px; color: var(--muted); }
+.logo-upload-info p { font-size: 12px; color: var(--muted); line-height: 1.5; }
 .btn-upload-logo {
-    display:inline-flex; align-items:center; gap:6px; margin-top:8px;
-    padding:7px 14px; border-radius:7px; background:var(--surface2);
-    border:1px solid var(--border); font-size:12px; color:var(--accent);
-    cursor:pointer; font-family:'DM Sans',sans-serif; transition:border-color .2s;
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+    padding: 7px 14px; border-radius: 7px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    font-size: 12px; color: var(--accent); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: border-color .2s, background .2s;
 }
-.btn-upload-logo:hover { border-color:var(--accent); background:rgba(167,139,250,.08); }
-#inputLogo { display:none; }
+.btn-upload-logo:hover { border-color: var(--accent); background: rgba(255,64,129,.06); }
+#inputLogo { display: none; }
 
+/* ── MAPS INFO BOX ── */
+.maps-info {
+    background: rgba(255,64,129,.05);
+    border: 1px solid rgba(255,64,129,.2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 6px;
+}
+.maps-info-title { font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
+.maps-info ol { font-size: 11px; color: var(--muted); padding-left: 14px; line-height: 1.9; margin: 0; }
+
+/* ── BUTTONS ── */
 .btn-save {
-    display:inline-flex; align-items:center; gap:8px;
-    padding:10px 22px; border-radius:8px;
-    background:linear-gradient(135deg,var(--accent2),var(--pink2));
-    color:#fff; font-size:13px; font-weight:600; border:none; cursor:pointer;
-    font-family:'DM Sans',sans-serif; transition:opacity .2s;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 8px;
+    background: linear-gradient(135deg, #FF80AB, #FF4081);
+    color: #fff; font-size: 13px; font-weight: 600;
+    border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 4px 14px rgba(255,64,129,.35);
+    transition: opacity .2s, transform .15s;
 }
-.btn-save:hover { opacity:.88; }
+.btn-save:hover { opacity: .88; transform: translateY(-1px); }
 
+/* ── ALERTS ── */
 .alert {
-    padding:12px 16px; border-radius:10px; font-size:13px; margin-bottom:20px;
-    display:flex; align-items:center; gap:8px;
+    padding: 12px 16px; border-radius: 10px; font-size: 13px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
 }
-.alert.success { background:rgba(52,211,153,.15); color:var(--green); border:1px solid rgba(52,211,153,.3); }
-.alert.error   { background:rgba(248,113,113,.15); color:var(--red);   border:1px solid rgba(248,113,113,.3); }
+.alert.success { background: rgba(0,191,165,.12); color: var(--green); border: 1px solid rgba(0,191,165,.3); }
+.alert.error   { background: rgba(255,23,68,.1);  color: var(--red);   border: 1px solid rgba(255,23,68,.25); }
 
-.divider { height:1px; background:var(--border); margin:20px 0; }
-.info-box { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; font-size:12px; color:var(--muted); line-height:1.6; }
-.info-box i { color:var(--accent); margin-right:4px; }
+/* ── INFO BOX ── */
+.info-box {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 12px; color: var(--text2); line-height: 1.6;
+}
+.info-box .info-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.info-box .info-row:last-child { margin-bottom: 0; }
+.info-box i { color: var(--accent); font-size: 14px; }
 
-@media (max-width: 900px) { .grid-2 { grid-template-columns:1fr; } }
+/* ── PASSWORD STRENGTH ── */
+.pw-strength { height: 4px; border-radius: 2px; margin-top: 6px; background: var(--border); overflow: hidden; }
+.pw-strength-bar { height: 100%; border-radius: 2px; transition: width .3s, background .3s; width: 0; }
+
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -259,71 +289,33 @@ a { text-decoration:none; color:inherit; }
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
-        <small>Admin Panel</small>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
         <a href="dashboard.php"  class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <a href="produk.php"     class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
         <a href="pesanan.php"    class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat</a>
-        <a href="nego.php" class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
+        <a href="chat.php"       class="nav-item"><i class="bi bi-chat-dots"></i> Chat</a>
+        <a href="nego.php"       class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
         <a href="pengaturan.php" class="nav-item active"><i class="bi bi-gear"></i> Pengaturan</a>
     </nav>
-
     <div class="sidebar-footer">
-
-        <!-- ADMIN CARD (CLICKABLE) -->
-        <div class="admin-card-wrap">
-            <!-- Dropdown (muncul di atas) -->
-            <div class="admin-dropdown" id="adminDropdown">
-                <div class="dropdown-header">
-                    <div class="dh-avatar">
-                        <?php if ($logo_path && file_exists($logo_path)): ?>
-                            <img src="<?= escape($logo_path) ?>" alt="logo">
-                        <?php else: ?>
-                            <?= strtoupper(substr($admin_nama, 0, 1)) ?>
-                        <?php endif; ?>
-                    </div>
-                    <div>
-                        <div class="dh-name"><?= escape($admin_nama) ?></div>
-                        <div class="dh-role">Administrator</div>
-                    </div>
-                </div>
-                <a href="pengaturan.php" class="dropdown-item">
-                    <i class="bi bi-gear"></i> Pengaturan Akun
-                </a>
-                <a href="../pages/home.php" class="dropdown-item" target="_blank">
-                    <i class="bi bi-shop"></i> Lihat Toko
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="../auth/logout_admin.php" class="dropdown-item danger">
-                    <i class="bi bi-box-arrow-left"></i> Keluar
-                </a>
+        <div class="admin-card">
+            <div class="admin-avatar">
+                <?php if ($logo_path && file_exists($logo_path)): ?>
+                    <img src="<?= escape($logo_path) ?>" alt="logo">
+                <?php else: ?>
+                    <?= strtoupper(substr($admin_nama, 0, 1)) ?>
+                <?php endif; ?>
             </div>
-
-            <!-- Card yang diklik -->
-            <div class="admin-card" id="adminCardBtn" onclick="toggleDropdown()">
-                <div class="admin-avatar">
-                    <?php if ($logo_path && file_exists($logo_path)): ?>
-                        <img src="<?= escape($logo_path) ?>" alt="logo">
-                    <?php else: ?>
-                        <?= strtoupper(substr($admin_nama, 0, 1)) ?>
-                    <?php endif; ?>
-                </div>
-                <div class="admin-info">
-                    <div class="name"><?= escape($admin_nama) ?></div>
-                    <div class="role">Administrator</div>
-                </div>
-                <i class="bi bi-chevron-up chevron"></i>
+            <div class="admin-info">
+                <div class="name"><?= escape($admin_nama) ?></div>
+                <div class="role">Administrator</div>
             </div>
         </div>
-
-        <a href="../auth/logout_admin.php" class="btn-logout">
-            <i class="bi bi-box-arrow-left"></i> Keluar
-        </a>
+        <a href="../auth/logout_admin.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
     </div>
 </aside>
 
@@ -332,7 +324,7 @@ a { text-decoration:none; color:inherit; }
         <div class="topbar-title">Pengaturan</div>
         <div class="topbar-right">
             <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
-            <a href="../pages/home.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
+            <a href="../index.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
         </div>
     </div>
 
@@ -340,14 +332,14 @@ a { text-decoration:none; color:inherit; }
 
         <?php if ($msg): ?>
         <div class="alert <?= $msg_type ?>">
-            <i class="bi bi-<?= $msg_type==='success' ? 'check-circle-fill' : 'x-circle-fill' ?>"></i>
+            <i class="bi bi-<?= $msg_type === 'success' ? 'check-circle-fill' : 'x-circle-fill' ?>"></i>
             <?= escape($msg) ?>
         </div>
         <?php endif; ?>
 
         <div class="grid-2">
 
-            <!-- INFO TOKO -->
+            <!-- ── INFORMASI TOKO ── -->
             <div class="card">
                 <div class="card-header">
                     <h3><i class="bi bi-shop" style="color:var(--accent);margin-right:6px;"></i> Informasi Toko</h3>
@@ -357,7 +349,7 @@ a { text-decoration:none; color:inherit; }
                     <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="update_toko" value="1">
 
-                        <!-- LOGO UPLOAD -->
+                        <!-- Logo -->
                         <div class="form-group">
                             <label class="form-label">Logo / Foto Toko</label>
                             <div class="logo-upload-wrap">
@@ -370,7 +362,7 @@ a { text-decoration:none; color:inherit; }
                                     <?php endif; ?>
                                 </div>
                                 <div class="logo-upload-info">
-                                    <p>Ukuran disarankan <strong>300×300px</strong>.<br>Format: JPG, PNG, atau WEBP.<br>Maks. ukuran file 2MB.</p>
+                                    <p>Ukuran disarankan <strong>300×300px</strong>.<br>Format: JPG, PNG, atau WEBP.<br>Maks. 2MB.</p>
                                     <label class="btn-upload-logo" for="inputLogo">
                                         <i class="bi bi-upload"></i> Pilih Gambar
                                     </label>
@@ -403,22 +395,21 @@ a { text-decoration:none; color:inherit; }
                                 value="<?= escape($settings['instagram'] ?? '') ?>">
                         </div>
                         <div class="form-group">
-    <label class="form-label">Link Google Maps Toko</label>
-    <input type="url" name="maps_url" class="form-input"
-           placeholder="https://maps.app.goo.gl/xxxxx"
-           value="<?= escape($settings['maps_url'] ?? '') ?>">
-    <div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);border-radius:8px;padding:10px 12px;margin-top:6px;">
-        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:4px;">
-            <i class="bi bi-question-circle"></i> Cara dapat link Google Maps:
-        </div>
-        <ol style="font-size:11px;color:var(--muted);padding-left:14px;line-height:1.9;margin:0;">
-            <li>Buka <strong>Google Maps</strong> di HP</li>
-            <li>Cari atau tandai lokasi toko/rumahmu</li>
-            <li>Tap <strong>Bagikan</strong> → <strong>Salin link</strong></li>
-            <li>Tempel link di kolom di atas</li>
-        </ol>
-    </div>
-</div>
+                            <label class="form-label">Link Google Maps Toko</label>
+                            <input type="url" name="maps_url" class="form-input"
+                                   placeholder="https://maps.app.goo.gl/xxxxx"
+                                   value="<?= escape($settings['maps_url'] ?? '') ?>">
+                            <div class="maps-info">
+                                <div class="maps-info-title"><i class="bi bi-question-circle"></i> Cara dapat link Google Maps:</div>
+                                <ol>
+                                    <li>Buka <strong>Google Maps</strong> di HP</li>
+                                    <li>Cari atau tandai lokasi toko/rumahmu</li>
+                                    <li>Tap <strong>Bagikan</strong> → <strong>Salin link</strong></li>
+                                    <li>Tempel link di kolom di atas</li>
+                                </ol>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn-save">
                             <i class="bi bi-floppy"></i> Simpan Pengaturan
                         </button>
@@ -426,7 +417,7 @@ a { text-decoration:none; color:inherit; }
                 </div>
             </div>
 
-            <!-- KANAN: PASSWORD + INFO -->
+            <!-- ── KANAN ── -->
             <div style="display:flex;flex-direction:column;gap:20px;">
 
                 <!-- GANTI PASSWORD -->
@@ -444,7 +435,8 @@ a { text-decoration:none; color:inherit; }
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Password Baru</label>
-                                <input type="password" name="pw_baru" class="form-input" placeholder="Minimal 6 karakter" required>
+                                <input type="password" name="pw_baru" class="form-input" placeholder="Minimal 6 karakter" id="pwBaru" required oninput="checkStrength(this.value)">
+                                <div class="pw-strength"><div class="pw-strength-bar" id="pwBar"></div></div>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Konfirmasi Password Baru</label>
@@ -464,10 +456,10 @@ a { text-decoration:none; color:inherit; }
                     </div>
                     <div class="card-body">
                         <div class="info-box">
-                            <div><i class="bi bi-code-slash"></i> <strong>Versi Sistem:</strong> 1.0.0</div>
-                            <div style="margin-top:6px;"><i class="bi bi-calendar3"></i> <strong>Tanggal:</strong> <?= date('d M Y, H:i') ?></div>
-                            <div style="margin-top:6px;"><i class="bi bi-person-badge"></i> <strong>Admin:</strong> <?= escape($admin_nama) ?></div>
-                            <div style="margin-top:6px;"><i class="bi bi-server"></i> <strong>PHP:</strong> <?= phpversion() ?></div>
+                            <div class="info-row"><i class="bi bi-code-slash"></i> <span><strong>Versi Sistem:</strong> 1.0.0</span></div>
+                            <div class="info-row"><i class="bi bi-calendar3"></i> <span><strong>Tanggal:</strong> <?= date('d M Y, H:i') ?></span></div>
+                            <div class="info-row"><i class="bi bi-person-badge"></i> <span><strong>Admin:</strong> <?= escape($admin_nama) ?></span></div>
+                            <div class="info-row"><i class="bi bi-server"></i> <span><strong>PHP:</strong> <?= phpversion() ?></span></div>
                         </div>
                     </div>
                 </div>
@@ -479,38 +471,33 @@ a { text-decoration:none; color:inherit; }
 </div><!-- end main -->
 
 <script>
-// ── Preview logo sebelum upload ──
 function previewLogo(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = document.getElementById('logoImg');
-            const placeholder = document.getElementById('logoPlaceholder');
+            const ph  = document.getElementById('logoPlaceholder');
             img.src = e.target.result;
             img.style.display = 'block';
-            if (placeholder) placeholder.style.display = 'none';
+            if (ph) ph.style.display = 'none';
         };
         reader.readAsDataURL(input.files[0]);
     }
 }
 
-// ── Toggle dropdown admin ──
-function toggleDropdown() {
-    const dropdown = document.getElementById('adminDropdown');
-    const card     = document.getElementById('adminCardBtn');
-    dropdown.classList.toggle('show');
-    card.classList.toggle('open');
+function checkStrength(val) {
+    const bar = document.getElementById('pwBar');
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const pct = (score / 5) * 100;
+    const colors = ['#FF1744','#FF6D00','#FFB300','#00BFA5','#00BFA5'];
+    bar.style.width  = pct + '%';
+    bar.style.background = colors[score - 1] || '#FFB6D0';
 }
-
-// Tutup dropdown kalau klik di luar
-document.addEventListener('click', function(e) {
-    const wrap = document.querySelector('.admin-card-wrap');
-    if (wrap && !wrap.contains(e.target)) {
-        document.getElementById('adminDropdown').classList.remove('show');
-        document.getElementById('adminCardBtn').classList.remove('open');
-    }
-});
 </script>
-
 </body>
 </html>

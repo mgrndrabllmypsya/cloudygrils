@@ -1,6 +1,4 @@
 <?php
-session_start();
+require_once 'session_penjual.php';
 session_destroy();
-header('Location: ../auth/login_penjual.php');
-exit;
-?>
+header("Location: ../auth/login.php"); exit;

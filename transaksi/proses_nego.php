@@ -1,20 +1,40 @@
 <?php
-session_start();
-include '../config/koneksi.php';
+$aksi = $_POST['aksi'] ?? '';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php"); exit;
+// Aksi dari PEMBELI
+$aksi_pembeli = ['ajukan', 'terima_counter', 'tolak_counter'];
+// Aksi dari PENJUAL
+$aksi_penjual = ['setuju', 'counter', 'tolak'];
+
+if (in_array($aksi, $aksi_pembeli)) {
+    session_name('session_pembeli');
+    session_start();
+    include '../config/koneksi.php';
+
+    if (!isset($_SESSION['login']) || $_SESSION['user_role'] !== 'pembeli') {
+        header("Location: ../auth/login.php"); exit;
+    }
+    $pembeli_id = (int)$_SESSION['user_id'];
+
+} elseif (in_array($aksi, $aksi_penjual)) {
+    session_name('session_penjual');
+    session_start();
+    include '../config/koneksi.php';
+
+    if (!isset($_SESSION['login']) || $_SESSION['user_role'] !== 'penjual') {
+        header("Location: ../auth/login.php"); exit;
+    }
+
+} else {
+    header("Location: ../pages/home.php"); exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../pages/home.php"); exit;
 }
 
-$pembeli_id = (int)$_SESSION['user_id'];
-$aksi       = $_POST['aksi'] ?? '';
-
 // ══════════════════════════════════════════
-// AKSI 1: AJUKAN NEGO BARU
+// AKSI 1: AJUKAN NEGO BARU (PEMBELI)
 // ══════════════════════════════════════════
 if ($aksi === 'ajukan') {
     $produk_id   = (int)($_POST['produk_id'] ?? 0);
@@ -58,7 +78,6 @@ if ($aksi === 'ajukan') {
     $ins->bind_param("iidds", $produk_id, $pembeli_id, $harga_asli, $harga_tawar, $pesan);
 
     if ($ins->execute()) {
-        $nego_id = $conn->insert_id;
         $ins->close();
         header("Location: ../pages/detail.php?id=$produk_id&nego=sukses"); exit;
     } else {
@@ -68,7 +87,7 @@ if ($aksi === 'ajukan') {
 }
 
 // ══════════════════════════════════════════
-// AKSI 2: TERIMA COUNTER DARI ADMIN
+// AKSI 2: TERIMA COUNTER (PEMBELI)
 // ══════════════════════════════════════════
 if ($aksi === 'terima_counter') {
     $nego_id = (int)($_POST['nego_id'] ?? 0);
@@ -92,7 +111,7 @@ if ($aksi === 'terima_counter') {
 }
 
 // ══════════════════════════════════════════
-// AKSI 3: TOLAK COUNTER DARI ADMIN
+// AKSI 3: TOLAK COUNTER (PEMBELI)
 // ══════════════════════════════════════════
 if ($aksi === 'tolak_counter') {
     $nego_id = (int)($_POST['nego_id'] ?? 0);
@@ -112,6 +131,50 @@ if ($aksi === 'tolak_counter') {
     $upd->close();
 
     header("Location: ../pages/detail.php?id=" . $nego['produk_id'] . "&nego=counter_ditolak"); exit;
+}
+
+// ══════════════════════════════════════════
+// AKSI 4: SETUJU (PENJUAL)
+// ══════════════════════════════════════════
+if ($aksi === 'setuju') {
+    $nego_id    = (int)($_POST['nego_id'] ?? 0);
+    $harga_deal = (float)($_POST['harga_deal'] ?? 0);
+    $pesan      = trim($_POST['pesan_admin'] ?? '');
+
+    $upd = $conn->prepare("UPDATE nego_harga SET status='disetujui', harga_deal=?, pesan_admin=?, updated_at=NOW() WHERE id=?");
+    $upd->bind_param("dsi", $harga_deal, $pesan, $nego_id);
+    $upd->execute();
+    $upd->close();
+    header("Location: ../penjual/nego.php?msg=setuju"); exit;
+}
+
+// ══════════════════════════════════════════
+// AKSI 5: COUNTER (PENJUAL)
+// ══════════════════════════════════════════
+if ($aksi === 'counter') {
+    $nego_id       = (int)($_POST['nego_id'] ?? 0);
+    $harga_counter = (float)($_POST['harga_counter'] ?? 0);
+    $pesan         = trim($_POST['pesan_admin'] ?? '');
+
+    $upd = $conn->prepare("UPDATE nego_harga SET status='counter', harga_counter=?, pesan_admin=?, updated_at=NOW() WHERE id=?");
+    $upd->bind_param("dsi", $harga_counter, $pesan, $nego_id);
+    $upd->execute();
+    $upd->close();
+    header("Location: ../penjual/nego.php?msg=counter"); exit;
+}
+
+// ══════════════════════════════════════════
+// AKSI 6: TOLAK (PENJUAL)
+// ══════════════════════════════════════════
+if ($aksi === 'tolak') {
+    $nego_id = (int)($_POST['nego_id'] ?? 0);
+    $pesan   = trim($_POST['pesan_admin'] ?? '');
+
+    $upd = $conn->prepare("UPDATE nego_harga SET status='ditolak', pesan_admin=?, updated_at=NOW() WHERE id=?");
+    $upd->bind_param("si", $pesan, $nego_id);
+    $upd->execute();
+    $upd->close();
+    header("Location: ../penjual/nego.php?msg=tolak"); exit;
 }
 
 header("Location: ../pages/home.php"); exit;
