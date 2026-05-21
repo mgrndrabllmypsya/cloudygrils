@@ -54,7 +54,15 @@ $ulasan_list = $q_ulasan ? mysqli_fetch_all($q_ulasan, MYSQLI_ASSOC) : [];
 $avg_rating  = count($ulasan_list) ? array_sum(array_column($ulasan_list,'rating')) / count($ulasan_list) : 0;
 
 // Cek apakah sudah ada pesanan aktif
-$q_pesan = mysqli_query($conn, "SELECT id FROM pesanan WHERE produk_id=$id AND pembeli_id=$user_id AND status NOT IN ('dibatalkan','selesai') LIMIT 1");
+// Cek apakah sudah ada pesanan aktif
+$q_pesan = mysqli_query($conn, "
+    SELECT id FROM pesanan 
+    WHERE produk_id=$id 
+    AND pembeli_id=$user_id 
+    AND status NOT IN ('dibatalkan','selesai')
+    AND NOT (status='menunggu' AND status_transfer='ditolak')
+    LIMIT 1
+");
 $sudah_pesan = $q_pesan && mysqli_num_rows($q_pesan) > 0;
 
 // Cek nego aktif milik pembeli untuk produk ini

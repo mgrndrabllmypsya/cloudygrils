@@ -84,6 +84,11 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tolak_transfer') {
         catatan_transfer='$catatan',
         status='menunggu'
         WHERE id=$id");
+
+mysqli_query($conn, "UPDATE produk SET status='aktif'
+        WHERE id = (SELECT produk_id FROM pesanan WHERE id=$id)");
+    
+
     header("Location: detail_pesanan.php?id=$id&msg=tolak"); exit;
 }
 
