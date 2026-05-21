@@ -52,6 +52,25 @@ for ($i = 4; $i >= 0; $i--) {
     $data_tahunan[] = ['label' => $thn, 'value' => (int)$r[0]];
 }
 
+// ── KATEGORI TERLARIS (dari produk yang sudah terjual via pesanan selesai) ──
+$q_kategori = mysqli_query($conn, "
+    SELECT pr.kategori, COUNT(*) AS jumlah
+    FROM pesanan ps
+    JOIN produk pr ON pr.id = ps.produk_id
+    WHERE ps.status = 'selesai'
+    GROUP BY pr.kategori
+    ORDER BY jumlah DESC
+    LIMIT 5
+");
+$data_kategori = [];
+$total_terjual = 0;
+if ($q_kategori) {
+    while ($r = mysqli_fetch_assoc($q_kategori)) {
+        $data_kategori[] = $r;
+        $total_terjual  += $r['jumlah'];
+    }
+}
+
 $admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
 $settings = [];
 $q_set = mysqli_query($conn, "SELECT * FROM pengaturan_toko WHERE id=1");
@@ -441,6 +460,19 @@ select.form-ctrl option { background:#fff; }
 }
 .btn-save-m:hover { opacity:.87; }
 
+/* ── KATEGORI TERLARIS ── */
+.donut-wrap { display:flex; align-items:center; justify-content:center; padding:20px 16px 8px; }
+.donut-canvas-wrap { position:relative; width:150px; height:150px; flex-shrink:0; }
+.donut-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+.donut-center .total-num  { font-size:22px; font-weight:700; color:var(--text); line-height:1; }
+.donut-center .total-label{ font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+.donut-legend { flex:1; padding-left:20px; display:flex; flex-direction:column; gap:8px; }
+.legend-item  { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; }
+.legend-left  { display:flex; align-items:center; gap:7px; }
+.legend-dot   { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.legend-name  { color:var(--text2); }
+.legend-pct   { font-weight:600; color:var(--muted); font-size:12px; }
+
 @media (max-width:900px) {
     .stats-grid { grid-template-columns:repeat(2,1fr); }
     .grid-2 { grid-template-columns:1fr; }
@@ -539,22 +571,63 @@ select.form-ctrl option { background:#fff; }
             </div>
         </div>
 
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3><i class="bi bi-bar-chart-line" style="color:var(--accent);margin-right:6px;"></i> Grafik Penjualan</h3>
-                <div class="chart-tabs">
-                    <button class="chart-tab active" onclick="switchChart('harian',this)">Harian</button>
-                    <button class="chart-tab" onclick="switchChart('mingguan',this)">Mingguan</button>
-                    <button class="chart-tab" onclick="switchChart('bulanan',this)">Bulanan</button>
-                    <button class="chart-tab" onclick="switchChart('tahunan',this)">Tahunan</button>
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:18px;margin-bottom:22px;">
+
+            <div class="chart-card" style="margin-bottom:0;">
+                <div class="chart-header">
+                    <h3><i class="bi bi-bar-chart-line" style="color:var(--accent);margin-right:6px;"></i> Grafik Penjualan</h3>
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" onclick="switchChart('harian',this)">Harian</button>
+                        <button class="chart-tab" onclick="switchChart('mingguan',this)">Mingguan</button>
+                        <button class="chart-tab" onclick="switchChart('bulanan',this)">Bulanan</button>
+                        <button class="chart-tab" onclick="switchChart('tahunan',this)">Tahunan</button>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-canvas-wrap"><canvas id="salesChart"></canvas></div>
                 </div>
             </div>
-            <div class="chart-body">
-                <div class="chart-canvas-wrap"><canvas id="salesChart"></canvas></div>
-            </div>
-        </div>
 
-        <div class="grid-2">
+            <!-- KATEGORI TERLARIS (samping grafik) -->
+            <div class="card" style="margin-bottom:0;">
+                <div class="card-header">
+                    <h3><i class="bi bi-pie-chart" style="color:var(--yellow);margin-right:6px;"></i> Kategori Terlaris</h3>
+                    <a href="produk.php">Detail →</a>
+                </div>
+                <?php if (!empty($data_kategori)): ?>
+                <div style="display:flex;flex-direction:column;align-items:center;padding:20px 16px 16px;">
+                    <div class="donut-canvas-wrap">
+                        <canvas id="donutChart"></canvas>
+                        <div class="donut-center">
+                            <div class="total-num"><?= $total_terjual ?></div>
+                            <div class="total-label">Total</div>
+                        </div>
+                    </div>
+                    <div style="width:100%;margin-top:16px;display:flex;flex-direction:column;gap:9px;">
+                        <?php
+                        $donut_colors = ['#FF4081','#2196F3','#FF9800','#00BFA5','#9C27B0'];
+                        foreach ($data_kategori as $i => $kat):
+                            $pct = $total_terjual > 0 ? round($kat['jumlah'] / $total_terjual * 100) : 0;
+                            $color = $donut_colors[$i % count($donut_colors)];
+                        ?>
+                        <div class="legend-item">
+                            <div class="legend-left">
+                                <span class="legend-dot" style="background:<?= $color ?>;"></span>
+                                <span class="legend-name"><?= escape($kat['kategori']) ?></span>
+                            </div>
+                            <span class="legend-pct"><?= $pct ?>%</span>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php else: ?>
+                <div class="empty"><i class="bi bi-pie-chart"></i>Belum ada data penjualan</div>
+                <?php endif; ?>
+            </div>
+
+        </div><!-- /chart + kategori row -->
+
+        <div class="grid-2" style="grid-template-columns:1fr 1fr;">
             <div class="card">
                 <div class="card-header">
                     <h3><i class="bi bi-bag-check" style="color:var(--accent);margin-right:6px;"></i> Pesanan Terbaru</h3>
@@ -631,9 +704,8 @@ select.form-ctrl option { background:#fff; }
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
 
-        <!-- Aksi Cepat -->
+        </div><!-- /grid-2 -->
         <div class="card" style="margin-top:18px;">
             <div class="card-header">
                 <h3><i class="bi bi-lightning-charge" style="color:var(--yellow);margin-right:6px;"></i> Aksi Cepat</h3>
@@ -843,6 +915,49 @@ function switchChart(period, btn) {
     buildChart(period);
 }
 buildChart('harian');
+
+/* ── DONUT CHART KATEGORI ── */
+<?php if (!empty($data_kategori)): ?>
+(function() {
+    const labels = <?= json_encode(array_column($data_kategori, 'kategori')) ?>;
+    const values = <?= json_encode(array_column($data_kategori, 'jumlah')) ?>;
+    const colors = ['#FF4081','#2196F3','#FF9800','#00BFA5','#9C27B0'];
+    const ctx = document.getElementById('donutChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors.slice(0, values.length),
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverBorderWidth: 3,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '68%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#fff',
+                    borderColor: '#FFB6D0',
+                    borderWidth: 1.5,
+                    titleColor: '#1A1A1A',
+                    bodyColor: '#FF4081',
+                    padding: 10,
+                    callbacks: {
+                        label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' terjual'
+                    }
+                }
+            }
+        }
+    });
+})();
+<?php endif; ?>
 
 /* ── ADMIN DROPDOWN ── */
 function toggleDropdown() {

@@ -352,52 +352,6 @@ footer {
 </div>
 
 <!-- FOOTER -->
-<footer>
-    <div class="footer-inner">
-        <div>
-            <span class="footer-logo">Cloudy <span>Girls</span></span>
-            <p style="font-size:13px;color:var(--muted);line-height:1.7;max-width:220px;">
-                <?= escape($toko['deskripsi'] ?? 'Toko preloved pakaian wanita berkualitas dari Banyuwangi.') ?>
-            </p>
-            <?php if (!empty($toko['no_hp'])): ?>
-            <a href="https://wa.me/<?= escape($toko['no_hp']) ?>"
-               style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13px;color:var(--green);font-weight:600;">
-                <i class="bi bi-whatsapp"></i> Hubungi Kami
-            </a>
-            <?php endif; ?>
-        </div>
-        <div>
-            <h4 style="font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:14px;color:var(--text);">Kategori</h4>
-            <div class="footer-links">
-                <?php foreach ($kategori_list as $kat): ?>
-                <a href="home.php?kategori=<?= urlencode($kat) ?>"><?= escape($kat) ?></a>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <div>
-            <h4 style="font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:14px;color:var(--text);">Akun</h4>
-            <div class="footer-links">
-                <a href="pesanan.php">Pesanan Saya</a>
-                <a href="profil.php">Profil</a>
-                <a href="../auth/logout.php">Keluar</a>
-            </div>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <p style="font-size:12px;color:var(--muted);">© <?= date('Y') ?> Cloudy Girls — Banyuwangi ♡</p>
-        <div class="footer-socials">
-            <?php if (!empty($toko['instagram'])): ?>
-            <a href="https://instagram.com/<?= ltrim(escape($toko['instagram']), '@') ?>" target="_blank">
-                <i class="bi bi-instagram"></i>
-            </a>
-            <?php endif; ?>
-            <?php if (!empty($toko['no_hp'])): ?>
-            <a href="https://wa.me/<?= escape($toko['no_hp']) ?>" target="_blank">
-                <i class="bi bi-whatsapp"></i>
-            </a>
-            <?php endif; ?>
-        </div>
-    </div>
-</footer>
-
 <?php include '../includes/footer.php'; ?>
+</body>
+</html>
