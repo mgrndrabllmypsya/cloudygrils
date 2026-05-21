@@ -69,20 +69,20 @@ $total_unread = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --bg:#FFF5F8; --surface:#FFFFFF; --surface2:#FFF0F5; --border:#FFB6D0;
-    --accent:#FF4081; --accent2:#F50057; --pink:#FF80AB; --pink2:#FF4081;
+    --bg:#FFF0F5; --surface:#FFFFFF; --surface2:#FFE8F2; --border:#F4A7C3;
+    --accent:#E8719A; --accent2:#D4547F; --pink:#F4A7C3; --pink2:#E8719A;
     --green:#00BFA5; --yellow:#FFB300; --red:#FF1744;
-    --text:#1A1A1A; --muted:#AAAAAA; --white:#FFFFFF;
+    --text:#1A1A1A; --muted:#BBA0B0; --white:#FFFFFF;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
 a{text-decoration:none;color:inherit;}
 
 /* SIDEBAR */
-.sidebar{width:240px;background:linear-gradient(180deg,#FF80AB 0%,#FF4081 45%,#F50057 100%);border-right:none;display:flex;flex-direction:column;flex-shrink:0;box-shadow:4px 0 28px rgba(255,64,129,.3);}
+.sidebar{width:240px;background:linear-gradient(180deg,#F4A7C3 0%,#E8719A 45%,#D4547F 100%);border-right:none;display:flex;flex-direction:column;flex-shrink:0;box-shadow:4px 0 28px rgba(212,84,127,.3);}
 .sidebar-logo{padding:22px 22px 18px;border-bottom:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);}
 .sidebar-logo .logo{font-family:'Playfair Display',serif;font-size:21px;font-weight:900;color:#fff;}
-.sidebar-logo .logo span{color:#FFE4EE;}
+.sidebar-logo .logo span{color:#FFE0EF;}
 .sidebar-logo small{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:3px;}
 .sidebar-nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
 .nav-item{display:flex;align-items:center;gap:11px;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:500;color:rgba(255,255,255,.8);transition:all .18s;}
@@ -113,7 +113,7 @@ a{text-decoration:none;color:inherit;}
 .chat-list-body{flex:1;overflow-y:auto;}
 .chat-item{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,214,224,.5);cursor:pointer;transition:background .15s;align-items:center;}
 .chat-item:hover{background:var(--surface2);}
-.chat-item.active{background:rgba(236,72,153,.08);border-left:3px solid var(--accent);}
+.chat-item.active{background:rgba(212,84,127,.08);border-left:3px solid var(--accent);}
 .chat-item-img{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
 .chat-item-info{flex:1;min-width:0;}
 .chat-item-nama{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}

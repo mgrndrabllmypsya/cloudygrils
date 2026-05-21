@@ -87,20 +87,20 @@ $logo_path = !empty($settings['logo']) ? '../uploads/toko/' . $settings['logo'] 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --bg:       #FFF5F8;
+    --bg:       #FFF0F5;
     --surface:  #FFFFFF;
-    --surface2: #FFF0F5;
-    --border:   #FFB6D0;
-    --accent:   #FF4081;
-    --accent2:  #F50057;
-    --pink:     #FF80AB;
-    --pink2:    #FF4081;
+    --surface2: #FFE8F2;
+    --border:   #F4A7C3;
+    --accent:   #E8719A;
+    --accent2:  #D4547F;
+    --pink:     #F4A7C3;
+    --pink2:    #E8719A;
     --green:    #00BFA5;
     --yellow:   #FFB300;
     --red:      #FF1744;
     --text:     #1A1A1A;
     --text2:    #444444;
-    --muted:    #AAAAAA;
+    --muted:    #BBA0B0;
     --white:    #FFFFFF;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -114,7 +114,7 @@ body {
 body::before {
     content:'';
     position:fixed; inset:0;
-    background-image: radial-gradient(circle, #FFB6D0 1px, transparent 1px);
+    background-image: radial-gradient(circle, #F4A7C3 1px, transparent 1px);
     background-size: 28px 28px;
     opacity:.15;
     pointer-events:none;
@@ -125,10 +125,10 @@ a { text-decoration:none; color:inherit; }
 /* ── SIDEBAR ── */
 .sidebar {
     width:230px;
-    background: linear-gradient(180deg, #FF80AB 0%, #FF4081 45%, #F50057 100%);
+    background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
     display:flex; flex-direction:column;
     position:fixed; top:0; left:0; bottom:0; z-index:50;
-    box-shadow: 4px 0 28px rgba(255,64,129,.3);
+    box-shadow: 4px 0 28px rgba(212,84,127,.3);
 }
 .sidebar-logo {
     padding:22px 22px 18px;
@@ -139,7 +139,7 @@ a { text-decoration:none; color:inherit; }
     font-family:'Playfair Display',serif;
     font-size:21px; font-weight:900; color:#fff;
 }
-.sidebar-logo .logo span { color:#FFE4EE; }
+.sidebar-logo .logo span { color:#FFE0EF; }
 .sidebar-logo small {
     display:block; font-size:10px;
     letter-spacing:2px; text-transform:uppercase;
@@ -197,17 +197,17 @@ a { text-decoration:none; color:inherit; }
 .admin-dropdown {
     display:none; position:absolute; bottom:calc(100% + 8px); left:0; right:0;
     background:#fff; border:1.5px solid var(--border); border-radius:12px;
-    overflow:hidden; box-shadow:0 8px 28px rgba(255,64,129,.2); z-index:100;
+    overflow:hidden; box-shadow:0 8px 28px rgba(212,84,127,.2); z-index:100;
 }
 .admin-dropdown.show { display:block; }
 .dropdown-header {
     padding:12px 14px; border-bottom:1px solid var(--border);
     display:flex; align-items:center; gap:10px;
-    background:linear-gradient(135deg,#FFE4EE,#FFF0F5);
+    background:linear-gradient(135deg,#FFE0EF,#FFF0F5);
 }
 .dropdown-header .dh-avatar {
     width:38px; height:38px; border-radius:50%;
-    background:linear-gradient(135deg,#FF80AB,#FF4081);
+    background:linear-gradient(135deg,#F4A7C3,#E8719A);
     display:flex; align-items:center; justify-content:center;
     font-weight:700; font-size:14px; color:#fff; flex-shrink:0; overflow:hidden;
 }
@@ -240,7 +240,7 @@ a { text-decoration:none; color:inherit; }
     padding:0 28px; height:62px;
     display:flex; align-items:center; justify-content:space-between;
     position:sticky; top:0; z-index:40;
-    box-shadow:0 2px 12px rgba(255,64,129,.07);
+    box-shadow:0 2px 12px rgba(212,84,127,.07);
 }
 .topbar-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:var(--text); }
 .topbar-right { display:flex; align-items:center; gap:10px; }
@@ -248,9 +248,9 @@ a { text-decoration:none; color:inherit; }
 .btn-toko {
     display:flex; align-items:center; gap:6px;
     padding:7px 16px; border-radius:8px;
-    background:linear-gradient(135deg,#FF80AB,#FF4081);
+    background:linear-gradient(135deg,#F4A7C3,#E8719A);
     font-size:12px; font-weight:600; color:#fff;
-    box-shadow:0 3px 12px rgba(255,64,129,.35);
+    box-shadow:0 3px 12px rgba(212,84,127,.35);
     transition:opacity .2s;
 }
 .btn-toko:hover { opacity:.88; }
@@ -264,36 +264,36 @@ a { text-decoration:none; color:inherit; }
     border-radius:16px; padding:20px;
     position:relative; overflow:hidden;
     transition:transform .2s, box-shadow .2s;
-    box-shadow:0 2px 12px rgba(255,64,129,.08);
+    box-shadow:0 2px 12px rgba(212,84,127,.08);
 }
-.stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(255,64,129,.15); }
+.stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(212,84,127,.15); }
 .stat-card::after {
     content:''; position:absolute; bottom:-20px; right:-20px;
     width:90px; height:90px; border-radius:50%; opacity:.07;
 }
-.stat-card.c1::after { background:#FF4081; }
+.stat-card.c1::after { background:#E8719A; }
 .stat-card.c2::after { background:#00BFA5; }
-.stat-card.c3::after { background:#F50057; }
-.stat-card.c4::after { background:#FFB300; }
+.stat-card.c3::after { background:#D4547F; }
+.stat-card.c4::after { background:#E8719A; }
 .stat-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:19px; margin-bottom:14px; }
-.stat-card.c1 .stat-icon { background:#FFE4EE; color:#FF4081; }
+.stat-card.c1 .stat-icon { background:#FFE0EF; color:#E8719A; }
 .stat-card.c2 .stat-icon { background:#E0F2F1; color:#00BFA5; }
-.stat-card.c3 .stat-icon { background:#FCE4EC; color:#F50057; }
+.stat-card.c3 .stat-icon { background:#FADADD; color:#D4547F; }
 .stat-card.c4 .stat-icon { background:#FFF8E1; color:#FFB300; }
-.stat-value { font-size:26px; font-weight:700; color:var(--text); line-height:1; margin-bottom:5px; }
+.stat-value { font-size:clamp(17px,2.2vw,26px); font-weight:700; color:var(--text); line-height:1; margin-bottom:5px; }
 .stat-label { font-size:12px; color:var(--muted); }
 
 /* ── CHART ── */
 .chart-card {
     background:var(--white); border:1.5px solid var(--border);
     border-radius:16px; overflow:hidden; margin-bottom:22px;
-    box-shadow:0 2px 12px rgba(255,64,129,.08);
+    box-shadow:0 2px 12px rgba(212,84,127,.08);
 }
 .chart-header {
     padding:15px 20px; border-bottom:1.5px solid var(--border);
     display:flex; align-items:center; justify-content:space-between;
     flex-wrap:wrap; gap:10px;
-    background:linear-gradient(to right,#FFF5F8,#fff);
+    background:linear-gradient(to right,#FFF0F5,#fff);
 }
 .chart-header h3 { font-size:14px; font-weight:600; color:var(--text); }
 .chart-tabs { display:flex; gap:4px; }
@@ -304,9 +304,9 @@ a { text-decoration:none; color:inherit; }
 }
 .chart-tab:hover { color:var(--accent); border-color:var(--pink); }
 .chart-tab.active {
-    background:linear-gradient(135deg,#FF80AB,#FF4081);
+    background:linear-gradient(135deg,#F4A7C3,#E8719A);
     color:#fff; border-color:transparent;
-    box-shadow:0 3px 10px rgba(255,64,129,.3);
+    box-shadow:0 3px 10px rgba(212,84,127,.3);
 }
 .chart-body { padding:20px; }
 .chart-canvas-wrap { position:relative; height:220px; }
@@ -316,12 +316,12 @@ a { text-decoration:none; color:inherit; }
 .card {
     background:var(--white); border:1.5px solid var(--border);
     border-radius:16px; overflow:hidden;
-    box-shadow:0 2px 12px rgba(255,64,129,.07);
+    box-shadow:0 2px 12px rgba(212,84,127,.07);
 }
 .card-header {
     padding:14px 20px; border-bottom:1.5px solid var(--border);
     display:flex; align-items:center; justify-content:space-between;
-    background:linear-gradient(to right,#FFF5F8,#fff);
+    background:linear-gradient(to right,#FFF0F5,#fff);
 }
 .card-header h3 { font-size:14px; font-weight:600; color:var(--text); }
 .card-header a { font-size:12px; color:var(--accent); font-weight:500; }
@@ -331,16 +331,16 @@ table { width:100%; border-collapse:collapse; }
 th {
     text-align:left; font-size:10px; letter-spacing:1px; text-transform:uppercase;
     color:var(--muted); padding:10px 18px; border-bottom:1.5px solid var(--border);
-    font-weight:600; background:#FFF8FA;
+    font-weight:600; background:#FFF2F7;
 }
-td { padding:11px 18px; font-size:13px; border-bottom:1px solid #FFE4EE; color:var(--text2); }
+td { padding:11px 18px; font-size:13px; border-bottom:1px solid #FFE0EF; color:var(--text2); }
 tr:last-child td { border-bottom:none; }
-tr:hover td { background:#FFF5F8; }
+tr:hover td { background:#FFF0F5; }
 .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
 .badge-green  { background:#E0F2F1; color:#00897B; }
-.badge-yellow { background:#FFF8E1; color:#F9A825; }
+.badge-yellow { background:#FFF2F7; color:#F9A825; }
 .badge-red    { background:#FFEBEE; color:#E53935; }
-.badge-pink   { background:#FFE4EE; color:#FF4081; }
+.badge-pink   { background:#FFE0EF; color:#E8719A; }
 .produk-row { display:flex; align-items:center; gap:10px; }
 .produk-thumb { width:38px; height:38px; border-radius:8px; object-fit:cover; flex-shrink:0; border:1.5px solid var(--border); }
 .produk-nama { font-size:13px; font-weight:500; color:var(--text); }
@@ -353,12 +353,12 @@ tr:hover td { background:#FFF5F8; }
 .action-btn {
     display:flex; align-items:center; gap:10px;
     padding:12px 14px; border-radius:10px;
-    background:#FFF5F8; border:1.5px solid var(--border);
+    background:#FFF0F5; border:1.5px solid var(--border);
     font-size:13px; font-weight:500; color:var(--text2); transition:all .2s;
     cursor:pointer; font-family:'DM Sans',sans-serif; text-align:left;
     width:100%;
 }
-.action-btn:hover { border-color:var(--accent); color:var(--accent); background:#FFE4EE; }
+.action-btn:hover { border-color:var(--accent); color:var(--accent); background:#FFE0EF; }
 .action-btn i { font-size:15px; }
 
 /* ══════════════════════════════
@@ -374,7 +374,7 @@ tr:hover td { background:#FFF5F8; }
     background:#fff; border:1.5px solid var(--border);
     border-radius:18px; width:100%; max-width:640px;
     max-height:90vh; overflow-y:auto;
-    box-shadow:0 25px 60px rgba(255,64,129,.2);
+    box-shadow:0 25px 60px rgba(212,84,127,.2);
     animation:modalIn .25s ease;
 }
 @keyframes modalIn { from{opacity:0;transform:translateY(20px) scale(.97)} to{opacity:1;transform:none} }
@@ -384,12 +384,12 @@ tr:hover td { background:#FFF5F8; }
     padding:18px 22px 14px; border-bottom:1.5px solid var(--border);
     display:flex; align-items:center; justify-content:space-between;
     position:sticky; top:0; background:#fff; z-index:1;
-    background:linear-gradient(to right,#FFF5F8,#fff);
+    background:linear-gradient(to right,#FFF0F5,#fff);
 }
 .modal-head-left { display:flex; align-items:center; gap:10px; }
 .modal-head-icon {
     width:36px; height:36px; border-radius:10px;
-    background:linear-gradient(135deg,#FFE4EE,#FFB6D0);
+    background:linear-gradient(135deg,#FFE0EF,#F4A7C3);
     display:flex; align-items:center; justify-content:center;
     font-size:16px; color:var(--accent);
 }
@@ -416,12 +416,12 @@ tr:hover td { background:#FFF5F8; }
 .form-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); }
 .form-label .req { color:var(--accent); margin-left:2px; }
 .form-ctrl {
-    background:#FFF5F8; border:1.5px solid var(--border);
+    background:#FFF0F5; border:1.5px solid var(--border);
     border-radius:8px; color:var(--text); padding:9px 12px;
     font-family:'DM Sans',sans-serif; font-size:13px; outline:none; width:100%;
     transition:border-color .2s, box-shadow .2s;
 }
-.form-ctrl:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,64,129,.1); }
+.form-ctrl:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(212,84,127,.1); }
 .form-ctrl::placeholder { color:var(--muted); }
 textarea.form-ctrl { resize:vertical; min-height:78px; }
 select.form-ctrl option { background:#fff; }
@@ -429,9 +429,9 @@ select.form-ctrl option { background:#fff; }
     border:2px dashed var(--border); border-radius:10px;
     padding:20px 16px; text-align:center; cursor:pointer;
     transition:all .2s; position:relative; overflow:hidden;
-    background:#FFF8FA; display:block;
+    background:#FFF2F7; display:block;
 }
-.upload-area:hover { border-color:var(--accent); background:#FFE4EE; }
+.upload-area:hover { border-color:var(--accent); background:#FFE0EF; }
 .upload-area input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
 .ua-icon { font-size:26px; color:var(--accent); opacity:.7; }
 .ua-text { font-size:13px; color:var(--accent); font-weight:600; margin-top:5px; }
@@ -441,22 +441,22 @@ select.form-ctrl option { background:#fff; }
     padding:14px 22px; border-top:1.5px solid var(--border);
     display:flex; justify-content:flex-end; gap:10px;
     position:sticky; bottom:0;
-    background:linear-gradient(to right,#FFF5F8,#fff);
+    background:linear-gradient(to right,#FFF0F5,#fff);
 }
 .btn-cancel-m {
     padding:9px 20px; border-radius:8px;
-    background:#FFF5F8; border:1.5px solid var(--border);
+    background:#FFF0F5; border:1.5px solid var(--border);
     color:var(--muted); font-size:13px; cursor:pointer;
     font-family:'DM Sans',sans-serif; transition:all .2s;
 }
 .btn-cancel-m:hover { color:var(--text); border-color:var(--accent); }
 .btn-save-m {
     padding:9px 22px; border-radius:8px;
-    background:linear-gradient(135deg,#FF80AB,#FF4081);
+    background:linear-gradient(135deg,#F4A7C3,#E8719A);
     color:#fff; font-size:13px; font-weight:600; border:none; cursor:pointer;
     font-family:'DM Sans',sans-serif; transition:opacity .2s;
     display:flex; align-items:center; gap:7px;
-    box-shadow:0 4px 14px rgba(255,64,129,.3);
+    box-shadow:0 4px 14px rgba(212,84,127,.3);
 }
 .btn-save-m:hover { opacity:.87; }
 
@@ -566,7 +566,7 @@ select.form-ctrl option { background:#fff; }
             </div>
             <div class="stat-card c4">
                 <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
-                <div class="stat-value" style="font-size:17px;"><?= formatRupiah($total_pendapatan) ?></div>
+                <div class="stat-value"><?= formatRupiah($total_pendapatan) ?></div>
                 <div class="stat-label">Pendapatan</div>
             </div>
         </div>
@@ -605,7 +605,7 @@ select.form-ctrl option { background:#fff; }
                     </div>
                     <div style="width:100%;margin-top:16px;display:flex;flex-direction:column;gap:9px;">
                         <?php
-                        $donut_colors = ['#FF4081','#2196F3','#FF9800','#00BFA5','#9C27B0'];
+                        $donut_colors = ['#E8719A','#2196F3','#FF9800','#00BFA5','#9C27B0'];
                         foreach ($data_kategori as $i => $kat):
                             $pct = $total_terjual > 0 ? round($kat['jumlah'] / $total_terjual * 100) : 0;
                             $color = $donut_colors[$i % count($donut_colors)];
@@ -621,7 +621,7 @@ select.form-ctrl option { background:#fff; }
                     </div>
                 </div>
                 <?php else: ?>
-                <div class="empty"><i class="bi bi-pie-chart"></i>Belum ada data penjualan</div>
+                <div class="empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:220px;"><i class="bi bi-pie-chart"></i>Belum ada data penjualan</div>
                 <?php endif; ?>
             </div>
 
@@ -857,8 +857,8 @@ function buildChart(period) {
     const values = raw.map(d => d.value);
     const ctx    = document.getElementById('salesChart').getContext('2d');
     const grad   = ctx.createLinearGradient(0, 0, 0, 220);
-    grad.addColorStop(0, 'rgba(255,64,129,0.22)');
-    grad.addColorStop(1, 'rgba(255,64,129,0.01)');
+    grad.addColorStop(0, 'rgba(212,84,127,0.22)');
+    grad.addColorStop(1, 'rgba(212,84,127,0.01)');
     if (salesChart) salesChart.destroy();
     salesChart = new Chart(ctx, {
         type: 'line',
@@ -867,10 +867,10 @@ function buildChart(period) {
             datasets: [{
                 label: 'Penjualan (Rp)',
                 data: values,
-                borderColor: '#FF4081',
+                borderColor: '#E8719A',
                 backgroundColor: grad,
                 borderWidth: 2.5,
-                pointBackgroundColor: '#FF4081',
+                pointBackgroundColor: '#E8719A',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
                 pointRadius: 4,
@@ -886,18 +886,18 @@ function buildChart(period) {
                 legend: { display: false },
                 tooltip: {
                     backgroundColor: '#fff',
-                    borderColor: '#FFB6D0',
+                    borderColor: '#F4A7C3',
                     borderWidth: 1.5,
                     titleColor: '#1A1A1A',
-                    bodyColor: '#FF4081',
+                    bodyColor: '#E8719A',
                     padding: 10,
                     callbacks: { label: ctx => ' Rp ' + ctx.parsed.y.toLocaleString('id-ID') }
                 }
             },
             scales: {
-                x: { grid: { color: 'rgba(255,182,208,0.3)' }, ticks: { color: '#AAAAAA', font: { size: 11 } } },
+                x: { grid: { color: 'rgba(212,167,195,0.3)' }, ticks: { color: '#AAAAAA', font: { size: 11 } } },
                 y: {
-                    grid: { color: 'rgba(255,182,208,0.3)' },
+                    grid: { color: 'rgba(212,167,195,0.3)' },
                     ticks: {
                         color: '#AAAAAA', font: { size: 11 },
                         callback: v => 'Rp ' + (v >= 1000000 ? (v/1000000).toFixed(1)+'jt' : v >= 1000 ? (v/1000).toFixed(0)+'rb' : v)
@@ -921,7 +921,7 @@ buildChart('harian');
 (function() {
     const labels = <?= json_encode(array_column($data_kategori, 'kategori')) ?>;
     const values = <?= json_encode(array_column($data_kategori, 'jumlah')) ?>;
-    const colors = ['#FF4081','#2196F3','#FF9800','#00BFA5','#9C27B0'];
+    const colors = ['#E8719A','#2196F3','#FF9800','#00BFA5','#9C27B0'];
     const ctx = document.getElementById('donutChart').getContext('2d');
     new Chart(ctx, {
         type: 'doughnut',
@@ -944,10 +944,10 @@ buildChart('harian');
                 legend: { display: false },
                 tooltip: {
                     backgroundColor: '#fff',
-                    borderColor: '#FFB6D0',
+                    borderColor: '#F4A7C3',
                     borderWidth: 1.5,
                     titleColor: '#1A1A1A',
-                    bodyColor: '#FF4081',
+                    bodyColor: '#E8719A',
                     padding: 10,
                     callbacks: {
                         label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' terjual'

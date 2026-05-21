@@ -242,7 +242,7 @@ a{text-decoration:none;color:inherit;}
 .sidebar-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:2px;}
 .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--muted);transition:all .2s;}
 .nav-item:hover{background:var(--surface2);color:var(--text);}
-.nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(236,72,153,.15));color:var(--accent);}
+.nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(212,84,127,.15));color:var(--accent);}
 .nav-item i{font-size:16px;width:20px;}
 .nav-section{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:14px 14px 6px;font-weight:600;}
 .sidebar-footer{padding:16px 12px;border-top:1px solid var(--border);}

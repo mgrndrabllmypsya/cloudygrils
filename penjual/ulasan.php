@@ -47,20 +47,20 @@ $admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --bg:       #FFF5F8;
+    --bg:       #FFF0F5;
     --surface:  #FFFFFF;
-    --surface2: #FFF0F5;
-    --border:   #FFB6D0;
-    --accent:   #FF4081;
-    --accent2:  #F50057;
-    --pink:     #FF80AB;
-    --pink2:    #FF4081;
+    --surface2: #FFE8F2;
+    --border:   #F4A7C3;
+    --accent:   #E8719A;
+    --accent2:  #D4547F;
+    --pink:     #F4A7C3;
+    --pink2:    #E8719A;
     --green:    #00BFA5;
     --yellow:   #FFB300;
     --red:      #FF1744;
     --text:     #1A1A1A;
     --text2:    #444444;
-    --muted:    #AAAAAA;
+    --muted:    #BBA0B0;
     --white:    #FFFFFF;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -74,7 +74,7 @@ body {
 body::before {
     content: '';
     position: fixed; inset: 0;
-    background-image: radial-gradient(circle, #FFB6D0 1px, transparent 1px);
+    background-image: radial-gradient(circle, #F4A7C3 1px, transparent 1px);
     background-size: 28px 28px;
     opacity: .15;
     pointer-events: none;
@@ -86,10 +86,10 @@ a { text-decoration: none; color: inherit; }
 /* ── SIDEBAR ── */
 .sidebar {
     width: 240px;
-    background: linear-gradient(180deg, #FF80AB 0%, #FF4081 45%, #F50057 100%);
+    background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
     display: flex; flex-direction: column;
     position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
-    box-shadow: 4px 0 28px rgba(255,64,129,.3);
+    box-shadow: 4px 0 28px rgba(212,84,127,.3);
 }
 .sidebar-logo {
     padding: 24px 24px 20px;
@@ -97,7 +97,7 @@ a { text-decoration: none; color: inherit; }
     background: rgba(255,255,255,.12);
 }
 .sidebar-logo .logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #fff; }
-.sidebar-logo .logo span { color: #FFE4EE; }
+.sidebar-logo .logo span { color: #FFE0EF; }
 .sidebar-logo small { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 2px; }
 .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.8); transition: all .2s; }
@@ -124,12 +124,12 @@ a { text-decoration: none; color: inherit; }
     padding: 0 32px; height: 64px;
     display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 40;
-    box-shadow: 0 2px 12px rgba(255,64,129,.07);
+    box-shadow: 0 2px 12px rgba(212,84,127,.07);
 }
 .topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); }
 .topbar-right { display: flex; align-items: center; gap: 10px; }
 .topbar-date { font-size: 12px; color: var(--muted); }
-.btn-toko { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: linear-gradient(135deg,#FF80AB,#FF4081); font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 3px 12px rgba(255,64,129,.35); transition: opacity .2s; }
+.btn-toko { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: linear-gradient(135deg,#F4A7C3,#E8719A); font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 3px 12px rgba(212,84,127,.35); transition: opacity .2s; }
 .btn-toko:hover { opacity: .88; }
 
 
