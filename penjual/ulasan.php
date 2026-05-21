@@ -146,7 +146,7 @@ a { text-decoration: none; color: inherit; }
 .stat-card.purple .stat-icon { background:rgba(124,58,237,.2); color:var(--accent); }
 .stat-card.yellow .stat-icon { background:rgba(251,191,36,.2); color:var(--yellow); }
 .stat-card.green .stat-icon { background:rgba(52,211,153,.2); color:var(--green); }
-.stat-value { font-size:26px; font-weight:700; color:var(--white); line-height:1; margin-bottom:4px; }
+.stat-value { font-size:26px; font-weight:700; color:var(--text); line-height:1; margin-bottom:4px; }
 .stat-label { font-size:12px; color:var(--muted); }
 
 .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }

@@ -61,7 +61,7 @@ $total_tolak    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM neg
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,#F4A7C3 1px,transparent 1px);background-size:28px 28px;opacity:.15;pointer-events:none;z-index:0;}
 a{text-decoration:none;color:inherit;}
-.sidebar{width:230px;background:linear-gradient(180deg,#F4A7C3 0%,#E8719A 45%,#D4547F 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:4px 0 28px rgba(212,84,127,.3);}
+.sidebar{width:240px;background:linear-gradient(180deg,#F4A7C3 0%,#E8719A 45%,#D4547F 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:4px 0 28px rgba(212,84,127,.3);}
 .sidebar-logo{padding:22px 22px 18px;border-bottom:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);}
 .sidebar-logo .logo{font-family:'Playfair Display',serif;font-size:21px;font-weight:900;color:#fff;}
 .sidebar-logo .logo span{color:#FFE0EF;}

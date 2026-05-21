@@ -163,7 +163,7 @@ a { text-decoration:none; color:inherit; }
 
 /* SIDEBAR */
 .sidebar {
-    width:230px;
+    width:240px;
     background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
     display:flex; flex-direction:column;
     position:fixed; top:0; left:0; bottom:0; z-index:50;
