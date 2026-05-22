@@ -12,10 +12,8 @@ function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8')
 $user_id   = $_SESSION['user_id'];
 $produk_id = (int)($_GET['produk_id'] ?? 0);
 
-// Ambil data pembeli
 $user = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM pembeli WHERE id=$user_id LIMIT 1"));
 
-// Ambil semua produk yang pernah dichat pembeli ini
 $q_list = mysqli_query($conn, "
     SELECT DISTINCT c.produk_id, pr.nama_barang, pr.foto_utama,
            (SELECT pesan FROM chat WHERE produk_id=c.produk_id AND pembeli_id=$user_id ORDER BY created_at DESC LIMIT 1) AS pesan_terakhir,
@@ -27,12 +25,10 @@ $q_list = mysqli_query($conn, "
     ORDER BY waktu_terakhir DESC
 ");
 
-// Jika produk_id dari URL, tambahkan ke list kalau belum ada
 if ($produk_id) {
     $pr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM produk WHERE id=$produk_id LIMIT 1"));
     if (!$pr) { header("Location: home.php"); exit; }
 } else {
-    // Default ke produk pertama di list
     $first = mysqli_fetch_assoc($q_list);
     if ($first) {
         $produk_id = $first['produk_id'];
@@ -43,7 +39,6 @@ if ($produk_id) {
     }
 }
 
-// Handle kirim pesan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $produk_id) {
     $pesan = trim($_POST['pesan'] ?? '');
     if ($pesan !== '') {
@@ -54,12 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $produk_id) {
     header("Location: chat.php?produk_id=$produk_id"); exit;
 }
 
-// Ambil pesan untuk produk aktif
 $pesan_list = [];
 if ($produk_id) {
-    // Tandai pesan admin sebagai sudah dibaca
     $conn->query("UPDATE chat SET sudah_dibaca=1 WHERE produk_id=$produk_id AND pembeli_id=$user_id AND pengirim='admin'");
-
     $q_pesan = mysqli_query($conn, "
         SELECT * FROM chat
         WHERE produk_id=$produk_id AND pembeli_id=$user_id
@@ -90,100 +82,194 @@ include '../includes/header.php';
 body { font-family:'DM Sans',sans-serif; color:var(--dark); background:var(--cream); }
 a { text-decoration:none; color:inherit; }
 
+/* ── LAYOUT ── */
+.chat-page { max-width:1000px; margin:0 auto; padding:24px 20px 40px; }
 .chat-wrap {
-    max-width:960px; margin:0 auto; padding:24px 20px 40px;
     display:grid; grid-template-columns:280px 1fr;
-    gap:16px; height:calc(100vh - 120px);
+    gap:16px; height:calc(100vh - 140px); min-height:500px;
 }
 
-/* LIST SIDEBAR */
+/* ── LIST SIDEBAR ── */
 .chat-list {
     background:var(--white); border:1.5px solid var(--border);
-    border-radius:16px; overflow:hidden; display:flex; flex-direction:column;
+    border-radius:16px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:0 2px 12px rgba(214,51,132,.08);
 }
 .chat-list-head {
-    padding:16px; border-bottom:1px solid var(--border);
+    padding:14px 16px; border-bottom:1px solid var(--border);
     background:var(--pink-blush);
-    font-weight:700; font-size:14px;
+    font-weight:700; font-size:14px; flex-shrink:0;
 }
 .chat-list-body { flex:1; overflow-y:auto; }
+.chat-list-body::-webkit-scrollbar { width:3px; }
+.chat-list-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
 .chat-item {
     display:flex; gap:10px; padding:12px 14px;
     border-bottom:1px solid var(--border); cursor:pointer;
     transition:background .15s; align-items:center;
+    text-decoration:none; color:inherit;
 }
 .chat-item:hover { background:var(--pink-blush); }
 .chat-item.active { background:var(--pink-pale); border-left:3px solid var(--pink-deep); }
 .chat-item-img {
-    width:44px; height:44px; border-radius:8px;
-    object-fit:cover; border:1px solid var(--border); flex-shrink:0;
+    width:44px; height:44px; border-radius:10px;
+    object-fit:cover; border:1.5px solid var(--border); flex-shrink:0;
 }
 .chat-item-info { flex:1; min-width:0; }
-.chat-item-nama { font-size:13px; font-weight:600; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.chat-item-preview { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
-.badge-unread { background:var(--pink-deep); color:#fff; font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px; flex-shrink:0; }
-.chat-empty-list { padding:32px 16px; text-align:center; color:var(--muted); font-size:13px; }
+.chat-item-nama {
+    font-size:13px; font-weight:600; color:var(--dark);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.chat-item-preview {
+    font-size:11px; color:var(--muted);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;
+}
+.badge-unread {
+    background:var(--pink-deep); color:#fff;
+    font-size:10px; font-weight:700;
+    min-width:18px; height:18px; border-radius:10px;
+    padding:0 5px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+}
+.chat-empty-list {
+    padding:32px 16px; text-align:center;
+    color:var(--muted); font-size:13px; line-height:1.7;
+}
 
-/* AREA CHAT */
+/* ── AREA CHAT ── */
 .chat-area {
     background:var(--white); border:1.5px solid var(--border);
     border-radius:16px; overflow:hidden;
     display:flex; flex-direction:column;
+    box-shadow:0 2px 12px rgba(214,51,132,.08);
 }
+
+/* HEADER */
 .chat-header {
-    padding:14px 16px; border-bottom:1px solid var(--border);
+    padding:14px 18px; border-bottom:1.5px solid var(--border);
     background:var(--pink-blush);
     display:flex; align-items:center; gap:12px;
+    flex-shrink:0;
 }
-.chat-header img { width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid var(--border); }
-.chat-header-info .nama { font-weight:700; font-size:14px; }
-.chat-header-info .sub { font-size:11px; color:var(--muted); }
-.chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; background:var(--cream); }
+.chat-header-img {
+    width:42px; height:42px; border-radius:10px;
+    object-fit:cover; border:1.5px solid var(--border); flex-shrink:0;
+}
+.chat-header-info { flex:1; min-width:0; }
+.chat-header-info .nama {
+    font-weight:700; font-size:14px; color:var(--dark);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.chat-header-info .sub { font-size:11px; color:var(--muted); margin-top:2px; }
+.chat-header-link {
+    font-size:12px; color:var(--pink-deep); font-weight:600;
+    display:flex; align-items:center; gap:4px; flex-shrink:0;
+    white-space:nowrap;
+}
+.chat-header-link:hover { text-decoration:underline !important; }
+
+/* MESSAGES */
+.chat-messages {
+    flex:1; overflow-y:auto; padding:16px;
+    display:flex; flex-direction:column; gap:12px;
+    background:var(--cream);
+}
+.chat-messages::-webkit-scrollbar { width:4px; }
+.chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+/* DATE SEPARATOR */
+.date-sep {
+    text-align:center; font-size:11px; color:var(--muted);
+    display:flex; align-items:center; gap:8px; margin:4px 0;
+}
+.date-sep::before, .date-sep::after { content:''; flex:1; height:1px; background:var(--border); }
 
 /* BUBBLE */
-.bubble-wrap { display:flex; gap:8px; align-items:flex-end; }
-.bubble-wrap.saya { flex-direction:row-reverse; }
-.bubble-avatar { width:28px; height:28px; border-radius:50%; object-fit:cover; flex-shrink:0; }
-.bubble {
-    max-width:65%; padding:9px 13px; border-radius:14px;
-    font-size:13px; line-height:1.5;
+.bubble-wrap {
+    display:flex; gap:8px; align-items:flex-end;
+    max-width:80%;
 }
-.bubble-wrap.admin .bubble { background:var(--white); border:1px solid var(--border); border-bottom-left-radius:4px; color:var(--dark); }
-.bubble-wrap.saya .bubble { background:linear-gradient(135deg,var(--pink-deep),var(--pink-mid)); color:#fff; border-bottom-right-radius:4px; }
-.bubble-time { font-size:10px; color:var(--muted); margin-top:4px; text-align:right; }
+.bubble-wrap.saya {
+    flex-direction:row-reverse;
+    margin-left:auto;
+}
+.bubble-wrap.admin { margin-right:auto; }
+
+.bubble-avatar {
+    width:30px; height:30px; border-radius:50%;
+    background:linear-gradient(135deg,var(--pink-deep),var(--pink-mid));
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; color:#fff; flex-shrink:0;
+}
+
+.bubble-content { display:flex; flex-direction:column; max-width:100%; }
+
+.bubble {
+    padding:10px 14px; border-radius:16px;
+    font-size:13px; line-height:1.6;
+    word-break:break-word; white-space:pre-wrap;
+}
+.bubble-wrap.admin .bubble {
+    background:var(--white); border:1.5px solid var(--border);
+    border-bottom-left-radius:4px; color:var(--dark);
+}
+.bubble-wrap.saya .bubble {
+    background:linear-gradient(135deg,var(--pink-deep),var(--pink-mid));
+    color:#fff; border-bottom-right-radius:4px;
+}
+
+.bubble-time {
+    font-size:10px; color:var(--muted);
+    margin-top:4px; padding:0 2px;
+}
+.bubble-wrap.saya .bubble-time { text-align:right; }
 .bubble-wrap.admin .bubble-time { text-align:left; }
 
 /* INPUT */
 .chat-input-area {
-    padding:12px 16px; border-top:1px solid var(--border);
-    background:var(--white); display:flex; gap:8px; align-items:flex-end;
+    padding:12px 16px; border-top:1.5px solid var(--border);
+    background:var(--white);
+    display:flex; gap:8px; align-items:flex-end; flex-shrink:0;
 }
 .chat-input {
-    flex:1; padding:10px 14px; border:1.5px solid var(--border);
-    border-radius:20px; font-family:'DM Sans',sans-serif; font-size:13px;
+    flex:1; padding:10px 16px;
+    border:1.5px solid var(--border); border-radius:24px;
+    font-family:'DM Sans',sans-serif; font-size:13px;
     outline:none; resize:none; max-height:100px; line-height:1.5;
     color:var(--dark); background:var(--cream); transition:border-color .2s;
+    overflow-y:auto;
 }
 .chat-input:focus { border-color:var(--pink-deep); background:#fff; }
 .btn-kirim {
-    width:38px; height:38px; border-radius:50%;
+    width:40px; height:40px; border-radius:50%; flex-shrink:0;
     background:linear-gradient(135deg,var(--pink-deep),var(--pink-mid));
-    border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
-    color:#fff; font-size:16px; flex-shrink:0; transition:opacity .2s;
+    border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:16px; transition:opacity .2s, transform .15s;
 }
-.btn-kirim:hover { opacity:.88; }
+.btn-kirim:hover { opacity:.88; transform:scale(1.06); }
 
-/* PLACEHOLDER CHAT */
-.chat-placeholder { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:40px; }
-.chat-placeholder i { font-size:3rem; margin-bottom:12px; opacity:.3; }
+/* PLACEHOLDER */
+.chat-placeholder {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    color:var(--muted); text-align:center; padding:40px;
+}
+.chat-placeholder i { font-size:3rem; margin-bottom:12px; opacity:.25; display:block; }
+.chat-placeholder p { font-size:13px; line-height:1.7; }
 
+/* RESPONSIVE */
 @media(max-width:680px) {
     .chat-wrap { grid-template-columns:1fr; height:auto; }
-    .chat-list { max-height:200px; }
-    .chat-area { height:60vh; }
+    .chat-list { max-height:180px; }
+    .chat-area { height:65vh; }
+    .bubble-wrap { max-width:90%; }
 }
 </style>
 
+<div class="chat-page">
 <div class="chat-wrap">
 
     <!-- LIST SIDEBAR -->
@@ -192,13 +278,12 @@ a { text-decoration:none; color:inherit; }
         <div class="chat-list-body">
             <?php
             $has_list = false;
-            // Tambahkan produk aktif jika baru mulai chat
+
             if ($produk_id && isset($pr)) {
                 $cek_existing = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM chat WHERE produk_id=$produk_id AND pembeli_id=$user_id LIMIT 1"));
                 if (!$cek_existing) {
-                    // Produk baru, tampilkan di list walau belum ada chat
-                    echo '<a href="chat.php?produk_id=' . $produk_id . '" class="chat-item active">';
                     $fotoSrc = !empty($pr['foto_utama']) ? '../uploads/produk/' . escape($pr['foto_utama']) : 'https://placehold.co/44x44/FDE8F2/D63384?text=CG';
+                    echo '<a href="chat.php?produk_id=' . $produk_id . '" class="chat-item active">';
                     echo '<img src="' . $fotoSrc . '" class="chat-item-img" alt="produk">';
                     echo '<div class="chat-item-info">';
                     echo '<div class="chat-item-nama">' . escape($pr['nama_barang']) . '</div>';
@@ -239,45 +324,51 @@ a { text-decoration:none; color:inherit; }
     <div class="chat-area">
         <?php if ($produk_id && isset($pr)): ?>
 
-        <!-- HEADER -->
         <div class="chat-header">
-            <?php $fotoSrc = !empty($pr['foto_utama']) ? '../uploads/produk/' . escape($pr['foto_utama']) : 'https://placehold.co/40x40/FDE8F2/D63384?text=CG'; ?>
-            <img src="<?= $fotoSrc ?>" alt="produk">
+            <?php $fotoSrc = !empty($pr['foto_utama']) ? '../uploads/produk/' . escape($pr['foto_utama']) : 'https://placehold.co/42x42/FDE8F2/D63384?text=CG'; ?>
+            <img src="<?= $fotoSrc ?>" class="chat-header-img" alt="produk">
             <div class="chat-header-info">
                 <div class="nama"><?= escape($pr['nama_barang']) ?></div>
                 <div class="sub">Chat dengan Cloudy Girls · Rp <?= number_format($pr['harga'],0,',','.') ?></div>
             </div>
-            <a href="detail.php?id=<?= $produk_id ?>" style="margin-left:auto;font-size:12px;color:var(--pink-deep);font-weight:600;">
+            <a href="detail.php?id=<?= $produk_id ?>" class="chat-header-link">
                 <i class="bi bi-box-arrow-up-right"></i> Lihat Produk
             </a>
         </div>
 
-        <!-- PESAN -->
         <div class="chat-messages" id="chatMessages">
             <?php if (empty($pesan_list)): ?>
-            <div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">
-                Mulai percakapan dengan penjual 👋
+            <div style="text-align:center;color:var(--muted);font-size:13px;padding:32px 20px;line-height:1.7;">
+                👋 Halo! Tanyakan apapun tentang produk ini kepada penjual.
             </div>
             <?php endif; ?>
 
-            <?php foreach ($pesan_list as $p):
-                $isSaya = $p['pengirim'] === 'pembeli';
-                $waktu  = date('H:i', strtotime($p['created_at']));
-                $tgl    = date('d M', strtotime($p['created_at']));
+            <?php
+            $prev_date = '';
+            foreach ($pesan_list as $p):
+                $isSaya  = $p['pengirim'] === 'pembeli';
+                $waktu   = date('H:i', strtotime($p['created_at']));
+                $tgl     = date('d M Y', strtotime($p['created_at']));
+
+                // Date separator
+                if ($tgl !== $prev_date):
+                    $prev_date = $tgl;
             ?>
+            <div class="date-sep"><?= $tgl === date('d M Y') ? 'Hari ini' : $tgl ?></div>
+            <?php endif; ?>
+
             <div class="bubble-wrap <?= $isSaya ? 'saya' : 'admin' ?>">
                 <?php if (!$isSaya): ?>
-                <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#D63384,#F06292);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">CG</div>
+                <div class="bubble-avatar">CG</div>
                 <?php endif; ?>
-                <div>
+                <div class="bubble-content">
                     <div class="bubble"><?= nl2br(escape($p['pesan'])) ?></div>
-                    <div class="bubble-time"><?= $tgl ?> <?= $waktu ?></div>
+                    <div class="bubble-time"><?= $waktu ?></div>
                 </div>
             </div>
             <?php endforeach; ?>
         </div>
 
-        <!-- INPUT -->
         <form method="POST" class="chat-input-area">
             <textarea name="pesan" class="chat-input" placeholder="Tulis pesan..." rows="1"
                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.form.submit();}"></textarea>
@@ -287,25 +378,25 @@ a { text-decoration:none; color:inherit; }
         <?php else: ?>
         <div class="chat-placeholder">
             <i class="bi bi-chat-dots"></i>
-            <p>Pilih percakapan atau buka produk<br>dan klik "Tanya Penjual"</p>
+            <p>Pilih percakapan di sebelah kiri<br>atau buka produk dan klik "Tanya Penjual"</p>
         </div>
         <?php endif; ?>
     </div>
 
 </div>
+</div>
 
 <script>
-// Auto scroll ke bawah
 const msgs = document.getElementById('chatMessages');
 if (msgs) msgs.scrollTop = msgs.scrollHeight;
 
-// Auto resize textarea
 const ta = document.querySelector('.chat-input');
 if (ta) {
     ta.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 100) + 'px';
     });
+    ta.focus();
 }
 </script>
 

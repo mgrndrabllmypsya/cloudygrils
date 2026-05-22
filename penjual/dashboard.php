@@ -14,6 +14,7 @@ $total_produk     = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM p
 $total_pesanan    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan"))[0] ?? 0;
 $total_pendapatan = mysqli_fetch_row(mysqli_query($conn, "SELECT SUM(total_bayar) FROM pesanan WHERE status='selesai'"))[0] ?? 0;
 $pesanan_pending  = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status='menunggu'"))[0] ?? 0;
+$total_unread = mysqli_fetch_row(mysqli_query($conn,"SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
 
 $q_pesanan = mysqli_query($conn, "
     SELECT ps.*, pb.nama AS nama_pembeli
@@ -166,7 +167,15 @@ a { text-decoration:none; color:inherit; }
     border-left:3px solid #fff;
 }
 .nav-item i { font-size:15px; width:18px; flex-shrink:0; }
-
+.badge-notif {
+    background:#fff;
+    color:var(--accent);
+    font-size:10px;
+    font-weight:700;
+    padding:1px 6px;
+    border-radius:10px;
+    margin-left:auto;
+}
 .sidebar-footer {
     padding:14px 10px;
     border-top:1.5px solid rgba(255,255,255,.2);
@@ -491,7 +500,11 @@ select.form-ctrl option { background:#fff; }
         <a href="dashboard.php" class="nav-item active"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <a href="produk.php"    class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
         <a href="pesanan.php"   class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="chat.php"      class="nav-item"><i class="bi bi-chat-dots"></i> Chat</a>
+        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
+            <?php if ($total_unread > 0): ?>
+                <span class="badge-notif"><?= $total_unread ?></span>
+            <?php endif; ?>
+        </a>
         <a href="nego.php"      class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>

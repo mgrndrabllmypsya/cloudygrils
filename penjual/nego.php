@@ -29,6 +29,7 @@ $total_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM neg
 $total_counter  = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='counter'"))[0] ?? 0;
 $total_setuju   = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='disetujui'"))[0] ?? 0;
 $total_tolak    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='ditolak'"))[0] ?? 0;
+$total_unread = mysqli_fetch_row(mysqli_query($conn,"SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -158,7 +159,11 @@ a{text-decoration:none;color:inherit;}
         <a href="dashboard.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <a href="produk.php"    class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
         <a href="pesanan.php"   class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="chat.php"      class="nav-item"><i class="bi bi-chat-dots"></i> Chat</a>
+        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
+        <?php if ($total_unread > 0): ?>
+    <span class="badge-notif"><?= $total_unread ?></span>
+    <?php endif; ?>
+</a>
         <a href="nego.php"      class="nav-item active">
             <i class="bi bi-tags"></i> Nego Harga
             <?php if ($total_menunggu > 0): ?>

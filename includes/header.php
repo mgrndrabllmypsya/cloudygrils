@@ -82,10 +82,13 @@ a { text-decoration: none; color: inherit; }
 
 /* BADGE (notif) */
 .nav-badge {
-    position: absolute; top: 6px; right: 6px;
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--red);
+    position: absolute; top: -4px; right: -4px;
+    min-width: 17px; height: 17px;
+    border-radius: 10px; padding: 0 4px;
+    background: var(--red); color: #fff;
+    font-size: 9px; font-weight: 700;
     border: 2px solid #fff;
+    display: flex; align-items: center; justify-content: center;
 }
 
 /* LOVE BUTTON */
@@ -234,7 +237,7 @@ if (isset($conn)) {
         <a href="../pages/chat.php" class="nav-icon-btn msg" title="Pesan">
             <i class="bi bi-chat-dots"></i>
             <?php if ($unread_msg > 0): ?>
-            <span class="nav-badge"></span>
+            <span class="nav-badge"><?= $unread_msg ?></span>
             <?php endif; ?>
         </a>
 

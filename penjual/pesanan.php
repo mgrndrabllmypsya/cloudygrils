@@ -31,6 +31,9 @@ $total_pesanan   = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pe
 $total_menunggu  = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status='menunggu'"))[0] ?? 0;
 $total_diproses  = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status='diproses'"))[0] ?? 0;
 $total_selesai   = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status='selesai'"))[0] ?? 0;
+$total_unread = mysqli_fetch_row(mysqli_query($conn,
+    "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"
+))[0] ?? 0;
 
 $total_perhatian = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status_transfer='menunggu' AND status='menunggu'"))[0] ?? 0;
 
@@ -104,6 +107,7 @@ a { text-decoration:none; color:inherit; }
 .nav-item:hover { background:rgba(255,255,255,.2); color:#fff; }
 .nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; }
 .nav-item i { font-size:15px; width:18px; flex-shrink:0; }
+.badge-notif { background:#fff; color:var(--accent); font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; margin-left:auto; }
 .sidebar-footer { padding:14px 10px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
 .admin-card { display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,.18); border-radius:10px; margin-bottom:8px; border:1.5px solid rgba(255,255,255,.3); }
 .admin-avatar { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.3); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; border:2px solid rgba(255,255,255,.5); }
@@ -224,7 +228,11 @@ tr:hover td { background:#FFF0F5; }
         <a href="dashboard.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <a href="produk.php"    class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
         <a href="pesanan.php"   class="nav-item active"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="chat.php"      class="nav-item"><i class="bi bi-chat-dots"></i> Chat</a>
+        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
+        <?php if ($total_unread > 0): ?>
+    <span class="badge-notif"><?= $total_unread ?></span>
+    <?php endif; ?>
+</a>
         <a href="nego.php"      class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
