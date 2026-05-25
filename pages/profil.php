@@ -32,7 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
             $error = 'Nama tidak boleh kosong.';
         } else {
             $foto_profil = $user['foto_profil'] ?? '';
-
+if (isset($_POST['hapus_foto']) && $_POST['hapus_foto'] === '1') {
+    $folderUpload = '../uploads/foto_profil/';
+    if ($foto_profil && file_exists($folderUpload . $foto_profil)) {
+        unlink($folderUpload . $foto_profil);
+    }
+    $foto_profil = '';
+}
             if (!empty($_FILES['foto_profil']['name']) && $_FILES['foto_profil']['error'] === UPLOAD_ERR_OK) {
                 $folderUpload = '../uploads/foto_profil/';
                 if (!is_dir($folderUpload)) mkdir($folderUpload, 0755, true);
@@ -58,9 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
                     $namaFile = 'profil_' . $user_id . '_' . time() . '.' . $ext;
 
                     // Hapus foto lama
-                    if ($foto_profil && file_exists($folderUpload . $foto_profil)) {
-                        unlink($folderUpload . $foto_profil);
-                    }
 
                     move_uploaded_file($_FILES['foto_profil']['tmp_name'], $folderUpload . $namaFile);
                     $foto_profil = $namaFile;
@@ -301,6 +304,7 @@ a { text-decoration:none; color:inherit; }
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="aksi" value="update_profil">
+                        <input type="hidden" name="hapus_foto" id="hapusFotoFlag" value="0">
 
                         <div class="foto-row">
                             <img src="<?= escape($foto_src) ?>" class="foto-avatar" id="fotoPreview" alt="foto">
@@ -430,8 +434,12 @@ function previewFoto(input) {
 }
 
 function hapusFoto() {
-    document.getElementById('fotoPreview').src = '<?= escape($foto_src) ?>';
-    document.getElementById('sidebarAvatar').src = '<?= escape($foto_src) ?>';
+    const defaultSrc = 'https://ui-avatars.com/api/?name=<?= urlencode($user['nama']) ?>&background=D63384&color=fff&size=128';
+    document.getElementById('fotoPreview').src = defaultSrc;
+    document.getElementById('sidebarAvatar').src = defaultSrc;
+    document.getElementById('hapusFotoFlag').value = '1';
+    const fileInput = document.querySelector('input[name="foto_profil"]');
+    if (fileInput) fileInput.value = '';
 }
 
 function cekKekuatan(pw) {

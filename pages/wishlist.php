@@ -36,7 +36,10 @@ include '../includes/header.php';
     --white:#FFFFFF; --dark:#2D1B25; --muted:#A07090;
     --border:#F2D0E5; --red:#F43F5E;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
+.page-wrap, .page-wrap *, .profil-layout, .profil-layout *,
+.sidebar-profil, .card, .alert {
+    box-sizing: border-box;
+}
 body { font-family:'DM Sans',sans-serif; color:var(--dark); background:var(--cream); }
 a { text-decoration:none !important; }
 .section { max-width:1280px; margin:0 auto; padding:28px 40px 60px; }
@@ -65,6 +68,12 @@ a { text-decoration:none !important; }
     box-shadow:0 2px 10px rgba(214,51,132,.18);
 }
 @media(max-width:768px) { .product-grid { grid-template-columns:repeat(2,1fr); } .section { padding:16px; } }
+/* Fix footer */
+footer * {
+    margin: revert;
+    padding: revert;
+    box-sizing: revert;
+}
 </style>
 
 <div class="section">
@@ -113,3 +122,5 @@ a { text-decoration:none !important; }
 </div>
 
 <?php include '../includes/footer.php'; ?>
+</body>
+</html>
