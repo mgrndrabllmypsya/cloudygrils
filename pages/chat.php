@@ -358,9 +358,6 @@ a { text-decoration:none; color:inherit; }
             <?php endif; ?>
 
             <div class="bubble-wrap <?= $isSaya ? 'saya' : 'admin' ?>">
-                <?php if (!$isSaya): ?>
-                <div class="bubble-avatar">CG</div>
-                <?php endif; ?>
                 <div class="bubble-content">
                     <div class="bubble"><?= nl2br(escape($p['pesan'])) ?></div>
                     <div class="bubble-time"><?= $waktu ?></div>

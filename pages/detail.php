@@ -428,4 +428,3 @@ function gantiFoto(el, src) {
     el.classList.add('active');
 }
 </script>
-<?php include '../includes/footer.php'; ?>

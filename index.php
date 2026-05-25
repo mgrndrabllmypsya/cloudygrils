@@ -19,7 +19,7 @@ $toko   = $q_toko ? mysqli_fetch_assoc($q_toko) : [];
 $filter_kategori = isset($_GET['kategori']) ? mysqli_real_escape_string($conn, $_GET['kategori']) : '';
 $where = "status='aktif'";
 if ($filter_kategori && $filter_kategori !== 'all') $where .= " AND kategori='$filter_kategori'";
-$q_produk = mysqli_query($conn, "SELECT * FROM produk WHERE $where ORDER BY created_at DESC LIMIT 8");
+$q_produk = mysqli_query($conn, "SELECT * FROM produk WHERE $where ORDER BY created_at DESC LIMIT 10");
 
 $q_ulasan = mysqli_query($conn, "
     SELECT ul.rating, ul.komentar, p.nama AS nama_pembeli
@@ -42,21 +42,19 @@ $kategori_list = ['Atasan','Bawahan','Dress/Gamis','Outer','Hijab & Aksesoris'];
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    /* === PINK SOFT GRADIENT PALETTE === */
-    /* Diambil dari gambar: pink cerah (#FF8FAB) → soft (#FFB3C6) → pastel (#FFD6E0) */
-    --bg:      #FFF0F4;          /* latar halaman, pink pastel sangat lembut */
-    --surface: #FFFFFF;          /* kartu / panel putih bersih */
-    --surface2:#FFF0F4;          /* surface sekunder, sedikit pink */
-    --border:  #FFB3C6;          /* border: pink soft tengah gradient */
-    --accent:  #D94F6E;          /* aksen utama: pink tua elegan */
-    --accent2: #C0395A;          /* aksen hover/deep */
-    --pink:    #FF8FAB;          /* pink cerah (warna atas gradient) */
-    --pink2:   #FFB3C6;          /* pink soft (warna tengah gradient) */
-    --muted:   #C48899;          /* teks abu-abu bernuansa pink */
-    --text:    #2D1520;          /* teks utama, gelap kecoklatan */
-    --text2:   #5C3244;          /* teks sekunder */
-    --yellow:  #E8956D;          /* bintang rating: peach-oranye lembut */
-    --green:   #5BAF9E;          /* whatsapp / CTA hijau soft */
+    --bg:      #FFF0F4;
+    --surface: #FFFFFF;
+    --surface2:#FFF0F4;
+    --border:  #FFB3C6;
+    --accent:  #D94F6E;
+    --accent2: #C0395A;
+    --pink:    #FF8FAB;
+    --pink2:   #FFB3C6;
+    --muted:   #C48899;
+    --text:    #2D1520;
+    --text2:   #5C3244;
+    --yellow:  #E8956D;
+    --green:   #5BAF9E;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--bg); overflow-x: hidden; }
@@ -101,7 +99,7 @@ header {
 }
 .btn-daftar:hover { opacity: .88; color: #fff; }
 
-/* HERO — menggunakan gradien persis seperti gambar */
+/* HERO */
 .hero {
     min-height: 560px;
     display: flex; align-items: center; justify-content: center;
@@ -152,9 +150,16 @@ header {
     background: rgba(255,255,255,.50); backdrop-filter: blur(8px);
     color: var(--text); padding: 14px 30px; border-radius: 40px;
     border: 1.5px solid rgba(255,255,255,.70);
-    font-weight: 500; font-size: 14px; transition: background .2s;
+    font-weight: 500; font-size: 14px; transition: all .2s;
+    cursor: pointer;
 }
 .hero-cta-outline:hover { background: rgba(255,255,255,.70); color: var(--text); }
+.hero-cta-outline .bi-arrow-down {
+    transition: transform .3s ease;
+}
+.hero-cta-outline:hover .bi-arrow-down {
+    transform: translateY(3px);
+}
 
 /* STATS STRIP */
 .stats-strip { background: var(--surface); border-bottom: 1.5px solid var(--border); position: relative; z-index: 2; }
@@ -179,7 +184,8 @@ header {
 
 /* CATEGORY BAR */
 .cat-bar {
-    background: #FFF5F8;
+    background: rgba(255,255,255,.97);
+    backdrop-filter: blur(10px);
     border-bottom: 1.5px solid var(--border);
     position: sticky; top: 68px; z-index: 99;
 }
@@ -208,7 +214,7 @@ header {
 .section-title span { color: var(--accent); }
 
 /* PRODUCT GRID */
-.product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.product-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
 .product-card {
     background: var(--surface); border: 1.5px solid var(--border);
     border-radius: 14px; overflow: hidden;
@@ -241,7 +247,6 @@ header {
 
 /* TESTIMONIAL */
 .testi-section {
-    /* gradient persis mengikuti gambar: atas gelap → bawah lembut */
     background: linear-gradient(180deg, #FF8FAB 0%, #FFB3C6 55%, #FFD6E0 100%);
     padding: 64px 40px; position: relative; overflow: hidden; z-index: 1;
 }
@@ -307,8 +312,17 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
 .empty-state i { font-size: 3rem; color: var(--border); display: block; margin-bottom: 12px; }
 .empty-state p { color: var(--muted); font-size: 14px; }
 
+/* SMOOTH SCROLL OVERLAY (flash saat klik) */
+.scroll-flash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(180deg, #FF8FAB, #FFD6E0);
+    opacity: 0; pointer-events: none;
+    transition: opacity .18s ease;
+}
+.scroll-flash.show { opacity: .18; }
+
 /* RESPONSIVE */
-@media (max-width: 1280px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 1280px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 768px) {
     .header-inner, .section, .footer-inner { padding-left: 16px; padding-right: 16px; }
     .product-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
@@ -327,6 +341,9 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
 </style>
 </head>
 <body>
+
+<!-- SMOOTH SCROLL FLASH OVERLAY -->
+<div class="scroll-flash" id="scrollFlash"></div>
 
 <!-- HEADER -->
 <header>
@@ -349,13 +366,13 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
         <p class="hero-sub">Koleksi pakaian wanita berkualitas pilihan — atasan, bawahan, dress, outer, hingga hijab.</p>
         <div class="hero-actions">
             <a href="auth/login.php" class="hero-cta"><i class="bi bi-bag-heart"></i> Mulai Belanja</a>
-            <a href="#produk" class="hero-cta-outline">Lihat Koleksi <i class="bi bi-arrow-down"></i></a>
+            <a href="#produk" class="hero-cta-outline" id="lihatKoleksi">Lihat Koleksi <i class="bi bi-arrow-down"></i></a>
         </div>
     </div>
 </section>
 
 <!-- CATEGORY BAR -->
-<div class="cat-bar">
+<div class="cat-bar" id="catBar">
     <div class="cat-inner">
         <a href="index.php" class="cat-link <?= $filter_kategori === '' ? 'active' : '' ?>">
             <i class="bi bi-grid"></i> Semua
@@ -434,3 +451,32 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
 
 <!-- FOOTER -->
 <?php include 'includes/footer.php'; ?>
+
+<script>
+document.getElementById('lihatKoleksi').addEventListener('click', function(e) {
+    e.preventDefault();
+
+    var flash   = document.getElementById('scrollFlash');
+    var target  = document.getElementById('produk');
+    var header  = document.querySelector('header');
+    var catBar  = document.getElementById('catBar');
+
+    if (!target) return;
+
+    // Flash overlay — subtle pink shimmer
+    flash.classList.add('show');
+    setTimeout(function() { flash.classList.remove('show'); }, 320);
+
+    // Hitung offset tepat di bawah header + cat-bar
+    var headerH = header  ? header.offsetHeight  : 0;
+    var catH    = catBar  ? catBar.offsetHeight   : 0;
+    var targetTop = target.getBoundingClientRect().top + window.scrollY;
+    var scrollTo  = targetTop - headerH - catH - 8;
+
+    // Smooth scroll native
+    window.scrollTo({ top: scrollTo, behavior: 'smooth' });
+});
+</script>
+
+</body>
+</html>

@@ -265,14 +265,6 @@ a{text-decoration:none;color:inherit;}
                 <?php endif; ?>
 
                 <div class="bubble-wrap <?= $isAdmin ? 'admin-msg' : 'pembeli' ?>">
-<?php 
-$fotoPembeli = $pembeli_aktif['foto_profil'] ?? '';
-if (!empty($fotoPembeli) && file_exists('../uploads/foto_profil/' . $fotoPembeli)): ?>
-    <img src="../uploads/foto_profil/<?= escape($fotoPembeli) ?>" 
-         style="width:30px;height:30px;border-radius:50%;object-fit:cover;">
-<?php else: ?>
-    <?= strtoupper(substr($pembeli_aktif['nama'], 0, 1)) ?>
-<?php endif; ?>
                     <div class="bubble-content">
                         <div class="bubble"><?= nl2br(escape($p['pesan'])) ?></div>
                         <div class="bubble-time"><?= $waktu ?></div>
