@@ -20,7 +20,9 @@ $produk_id    = (int)$_POST['produk_id'];
 $nego_id      = !empty($_POST['nego_id']) ? (int)$_POST['nego_id'] : null;
 $metode       = $_POST['metode'];
 $harga_produk = (float)$_POST['harga_produk'];
-$catatan      = trim($_POST['catatan'] ?? '');
+$catatan = $metode === 'cod' 
+    ? trim($_POST['catatan_cod'] ?? '') 
+    : trim($_POST['catatan'] ?? '');
 
 $ongkir  = $metode === 'transfer' ? (float)($_POST['ongkir'] ?? 0) : 0;
 $diskon  = ($metode === 'transfer' && $harga_produk > 50000) ? 10000 : 0;

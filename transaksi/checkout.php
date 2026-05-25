@@ -499,7 +499,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
 
         <div class="form-group">
           <label>Catatan untuk Penjual</label>
-          <textarea name="catatan" placeholder="Contoh: jam berapa kamu akan datang, patokan, dll."></textarea>
+<textarea name="catatan_cod" id="catatan_cod" placeholder="Contoh: jam berapa kamu akan datang, patokan, dll."></textarea>
         </div>
       </div>
 

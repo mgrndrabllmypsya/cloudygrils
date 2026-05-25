@@ -66,7 +66,7 @@ $q_pesan = mysqli_query($conn, "
 $sudah_pesan = $q_pesan && mysqli_num_rows($q_pesan) > 0;
 
 // Cek nego aktif milik pembeli untuk produk ini
-$q_nego = mysqli_query($conn, "SELECT * FROM nego_harga WHERE produk_id=$id AND pembeli_id=$user_id ORDER BY created_at DESC LIMIT 1");
+$q_nego = mysqli_query($conn, "SELECT * FROM nego_harga WHERE produk_id=$id AND pembeli_id=$user_id ORDER BY updated_at DESC LIMIT 1");
 $nego   = $q_nego && mysqli_num_rows($q_nego) > 0 ? mysqli_fetch_assoc($q_nego) : null;
 
 $base_url   = '../';
@@ -277,6 +277,11 @@ include '../includes/header.php';
                 <?php else: ?>
                 <div>Penjual tidak menyetujui harga tawarmu.</div>
                 <?php endif; ?>
+            </div>
+            <?php elseif ($nego['status'] === 'counter_ditolak'): ?>
+            <div class="nego-status nego-ditolak">
+                <div class="nego-status-title"><i class="bi bi-x-circle-fill"></i> Kamu menolak harga counter</div>
+                <div>Kamu bisa mengajukan penawaran baru.</div>
             </div>
             <?php elseif ($nego['status'] === 'counter'): ?>
             <div class="nego-status nego-counter">

@@ -506,7 +506,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
             </div>
             <div class="card-body">
                 <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
-                    Pesanan ini menggunakan metode <strong style="color:var(--green);">COD (Bayar di Tempat)</strong>.
+                    Pesanan ini menggunakan metode <strong style="color:var(--green);">COD (🛵 Antar ke Rumah)</strong>.
                     Tidak ada konfirmasi transfer. Langsung siapkan barang dan hubungi pembeli untuk koordinasi pengantaran.
                 </p>
                 <form method="POST">
@@ -600,7 +600,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             <span class="info-label">Metode Bayar</span>
                             <span class="info-val">
                                 <?php if ($is_cod): ?>
-                                    <i class="bi bi-cash" style="color:var(--green);"></i> COD (Bayar di Tempat)
+                                    <i class="bi bi-cash" style="color:var(--green);"></i> COD (🛵 Antar ke Rumah)
                                 <?php else: ?>
                                     <i class="bi bi-credit-card" style="color:var(--accent);"></i>
                                     Transfer <?= strtoupper(escape($row['metode_transfer'] ?? '')) ?>
@@ -658,11 +658,26 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                         </div>
                         <?php endif; ?>
 
+                        <?php if ($is_cod): ?>
+                            <?php
+                            // Deteksi jenis COD dari kolom catatan
+                            $cod_jenis_val = '';
+                            if (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m)) {
+                                $cod_jenis_val = $m[1]; // antar_pembeli atau antar
+                            }
+                            ?>
+                            <?php if ($cod_jenis_val === 'antar_pembeli' && $row['detail_alamat']): ?>
+                            <?php elseif ($cod_jenis_val === 'antar'): ?>
+                            <div class="info-row">
+                                <span class="info-label">Jenis COD</span>
+                                <span class="info-val" style="color:var(--accent);">
+                                    🏪 Pembeli datang ke toko
+                                </span>
+                            </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
                         <?php if ($row['catatan']): ?>
-                        <div class="info-row">
-                            <span class="info-label">Catatan Pembeli</span>
-                            <span class="info-val" style="color:var(--yellow);font-style:italic;">"<?= escape($row['catatan']) ?>"</span>
-                        </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -790,7 +805,27 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                 <?php endif; ?>
 
                 <!-- PENGIRIMAN & RESI / INFO COD -->
-                <?php if (in_array($status, ['diproses','dikirim','selesai'])): ?>
+                 <?php if ($is_cod && !empty($row['alamat_cod'])): ?>
+<div class="card">
+    <div class="card-head">
+        <div class="icon" style="background:rgba(52,211,153,.15);color:var(--green);"><i class="bi bi-geo-alt"></i></div>
+        <h3>Alamat Pengantaran</h3>
+    </div>
+    <div class="card-body">
+        <div class="info-row">
+            <span class="info-label">Jenis COD</span>
+            <span class="info-val" style="color:var(--green);">
+                <?= escape($row['jenis_cod'] ?? '-') === 'antar_pembeli' ? '🛵 Antar ke Rumah' : '🏪 Beli ke Rumah Penjual' ?>
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Alamat Lengkap</span>
+            <span class="info-val"><?= escape($row['alamat_cod']) ?></span>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+                <?php if (in_array($status, ['diproses','dikirim','selesai']) || ($is_cod && $status === 'menunggu')): ?>
                 <div class="card">
                     <div class="card-head">
                         <div class="icon" style="background:rgba(52,211,153,.15);color:var(--green);">
@@ -801,12 +836,6 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     <div class="card-body">
 
                         <?php if ($is_cod): ?>
-                            <div class="cod-box">
-                                <div class="cod-box-title"><i class="bi bi-cash-coin"></i> Metode: COD (Bayar di Tempat)</div>
-                                <div class="cod-box-row"><i class="bi bi-geo-alt-fill"></i> Area pengantaran: <strong>Banyuwangi Kota</strong></div>
-                                <div class="cod-box-row"><i class="bi bi-cash"></i> Pembayaran dilakukan saat barang tiba di tangan pembeli</div>
-                                <div class="cod-box-row"><i class="bi bi-telephone-fill"></i> Hubungi pembeli untuk konfirmasi lokasi & jadwal pengantaran</div>
-                            </div>
                             <div class="info-row">
                                 <span class="info-label">No. HP Pembeli</span>
                                 <span class="info-val">
@@ -819,12 +848,21 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                                 <span class="info-label">Nama Pembeli</span>
                                 <span class="info-val"><?= escape($row['nama_pembeli']) ?></span>
                             </div>
-                            <?php if ($row['catatan']): ?>
-                            <div class="info-row">
-                                <span class="info-label">Catatan Lokasi</span>
-                                <span class="info-val" style="color:var(--yellow);font-style:italic;">"<?= escape($row['catatan']) ?>"</span>
+                             <div class="info-row">
+                                <span class="info-label">Alamat Pembeli</span>
+                                <span class="info-val" style="color:var(--green);max-width:260px;">
+                                    <i class="bi bi-geo-alt-fill"></i> <?= escape($row['detail_alamat']) ?>
+                                </span>
                             </div>
-                            <?php endif; ?>
+                     <?php
+$catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catatan'] ?? ''));
+?>
+<div class="info-row">
+    <span class="info-label">Catatan Pembeli</span>
+    <span class="info-val" style="color:var(--yellow);font-style:italic;">
+        <?= $catatan_murni ? '"' . escape($catatan_murni) . '"' : '<span style="color:var(--muted);">Tidak ada catatan</span>' ?>
+    </span>
+</div>
 
                         <?php else: ?>
                             <div class="info-row">
@@ -961,9 +999,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             <span class="info-val"><?= escape($row['hp_pembeli'] ?? '-') ?></span>
                         </div>
                         <?php if ($is_cod): ?>
-                        <div style="margin-top:12px;padding:10px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:8px;font-size:12px;color:var(--green);">
-                            <i class="bi bi-geo-alt-fill"></i> Metode COD — hanya area Banyuwangi Kota
-                        </div>
+            
                         <?php endif; ?>
                     </div>
                 </div>

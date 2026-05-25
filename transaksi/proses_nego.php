@@ -125,7 +125,7 @@ if ($aksi === 'tolak_counter') {
 
     if (!$nego) { header("Location: ../pages/home.php"); exit; }
 
-    $upd = $conn->prepare("UPDATE nego_harga SET status='ditolak', updated_at=NOW() WHERE id=?");
+    $upd = $conn->prepare("UPDATE nego_harga SET status='counter_ditolak', updated_at=NOW() WHERE id=?");
     $upd->bind_param("i", $nego_id);
     $upd->execute();
     $upd->close();
