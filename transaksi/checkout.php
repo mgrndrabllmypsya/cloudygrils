@@ -23,7 +23,7 @@ $stmt->bind_param("i", $produk_id);
 $stmt->execute();
 $produk = $stmt->get_result()->fetch_assoc();
 $stmt->close();
-$toko = mysqli_fetch_assoc(mysqli_query($conn, "SELECT alamat, maps_url FROM pengaturan_toko WHERE id=1"));
+$toko = mysqli_fetch_assoc(mysqli_query($conn, "SELECT alamat, maps_url, no_rek_bca, nama_rek_bca, no_dana, nama_dana FROM pengaturan_toko WHERE id=1"));
 if (!$produk) {
     echo "Produk tidak ditemukan.";
     exit;
@@ -580,14 +580,20 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
       <?php endif; ?>
 
       <label style="margin-bottom:.6rem;">Rekening Tujuan Transfer <span class="req">*</span></label>
+      <?php
+        $no_bca  = !empty($toko['no_rek_bca'])   ? htmlspecialchars($toko['no_rek_bca'])   : '-';
+        $nm_bca  = !empty($toko['nama_rek_bca']) ? htmlspecialchars($toko['nama_rek_bca']) : 'Cloudy Girls';
+        $no_dana = !empty($toko['no_dana'])       ? htmlspecialchars($toko['no_dana'])      : '-';
+        $nm_dana = !empty($toko['nama_dana'])     ? htmlspecialchars($toko['nama_dana'])    : 'Cloudy Girls';
+      ?>
       <div class="rekening-grid">
         <div class="rek-card" onclick="pilihRek('bca')">
           <div class="rek-name">🏦 BCA</div>
-          <div class="rek-no">1234567890<br>a/n Cloudy Girls</div>
+          <div class="rek-no"><?= $no_bca ?><br>a/n <?= $nm_bca ?></div>
         </div>
         <div class="rek-card" onclick="pilihRek('dana')">
           <div class="rek-name">💜 DANA</div>
-          <div class="rek-no">08123456789<br>a/n Cloudy Girls</div>
+          <div class="rek-no"><?= $no_dana ?><br>a/n <?= $nm_dana ?></div>
         </div>
       </div>
 

@@ -14,12 +14,16 @@ $msg_type = '';
 
 // Handle update pengaturan toko
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_toko'])) {
-    $nama_toko  = mysqli_real_escape_string($conn, $_POST['nama_toko']  ?? '');
-    $deskripsi  = mysqli_real_escape_string($conn, $_POST['deskripsi']  ?? '');
-    $no_hp      = mysqli_real_escape_string($conn, $_POST['no_hp']      ?? '');
-    $alamat     = mysqli_real_escape_string($conn, $_POST['alamat']     ?? '');
-    $instagram  = mysqli_real_escape_string($conn, $_POST['instagram']  ?? '');
-    $maps_url   = mysqli_real_escape_string($conn, $_POST['maps_url']   ?? '');
+    $nama_toko   = mysqli_real_escape_string($conn, $_POST['nama_toko']   ?? '');
+    $deskripsi   = mysqli_real_escape_string($conn, $_POST['deskripsi']   ?? '');
+    $no_hp       = mysqli_real_escape_string($conn, $_POST['no_hp']       ?? '');
+    $alamat      = mysqli_real_escape_string($conn, $_POST['alamat']      ?? '');
+    $instagram   = mysqli_real_escape_string($conn, $_POST['instagram']   ?? '');
+    $maps_url    = mysqli_real_escape_string($conn, $_POST['maps_url']    ?? '');
+    $no_rek_bca  = mysqli_real_escape_string($conn, $_POST['no_rek_bca']  ?? '');
+    $nama_rek_bca= mysqli_real_escape_string($conn, $_POST['nama_rek_bca']?? '');
+    $no_dana     = mysqli_real_escape_string($conn, $_POST['no_dana']     ?? '');
+    $nama_dana   = mysqli_real_escape_string($conn, $_POST['nama_dana']   ?? '');
 
     $logo_sql = '';
     if (!empty($_FILES['logo']['name'])) {
@@ -44,11 +48,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_toko'])) {
         if ($exist && $exist[0] > 0) {
             mysqli_query($conn, "UPDATE pengaturan_toko SET
                 nama_toko='$nama_toko', deskripsi='$deskripsi', no_hp='$no_hp',
-                alamat='$alamat', instagram='$instagram', maps_url='$maps_url'
+                alamat='$alamat', instagram='$instagram', maps_url='$maps_url',
+                no_rek_bca='$no_rek_bca', nama_rek_bca='$nama_rek_bca',
+                no_dana='$no_dana', nama_dana='$nama_dana'
                 $logo_sql WHERE id=1");
         } else {
-            mysqli_query($conn, "INSERT INTO pengaturan_toko (nama_toko, deskripsi, no_hp, alamat, instagram, maps_url)
-                VALUES ('$nama_toko','$deskripsi','$no_hp','$alamat','$instagram','$maps_url')");
+            mysqli_query($conn, "INSERT INTO pengaturan_toko
+                (nama_toko, deskripsi, no_hp, alamat, instagram, maps_url, no_rek_bca, nama_rek_bca, no_dana, nama_dana)
+                VALUES ('$nama_toko','$deskripsi','$no_hp','$alamat','$instagram','$maps_url',
+                        '$no_rek_bca','$nama_rek_bca','$no_dana','$nama_dana')");
         }
         $msg = 'Pengaturan toko berhasil disimpan.';
         $msg_type = 'success';
@@ -213,6 +221,40 @@ a { text-decoration: none; color: inherit; }
 .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
 .form-textarea { resize: vertical; min-height: 80px; }
 
+/* ── INPUT WITH ICON ── */
+.input-icon-wrap { position: relative; }
+.input-icon-wrap .form-input { padding-left: 36px; }
+.input-icon-wrap .input-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    font-size: 14px; color: var(--muted); pointer-events: none;
+}
+
+/* ── REKENING SECTION ── */
+.rek-divider {
+    margin: 20px 0 16px;
+    padding-top: 18px;
+    border-top: 1.5px dashed var(--border);
+}
+.rek-divider-title {
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 14px;
+    text-transform: uppercase; letter-spacing: .5px;
+}
+.rek-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rek-preview {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+}
+.rek-preview .rek-icon { font-size: 22px; flex-shrink: 0; }
+.rek-preview .rek-detail .rek-bank { font-size: 12px; font-weight: 700; color: var(--text); }
+.rek-preview .rek-detail .rek-nomor { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: .5px; margin-top: 1px; }
+.rek-preview .rek-detail .rek-atas  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
 /* ── LOGO UPLOAD ── */
 .logo-upload-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
 .logo-preview {
@@ -281,7 +323,7 @@ a { text-decoration: none; color: inherit; }
 .pw-strength { height: 4px; border-radius: 2px; margin-top: 6px; background: var(--border); overflow: hidden; }
 .pw-strength-bar { height: 100%; border-radius: 2px; transition: width .3s, background .3s; width: 0; }
 
-@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } .rek-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -343,7 +385,7 @@ a { text-decoration: none; color: inherit; }
             <div class="card">
                 <div class="card-header">
                     <h3><i class="bi bi-shop" style="color:var(--accent);margin-right:6px;"></i> Informasi Toko</h3>
-                    <p>Atur tampilan dan info toko Anda</p>
+                    <p>Atur tampilan, info toko, dan rekening pembayaran</p>
                 </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
@@ -409,6 +451,80 @@ a { text-decoration: none; color: inherit; }
                                 </ol>
                             </div>
                         </div>
+
+                        <!-- ── REKENING PEMBAYARAN ── -->
+                        <div class="rek-divider">
+                            <div class="rek-divider-title">
+                                <i class="bi bi-credit-card-2-front"></i> Rekening Pembayaran Transfer
+                            </div>
+
+                            <!-- Preview rekening (live update) -->
+                            <div class="rek-preview" id="prevBCA">
+                                <div class="rek-icon">🏦</div>
+                                <div class="rek-detail">
+                                    <div class="rek-bank">BCA</div>
+                                    <div class="rek-nomor" id="prevNoBCA"><?= escape($settings['no_rek_bca'] ?? '—') ?></div>
+                                    <div class="rek-atas" id="prevNamaBCA">a/n <?= escape($settings['nama_rek_bca'] ?? 'Cloudy Girls') ?></div>
+                                </div>
+                            </div>
+
+                            <div class="rek-grid">
+                                <div class="form-group">
+                                    <label class="form-label">No. Rekening BCA</label>
+                                    <div class="input-icon-wrap">
+                                        <i class="bi bi-bank input-icon"></i>
+                                        <input type="text" name="no_rek_bca" id="inpNoBCA" class="form-input"
+                                               placeholder="Contoh: 1234567890"
+                                               value="<?= escape($settings['no_rek_bca'] ?? '') ?>"
+                                               oninput="updatePrev('BCA')">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Nama Pemilik Rek. BCA</label>
+                                    <div class="input-icon-wrap">
+                                        <i class="bi bi-person input-icon"></i>
+                                        <input type="text" name="nama_rek_bca" id="inpNamaBCA" class="form-input"
+                                               placeholder="Nama sesuai rekening"
+                                               value="<?= escape($settings['nama_rek_bca'] ?? '') ?>"
+                                               oninput="updatePrev('BCA')">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preview DANA -->
+                            <div class="rek-preview" id="prevDANA" style="margin-top:4px;">
+                                <div class="rek-icon">💜</div>
+                                <div class="rek-detail">
+                                    <div class="rek-bank">DANA</div>
+                                    <div class="rek-nomor" id="prevNoDANA"><?= escape($settings['no_dana'] ?? '—') ?></div>
+                                    <div class="rek-atas" id="prevNamaDANA">a/n <?= escape($settings['nama_dana'] ?? 'Cloudy Girls') ?></div>
+                                </div>
+                            </div>
+
+                            <div class="rek-grid">
+                                <div class="form-group">
+                                    <label class="form-label">No. DANA</label>
+                                    <div class="input-icon-wrap">
+                                        <i class="bi bi-phone input-icon"></i>
+                                        <input type="text" name="no_dana" id="inpNoDANA" class="form-input"
+                                               placeholder="Contoh: 08123456789"
+                                               value="<?= escape($settings['no_dana'] ?? '') ?>"
+                                               oninput="updatePrev('DANA')">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Nama Pemilik DANA</label>
+                                    <div class="input-icon-wrap">
+                                        <i class="bi bi-person input-icon"></i>
+                                        <input type="text" name="nama_dana" id="inpNamaDANA" class="form-input"
+                                               placeholder="Nama akun DANA"
+                                               value="<?= escape($settings['nama_dana'] ?? '') ?>"
+                                               oninput="updatePrev('DANA')">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end rekening -->
 
                         <button type="submit" class="btn-save">
                             <i class="bi bi-floppy"></i> Simpan Pengaturan
@@ -497,6 +613,21 @@ function checkStrength(val) {
     const colors = ['#FF1744','#FF6D00','#FFB300','#00BFA5','#00BFA5'];
     bar.style.width  = pct + '%';
     bar.style.background = colors[score - 1] || '#F4A7C3';
+}
+
+// Live preview rekening saat mengetik
+function updatePrev(type) {
+    if (type === 'BCA') {
+        const no   = document.getElementById('inpNoBCA').value.trim();
+        const nama = document.getElementById('inpNamaBCA').value.trim();
+        document.getElementById('prevNoBCA').textContent   = no   || '—';
+        document.getElementById('prevNamaBCA').textContent = 'a/n ' + (nama || 'Cloudy Girls');
+    } else {
+        const no   = document.getElementById('inpNoDANA').value.trim();
+        const nama = document.getElementById('inpNamaDANA').value.trim();
+        document.getElementById('prevNoDANA').textContent   = no   || '—';
+        document.getElementById('prevNamaDANA').textContent = 'a/n ' + (nama || 'Cloudy Girls');
+    }
 }
 </script>
 </body>
