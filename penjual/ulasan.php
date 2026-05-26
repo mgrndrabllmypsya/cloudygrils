@@ -99,11 +99,12 @@ a { text-decoration: none; color: inherit; }
 .sidebar-logo .logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #fff; }
 .sidebar-logo .logo span { color: #FFE0EF; }
 .sidebar-logo small { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 2px; }
-.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.8); transition: all .2s; }
 .nav-item:hover { background: rgba(255,255,255,.2); color: #fff; }
 .nav-item.active { background: rgba(255,255,255,.28); color: #fff; font-weight: 600; border-left: 3px solid #fff; }
-.nav-item i { font-size: 16px; width: 20px; }
+.nav-item i { font-size: 16px; width: 20px; flex-shrink: 0; }
+.badge-notif { background: rgba(255,255,255,.9); color: var(--accent2); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; margin-left: auto; }
 .nav-section { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.55); padding: 14px 14px 6px; font-weight: 600; }
 .sidebar-footer { padding: 16px 12px; border-top: 1.5px solid rgba(255,255,255,.2); background: rgba(0,0,0,.1); }
 .admin-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,.18); border-radius: 10px; margin-bottom: 10px; border: 1.5px solid rgba(255,255,255,.3); }
@@ -115,7 +116,7 @@ a { text-decoration: none; color: inherit; }
 .btn-logout:hover { background: rgba(255,255,255,.2); color: #fff; }
 
 
-.main { margin-left:240px; flex:1; display:flex; flex-direction:column; }
+.main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
 /* ── TOPBAR ── */
 .topbar {
     background: rgba(255,255,255,.95);
@@ -129,11 +130,11 @@ a { text-decoration: none; color: inherit; }
 .topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); }
 .topbar-right { display: flex; align-items: center; gap: 10px; }
 .topbar-date { font-size: 12px; color: var(--muted); }
-.btn-toko { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: linear-gradient(135deg,#F4A7C3,#E8719A); font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 3px 12px rgba(212,84,127,.35); transition: opacity .2s; }
+.btn-toko { display: flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 8px; background: linear-gradient(135deg,#F4A7C3,#E8719A); font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 3px 12px rgba(212,84,127,.35); transition: opacity .2s; }
 .btn-toko:hover { opacity: .88; }
 
 
-.content { padding:28px 32px; flex:1; }
+.content { padding: 26px 28px; flex: 1; }
 
 .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
 .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; position:relative; overflow:hidden; transition:transform .2s,border-color .2s; }
@@ -151,7 +152,7 @@ a { text-decoration: none; color: inherit; }
 
 .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
 .card-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
-.card-header h3 { font-size:14px; font-weight:600; color:var(--white); }
+.card-header h3 { font-size:14px; font-weight:600; color:var(--text); }
 .filter-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .filter-select, .search-input { background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:12px; padding:6px 12px; outline:none; font-family:'DM Sans',sans-serif; }
 .filter-select:focus, .search-input:focus { border-color:var(--accent); }
@@ -180,7 +181,7 @@ tr:hover td { background:var(--surface2); }
 .confirm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; align-items:center; justify-content:center; }
 .confirm-overlay.show { display:flex; }
 .confirm-box { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px; max-width:360px; width:90%; }
-.confirm-box h4 { font-size:15px; font-weight:700; color:var(--white); margin-bottom:8px; }
+.confirm-box h4 { font-size:15px; font-weight:700; color:var(--text); margin-bottom:8px; }
 .confirm-box p { font-size:13px; color:var(--muted); margin-bottom:20px; }
 .confirm-btns { display:flex; gap:8px; justify-content:flex-end; }
 .btn-cancel-c { padding:8px 16px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif; }
@@ -281,7 +282,7 @@ tr:hover td { background:var(--surface2); }
                     <?php $no=1; while ($row = mysqli_fetch_assoc($q_ulasan)): ?>
                         <tr>
                             <td style="color:var(--muted);"><?= $no++ ?></td>
-                            <td style="font-weight:500;color:var(--white);"><?= escape($row['nama_pembeli']) ?></td>
+                            <td style="font-weight:500;color:var(--text);"><?= escape($row['nama_pembeli']) ?></td>
                             <td style="color:var(--muted);font-size:12px;"><?= escape($row['nama_barang']) ?></td>
                             <td>
                                 <div class="stars">

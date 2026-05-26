@@ -173,39 +173,39 @@ a { text-decoration:none; color:inherit; }
     position:fixed; top:0; left:0; bottom:0; z-index:50;
     box-shadow: 4px 0 28px rgba(212,84,127,.3);
 }
-.sidebar-logo { padding:22px 22px 18px; border-bottom:1.5px solid rgba(255,255,255,.2); background:rgba(255,255,255,.12); }
-.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:21px; font-weight:900; color:#fff; }
+.sidebar-logo { padding:24px 24px 20px; border-bottom:1.5px solid rgba(255,255,255,.2); background:rgba(255,255,255,.12); }
+.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:#fff; }
 .sidebar-logo .logo span { color:#FFE0EF; }
-.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:3px; }
-.sidebar-nav { flex:1; padding:14px 10px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
-.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:12px 12px 5px; font-weight:600; }
-.nav-item { display:flex; align-items:center; gap:11px; padding:9px 13px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); transition:all .18s; }
+.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:2px; }
+.sidebar-nav { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
+.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:14px 14px 6px; font-weight:600; }
+.nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); transition:all .2s; }
 .nav-item:hover { background:rgba(255,255,255,.2); color:#fff; }
 .nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; }
-.nav-item i { font-size:15px; width:18px; flex-shrink:0; }
+.nav-item i { font-size:16px; width:20px; flex-shrink:0; }
 .badge-notif { background:#fff; color:var(--accent); font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; margin-left:auto; }
-.sidebar-footer { padding:14px 10px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
-.admin-card { display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,.18); border-radius:10px; margin-bottom:8px; border:1.5px solid rgba(255,255,255,.3); }
+.sidebar-footer { padding:16px 12px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
+.admin-card { display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,.18); border-radius:10px; margin-bottom:10px; border:1.5px solid rgba(255,255,255,.3); }
 .admin-avatar { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.3); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; border:2px solid rgba(255,255,255,.5); }
-.admin-info .name { font-size:12px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.admin-info .name { font-size:13px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .admin-info .role { font-size:10px; color:rgba(255,255,255,.65); }
-.btn-logout { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; font-size:12px; color:rgba(255,255,255,.85); transition:background .2s; width:100%; }
+.btn-logout { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:8px; font-size:12px; color:rgba(255,255,255,.85); transition:background .2s; width:100%; }
 .btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
 
 /* MAIN */
-.main { margin-left:230px; flex:1; display:flex; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
+.main { margin-left:240px; flex:1; display:flex; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
 
 /* TOPBAR */
 .topbar {
     background:rgba(255,255,255,.95);
     backdrop-filter:blur(12px);
     border-bottom:1.5px solid var(--border);
-    padding:0 28px; height:62px;
+    padding:0 32px; height:64px;
     display:flex; align-items:center; justify-content:space-between;
     position:sticky; top:0; z-index:40;
     box-shadow:0 2px 12px rgba(212,84,127,.07);
 }
-.topbar-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:var(--text); }
+.topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text); }
 .topbar-right { display:flex; align-items:center; gap:10px; }
 .topbar-date { font-size:12px; color:var(--muted); }
 .btn-toko { display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; background:var(--surface2); border:1.5px solid var(--border); font-size:12px; font-weight:500; color:var(--text2); transition:all .2s; }
@@ -367,7 +367,7 @@ select.form-control option { background:var(--surface2); }
 .confirm-overlay.show { display:flex; }
 .confirm-box { background:var(--white); border:1.5px solid var(--border); border-radius:16px; padding:28px; max-width:380px; width:90%; box-shadow:0 20px 50px rgba(212,84,127,.2); animation:modalIn .2s ease; }
 .confirm-icon { width:52px; height:52px; border-radius:14px; background:#FFEBEE; border:1.5px solid #FFCDD2; display:flex; align-items:center; justify-content:center; font-size:24px; color:var(--red); margin:0 auto 16px; }
-.confirm-box h4 { font-size:16px; font-weight:700; color:var(--text); text-align:center; margin-bottom:8px; }
+.confirm-box h4 { font-size:16px; font-weight:700; color:var(--text); text-align:center; margin-bottom:10px; }
 .confirm-box p  { font-size:13px; color:var(--muted); text-align:center; margin-bottom:22px; line-height:1.5; }
 .confirm-btns { display:flex; gap:10px; }
 .confirm-btns .btn-c { flex:1; padding:10px; border-radius:8px; background:var(--surface2); border:1.5px solid var(--border); color:var(--muted); font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }

@@ -53,7 +53,6 @@ for ($i = 4; $i >= 0; $i--) {
     $data_tahunan[] = ['label' => $thn, 'value' => (int)$r[0]];
 }
 
-// ── KATEGORI TERLARIS (dari produk yang sudah terjual via pesanan selesai) ──
 $q_kategori = mysqli_query($conn, "
     SELECT pr.kategori, COUNT(*) AS jumlah
     FROM pesanan ps
@@ -125,40 +124,47 @@ a { text-decoration:none; color:inherit; }
 
 /* ── SIDEBAR ── */
 .sidebar {
-    width:240px;
+    width: 270px; /* diperlebar dari 240px */
     background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
-    display:flex; flex-direction:column;
-    position:fixed; top:0; left:0; bottom:0; z-index:50;
-    box-shadow: 4px 0 28px rgba(212,84,127,.3);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    border-radius: 0 28px 28px 0; /* ujung kanan melengkung */
+    box-shadow: 6px 0 32px rgba(212,84,127,.28);
+    overflow: hidden;
 }
 .sidebar-logo {
-    padding:22px 22px 18px;
+    padding:24px 24px 20px;
     border-bottom:1.5px solid rgba(255,255,255,.2);
     background:rgba(255,255,255,.12);
 }
 .sidebar-logo .logo {
     font-family:'Playfair Display',serif;
-    font-size:21px; font-weight:900; color:#fff;
+    font-size:20px; font-weight:900; color:#fff;
 }
 .sidebar-logo .logo span { color:#FFE0EF; }
 .sidebar-logo small {
     display:block; font-size:10px;
     letter-spacing:2px; text-transform:uppercase;
-    color:rgba(255,255,255,.65); margin-top:3px;
+    color:rgba(255,255,255,.65); margin-top:2px;
 }
 .sidebar-nav {
-    flex:1; padding:14px 10px;
+    flex:1; padding:16px 14px;
     display:flex; flex-direction:column; gap:2px; overflow-y:auto;
 }
 .nav-section {
     font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
-    color:rgba(255,255,255,.55); padding:12px 12px 5px; font-weight:600;
+    color:rgba(255,255,255,.55); padding:14px 14px 6px; font-weight:600;
 }
 .nav-item {
-    display:flex; align-items:center; gap:11px;
-    padding:9px 13px; border-radius:10px;
+    display:flex; align-items:center; gap:12px;
+    padding:10px 14px; border-radius:10px;
     font-size:13px; font-weight:500; color:rgba(255,255,255,.8);
-    transition:all .18s;
+    transition:all .2s;
 }
 .nav-item:hover { background:rgba(255,255,255,.2); color:#fff; }
 .nav-item.active {
@@ -166,7 +172,7 @@ a { text-decoration:none; color:inherit; }
     color:#fff; font-weight:600;
     border-left:3px solid #fff;
 }
-.nav-item i { font-size:15px; width:18px; flex-shrink:0; }
+.nav-item i { font-size:16px; width:20px; flex-shrink:0; }
 .badge-notif {
     background:#fff;
     color:var(--accent);
@@ -177,11 +183,11 @@ a { text-decoration:none; color:inherit; }
     margin-left:auto;
 }
 .sidebar-footer {
-    padding:14px 10px;
+    padding:16px 14px;
     border-top:1.5px solid rgba(255,255,255,.2);
     background:rgba(0,0,0,.1);
 }
-.admin-card-wrap { position:relative; margin-bottom:8px; }
+.admin-card-wrap { position:relative; margin-bottom:10px; }
 .admin-card {
     display:flex; align-items:center; gap:10px;
     padding:10px 12px; background:rgba(255,255,255,.18);
@@ -199,7 +205,7 @@ a { text-decoration:none; color:inherit; }
 }
 .admin-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
 .admin-info { flex:1; min-width:0; }
-.admin-info .name { font-size:12px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.admin-info .name { font-size:13px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .admin-info .role { font-size:10px; color:rgba(255,255,255,.65); }
 .admin-card .chevron { font-size:11px; color:rgba(255,255,255,.7); transition:transform .2s; }
 .admin-card.open .chevron { transform:rotate(180deg); }
@@ -235,28 +241,28 @@ a { text-decoration:none; color:inherit; }
 .dropdown-divider { height:1px; background:var(--border); }
 .btn-logout {
     display:flex; align-items:center; gap:8px;
-    padding:8px 12px; border-radius:8px; font-size:12px;
+    padding:8px 14px; border-radius:8px; font-size:12px;
     color:rgba(255,255,255,.85); transition:background .2s; width:100%;
 }
 .btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
 
 /* ── MAIN ── */
-.main { margin-left:230px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
+.main { margin-left:270px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
 .topbar {
     background:rgba(255,255,255,.95);
     backdrop-filter:blur(12px);
     border-bottom:1.5px solid var(--border);
-    padding:0 28px; height:62px;
+    padding:0 32px; height:64px;
     display:flex; align-items:center; justify-content:space-between;
     position:sticky; top:0; z-index:40;
     box-shadow:0 2px 12px rgba(212,84,127,.07);
 }
-.topbar-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:var(--text); }
+.topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text); }
 .topbar-right { display:flex; align-items:center; gap:10px; }
 .topbar-date { font-size:12px; color:var(--muted); }
 .btn-toko {
     display:flex; align-items:center; gap:6px;
-    padding:7px 16px; border-radius:8px;
+    padding:8px 14px; border-radius:8px;
     background:linear-gradient(135deg,#F4A7C3,#E8719A);
     font-size:12px; font-weight:600; color:#fff;
     box-shadow:0 3px 12px rgba(212,84,127,.35);
@@ -370,9 +376,7 @@ tr:hover td { background:#FFF0F5; }
 .action-btn:hover { border-color:var(--accent); color:var(--accent); background:#FFE0EF; }
 .action-btn i { font-size:15px; }
 
-/* ══════════════════════════════
-   MODAL TAMBAH PRODUK
-══════════════════════════════ */
+/* ── MODAL TAMBAH PRODUK ── */
 .modal-overlay {
     display:none; position:fixed; inset:0;
     background:rgba(0,0,0,.55); backdrop-filter:blur(4px);
@@ -485,6 +489,7 @@ select.form-ctrl option { background:#fff; }
 @media (max-width:900px) {
     .stats-grid { grid-template-columns:repeat(2,1fr); }
     .grid-2 { grid-template-columns:1fr; }
+    .sidebar { border-radius:0; }
     .main { margin-left:0; }
 }
 </style>
@@ -601,7 +606,6 @@ select.form-ctrl option { background:#fff; }
                 </div>
             </div>
 
-            <!-- KATEGORI TERLARIS (samping grafik) -->
             <div class="card" style="margin-bottom:0;">
                 <div class="card-header">
                     <h3><i class="bi bi-pie-chart" style="color:var(--yellow);margin-right:6px;"></i> Kategori Terlaris</h3>
@@ -638,7 +642,7 @@ select.form-ctrl option { background:#fff; }
                 <?php endif; ?>
             </div>
 
-        </div><!-- /chart + kategori row -->
+        </div>
 
         <div class="grid-2" style="grid-template-columns:1fr 1fr;">
             <div class="card">
@@ -718,13 +722,13 @@ select.form-ctrl option { background:#fff; }
                 </div>
             </div>
 
-        </div><!-- /grid-2 -->
+        </div>
+
         <div class="card" style="margin-top:18px;">
             <div class="card-header">
                 <h3><i class="bi bi-lightning-charge" style="color:var(--yellow);margin-right:6px;"></i> Aksi Cepat</h3>
             </div>
             <div class="actions-grid">
-                <!-- Tombol ini sekarang buka modal langsung di dashboard -->
                 <button onclick="openTambahModal()" class="action-btn">
                     <i class="bi bi-plus-circle" style="color:var(--accent);"></i> Tambah Produk Baru
                 </button>
@@ -734,13 +738,11 @@ select.form-ctrl option { background:#fff; }
             </div>
         </div>
 
-    </div><!-- /content -->
-</div><!-- /main -->
+    </div>
+</div>
 
 
-<!-- ══════════════════════════════
-     MODAL TAMBAH PRODUK
-══════════════════════════════ -->
+<!-- MODAL TAMBAH PRODUK -->
 <div class="modal-overlay" id="dashModalOverlay">
     <div class="modal-box">
 
@@ -755,13 +757,11 @@ select.form-ctrl option { background:#fff; }
             <button class="btn-close-modal" onclick="closeTambahModal()"><i class="bi bi-x-lg"></i></button>
         </div>
 
-        <!-- Form submit ke produk.php — logika insert sudah ada di sana -->
         <form method="POST" action="produk.php" enctype="multipart/form-data">
             <input type="hidden" name="id_edit" value="0">
 
             <div class="modal-body">
 
-                <!-- FOTO -->
                 <div class="form-section">
                     <div class="form-section-title">
                         <i class="bi bi-image" style="color:var(--pink2)"></i> Foto Produk
@@ -775,7 +775,6 @@ select.form-ctrl option { background:#fff; }
                     <img id="dash-preview" src="" alt="Preview">
                 </div>
 
-                <!-- INFO DASAR -->
                 <div class="form-section">
                     <div class="form-section-title">
                         <i class="bi bi-info-circle" style="color:var(--accent)"></i> Informasi Dasar
@@ -810,7 +809,6 @@ select.form-ctrl option { background:#fff; }
                     </div>
                 </div>
 
-                <!-- HARGA & DETAIL -->
                 <div class="form-section" style="margin-bottom:0;">
                     <div class="form-section-title">
                         <i class="bi bi-tag" style="color:var(--green)"></i> Harga &amp; Detail
@@ -837,7 +835,7 @@ select.form-ctrl option { background:#fff; }
                     </div>
                 </div>
 
-            </div><!-- /modal-body -->
+            </div>
 
             <div class="modal-foot">
                 <button type="button" class="btn-cancel-m" onclick="closeTambahModal()">
@@ -850,12 +848,11 @@ select.form-ctrl option { background:#fff; }
         </form>
 
     </div>
-</div><!-- /modal-overlay -->
+</div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-/* ── CHART ── */
 const chartData = {
     harian:   <?= json_encode($data_harian) ?>,
     mingguan: <?= json_encode($data_mingguan) ?>,
@@ -929,7 +926,6 @@ function switchChart(period, btn) {
 }
 buildChart('harian');
 
-/* ── DONUT CHART KATEGORI ── */
 <?php if (!empty($data_kategori)): ?>
 (function() {
     const labels = <?= json_encode(array_column($data_kategori, 'kategori')) ?>;
@@ -972,7 +968,6 @@ buildChart('harian');
 })();
 <?php endif; ?>
 
-/* ── ADMIN DROPDOWN ── */
 function toggleDropdown() {
     document.getElementById('adminDropdown').classList.toggle('show');
     document.getElementById('adminCardBtn').classList.toggle('open');
@@ -985,7 +980,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-/* ── MODAL TAMBAH PRODUK ── */
 function openTambahModal() {
     document.getElementById('dashModalOverlay').classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -993,7 +987,6 @@ function openTambahModal() {
 function closeTambahModal() {
     document.getElementById('dashModalOverlay').classList.remove('show');
     document.body.style.overflow = '';
-    // Reset form & preview
     document.querySelector('#dashModalOverlay form').reset();
     const prev = document.getElementById('dash-preview');
     prev.src = '';
@@ -1007,7 +1000,6 @@ function dashPreview(input) {
         r.readAsDataURL(input.files[0]);
     }
 }
-// Klik di luar modal → tutup
 document.getElementById('dashModalOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeTambahModal();
 });

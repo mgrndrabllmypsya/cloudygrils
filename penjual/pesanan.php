@@ -94,40 +94,40 @@ a { text-decoration:none; color:inherit; }
     box-shadow: 4px 0 28px rgba(212,84,127,.3);
 }
 .sidebar-logo {
-    padding:22px 22px 18px;
+    padding:24px 24px 20px;
     border-bottom:1.5px solid rgba(255,255,255,.2);
     background:rgba(255,255,255,.12);
 }
-.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:21px; font-weight:900; color:#fff; }
+.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:#fff; }
 .sidebar-logo .logo span { color:#FFE0EF; }
-.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:3px; }
-.sidebar-nav { flex:1; padding:14px 10px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
-.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:12px 12px 5px; font-weight:600; }
-.nav-item { display:flex; align-items:center; gap:11px; padding:9px 13px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); transition:all .18s; }
+.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:2px; }
+.sidebar-nav { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
+.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:14px 14px 6px; font-weight:600; }
+.nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); transition:all .2s; }
 .nav-item:hover { background:rgba(255,255,255,.2); color:#fff; }
 .nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; }
-.nav-item i { font-size:15px; width:18px; flex-shrink:0; }
+.nav-item i { font-size:16px; width:20px; flex-shrink:0; }
 .badge-notif { background:#fff; color:var(--accent); font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; margin-left:auto; }
-.sidebar-footer { padding:14px 10px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
+.sidebar-footer { padding:16px 12px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
 .admin-card { display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,.18); border-radius:10px; margin-bottom:8px; border:1.5px solid rgba(255,255,255,.3); }
 .admin-avatar { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.3); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; border:2px solid rgba(255,255,255,.5); }
-.admin-info .name { font-size:12px; font-weight:600; color:#fff; }
+.admin-info .name { font-size:13px; font-weight:600; color:#fff; }
 .admin-info .role { font-size:10px; color:rgba(255,255,255,.65); }
-.btn-logout { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; font-size:12px; color:rgba(255,255,255,.85); transition:background .2s; width:100%; }
+.btn-logout { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:8px; font-size:12px; color:rgba(255,255,255,.85); transition:background .2s; width:100%; }
 .btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
 
 /* MAIN */
-.main { margin-left:230px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
+.main { margin-left:240px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
 .topbar {
     background:rgba(255,255,255,.95);
     backdrop-filter:blur(12px);
     border-bottom:1.5px solid var(--border);
-    padding:0 28px; height:62px;
+    padding:0 32px; height:64px;
     display:flex; align-items:center; justify-content:space-between;
     position:sticky; top:0; z-index:40;
     box-shadow:0 2px 12px rgba(212,84,127,.07);
 }
-.topbar-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:var(--text); }
+.topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text); }
 .topbar-right { display:flex; align-items:center; gap:10px; }
 .topbar-date { font-size:12px; color:var(--muted); }
 .btn-toko { display:flex; align-items:center; gap:6px; padding:7px 16px; border-radius:8px; background:linear-gradient(135deg,#F4A7C3,#E8719A); font-size:12px; font-weight:600; color:#fff; box-shadow:0 3px 12px rgba(212,84,127,.35); transition:opacity .2s; }

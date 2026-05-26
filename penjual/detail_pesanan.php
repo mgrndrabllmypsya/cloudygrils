@@ -224,126 +224,127 @@ if (!$is_cod && $row['no_resi'] && $row['kurir'] && in_array($status, ['dikirim'
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --bg:#0F0E17; --surface:#1A1825; --surface2:#232136; --border:#2E2B3D;
-    --accent:#A78BFA; --accent2:#7C3AED; --pink:#F9A8D4; --pink2:#EC4899;
-    --green:#34D399; --yellow:#FBBF24; --red:#F87171; --orange:#FB923C;
-    --text:#E2E0F0; --muted:#6B6880; --white:#FFFFFF;
+    --bg:#FFF0F5; --surface:#FFFFFF; --surface2:#FFE8F2; --border:#F4A7C3;
+    --accent:#E8719A; --accent2:#D4547F; --pink:#F4A7C3; --pink2:#E8719A;
+    --green:#00BFA5; --yellow:#FFB300; --red:#FF1744; --orange:#FF6D00;
+    --text:#1A1A1A; --text2:#444444; --muted:#BBA0B0; --white:#FFFFFF;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,#F4A7C3 1px,transparent 1px);background-size:28px 28px;opacity:.15;pointer-events:none;z-index:0;}
 a{text-decoration:none;color:inherit;}
 
 /* SIDEBAR */
-.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;}
-.sidebar-logo{padding:24px 24px 20px;border-bottom:1px solid var(--border);}
-.sidebar-logo .logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--white);}
-.sidebar-logo .logo span{color:var(--accent);}
-.sidebar-logo small{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
-.sidebar-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:2px;}
-.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--muted);transition:all .2s;}
-.nav-item:hover{background:var(--surface2);color:var(--text);}
-.nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(212,84,127,.15));color:var(--accent);}
-.nav-item i{font-size:16px;width:20px;}
-.nav-section{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:14px 14px 6px;font-weight:600;}
-.sidebar-footer{padding:16px 12px;border-top:1px solid var(--border);}
-.admin-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:10px;}
-.admin-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--pink2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;}
-.admin-info .name{font-size:13px;font-weight:600;color:var(--text);}
-.admin-info .role{font-size:10px;color:var(--muted);}
-.btn-logout{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:12px;color:var(--red);transition:background .2s;width:100%;}
-.btn-logout:hover{background:rgba(248,113,113,.1);}
+.sidebar{width:240px;background:linear-gradient(180deg,#F4A7C3 0%,#E8719A 45%,#D4547F 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:4px 0 28px rgba(212,84,127,.3);}
+.sidebar-logo{padding:24px 24px 20px;border-bottom:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);}
+.sidebar-logo .logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:#fff;}
+.sidebar-logo .logo span{color:#FFE0EF;}
+.sidebar-logo small{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:2px;}
+.sidebar-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500;color:rgba(255,255,255,.8);transition:all .2s;}
+.nav-item:hover{background:rgba(255,255,255,.2);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,.28);color:#fff;font-weight:600;border-left:3px solid #fff;}
+.nav-item i{font-size:16px;width:20px;flex-shrink:0;}
+.nav-section{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.55);padding:14px 14px 6px;font-weight:600;}
+.sidebar-footer{padding:16px 12px;border-top:1.5px solid rgba(255,255,255,.2);background:rgba(0,0,0,.1);}
+.admin-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.18);border-radius:10px;margin-bottom:10px;border:1.5px solid rgba(255,255,255,.3);}
+.admin-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.5);}
+.admin-info .name{font-size:13px;font-weight:600;color:#fff;}
+.admin-info .role{font-size:10px;color:rgba(255,255,255,.65);}
+.btn-logout{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:12px;color:rgba(255,255,255,.85);transition:background .2s;width:100%;}
+.btn-logout:hover{background:rgba(255,255,255,.2);color:#fff;}
 
 /* MAIN */
-.main{margin-left:240px;flex:1;display:flex;flex-direction:column;}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;position:relative;z-index:1;}
+.topbar{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1.5px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 12px rgba(212,84,127,.07);}
 .topbar-left{display:flex;align-items:center;gap:12px;}
-.topbar-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
-.btn-back{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:12px;color:var(--muted);transition:all .2s;}
+.topbar-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text);}
+.btn-back{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:var(--surface2);border:1.5px solid var(--border);font-size:12px;color:var(--text2);transition:all .2s;}
 .btn-back:hover{border-color:var(--accent);color:var(--accent);}
-.content{padding:28px 32px;flex:1;}
+.content{padding:26px 28px;flex:1;}
 
 /* LAYOUT 2 COL */
 .detail-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
 
 /* CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
-.card-head{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.card-head h3{font-size:13px;font-weight:700;color:var(--white);}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 12px rgba(212,84,127,.08);}
+.card-head{padding:14px 20px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--surface2);}
+.card-head h3{font-size:13px;font-weight:700;color:var(--text);}
 .card-head .icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 .card-body{padding:20px;}
 
 /* INFO ROW */
-.info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(46,43,61,.4);font-size:13px;gap:12px;}
+.info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(244,167,195,.3);font-size:13px;gap:12px;}
 .info-row:last-child{border-bottom:none;}
 .info-label{color:var(--muted);font-size:12px;flex-shrink:0;}
-.info-val{color:var(--white);font-weight:500;text-align:right;}
+.info-val{color:var(--text);font-weight:500;text-align:right;}
 
 /* BADGE */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.badge-menunggu{background:rgba(167,139,250,.15);color:var(--accent);}
-.badge-dikonfirmasi{background:rgba(251,191,36,.15);color:var(--yellow);}
-.badge-diproses{background:rgba(251,146,60,.15);color:var(--orange);}
-.badge-dikirim{background:rgba(52,211,153,.15);color:var(--green);}
-.badge-selesai{background:rgba(52,211,153,.2);color:var(--green);}
-.badge-dibatalkan{background:rgba(248,113,113,.15);color:var(--red);}
-.badge-transfer-menunggu{background:rgba(251,191,36,.15);color:var(--yellow);}
-.badge-transfer-dikonfirmasi{background:rgba(52,211,153,.2);color:var(--green);}
-.badge-transfer-ditolak{background:rgba(248,113,113,.15);color:var(--red);}
+.badge-menunggu{background:rgba(232,113,154,.12);color:var(--accent);}
+.badge-dikonfirmasi{background:rgba(255,179,0,.15);color:var(--yellow);}
+.badge-diproses{background:rgba(255,109,0,.12);color:var(--orange);}
+.badge-dikirim{background:rgba(0,191,165,.12);color:var(--green);}
+.badge-selesai{background:rgba(0,191,165,.18);color:var(--green);}
+.badge-dibatalkan{background:rgba(255,23,68,.1);color:var(--red);}
+.badge-transfer-menunggu{background:rgba(255,179,0,.15);color:var(--yellow);}
+.badge-transfer-dikonfirmasi{background:rgba(0,191,165,.15);color:var(--green);}
+.badge-transfer-ditolak{background:rgba(255,23,68,.1);color:var(--red);}
 
 /* PRODUK CARD */
 .produk-item{display:flex;gap:14px;align-items:center;padding:14px 0;}
-.produk-img{width:64px;height:64px;border-radius:10px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
-.produk-img-placeholder{width:64px;height:64px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--muted);flex-shrink:0;}
-.produk-nama{font-weight:600;color:var(--white);font-size:14px;margin-bottom:4px;}
+.produk-img{width:64px;height:64px;border-radius:10px;object-fit:cover;border:1.5px solid var(--border);flex-shrink:0;}
+.produk-img-placeholder{width:64px;height:64px;border-radius:10px;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--muted);flex-shrink:0;}
+.produk-nama{font-weight:600;color:var(--text);font-size:14px;margin-bottom:4px;}
 .produk-harga{font-size:13px;color:var(--accent);font-weight:600;}
 
 /* BUKTI TRANSFER */
 .bukti-wrap{margin-top:12px;}
-.bukti-wrap img{width:100%;max-height:300px;object-fit:contain;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:zoom-in;}
-.no-bukti{text-align:center;padding:24px;color:var(--muted);font-size:12px;background:var(--surface2);border-radius:10px;border:1px dashed var(--border);}
+.bukti-wrap img{width:100%;max-height:300px;object-fit:contain;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);cursor:zoom-in;}
+.no-bukti{text-align:center;padding:24px;color:var(--muted);font-size:12px;background:var(--surface2);border-radius:10px;border:1.5px dashed var(--border);}
 
 /* ACTION BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
-.btn-green{background:rgba(52,211,153,.15);color:var(--green);border:1px solid rgba(52,211,153,.3);}
-.btn-green:hover{background:rgba(52,211,153,.25);}
-.btn-red{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3);}
-.btn-red:hover{background:rgba(248,113,113,.25);}
-.btn-accent{background:linear-gradient(135deg,var(--accent2),var(--pink2));color:#fff;}
+.btn-green{background:rgba(0,191,165,.12);color:var(--green);border:1.5px solid rgba(0,191,165,.3);}
+.btn-green:hover{background:rgba(0,191,165,.22);}
+.btn-red{background:rgba(255,23,68,.08);color:var(--red);border:1.5px solid rgba(255,23,68,.25);}
+.btn-red:hover{background:rgba(255,23,68,.15);}
+.btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
 .btn-accent:hover{opacity:.85;}
-.btn-secondary{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.btn-secondary{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border);}
 .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
 .btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
 
 /* FORM INPUT */
 .form-group{margin-bottom:12px;}
 .form-group label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
-.form-input,.form-select,.form-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:9px 12px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:9px 12px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);}
 .form-textarea{resize:vertical;min-height:70px;}
 
 /* ALERT */
 .alert-msg{padding:11px 16px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:16px;}
-.alert-success{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.3);}
-.alert-danger{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.3);}
-.alert-info{background:rgba(167,139,250,.1);color:var(--accent);border:1px solid rgba(167,139,250,.25);}
+.alert-success{background:rgba(0,191,165,.1);color:var(--green);border:1.5px solid rgba(0,191,165,.3);}
+.alert-danger{background:rgba(255,23,68,.07);color:var(--red);border:1.5px solid rgba(255,23,68,.2);}
+.alert-info{background:rgba(232,113,154,.1);color:var(--accent);border:1.5px solid rgba(232,113,154,.25);}
 
 /* DIVIDER */
-hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
+hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
 
 /* COD INFO BOX */
-.cod-box{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.25);border-radius:10px;padding:14px;margin-bottom:14px;}
+.cod-box{background:rgba(0,191,165,.06);border:1.5px solid rgba(0,191,165,.2);border-radius:10px;padding:14px;margin-bottom:14px;}
 .cod-box-title{font-size:13px;color:var(--green);font-weight:700;margin-bottom:8px;}
 .cod-box-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.5;}
 .cod-box-row:last-child{margin-bottom:0;}
-.cod-box-row strong{color:var(--white);}
+.cod-box-row strong{color:var(--text);}
 .cod-box-row i{color:var(--green);font-size:14px;flex-shrink:0;}
 
 /* TIMELINE ALUR PESANAN */
 .tl-item{display:flex;gap:14px;padding:10px 0;position:relative;}
 .tl-item:not(:last-child)::after{content:'';position:absolute;left:14px;top:34px;bottom:0;width:1px;background:var(--border);}
 .tl-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px;}
-.tl-dot.done{background:rgba(52,211,153,.2);color:var(--green);}
-.tl-dot.active{background:rgba(167,139,250,.2);color:var(--accent);}
+.tl-dot.done{background:rgba(0,191,165,.15);color:var(--green);}
+.tl-dot.active{background:rgba(232,113,154,.18);color:var(--accent);}
 .tl-dot.pending{background:var(--surface2);color:var(--muted);}
 .tl-text .title{font-size:13px;font-weight:600;}
 .tl-text .sub{font-size:11px;color:var(--muted);margin-top:2px;}
@@ -352,20 +353,20 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
 .track-item{display:flex;gap:14px;padding:10px 0;position:relative;}
 .track-item:not(:last-child)::after{content:'';position:absolute;left:11px;top:28px;bottom:0;width:1px;background:var(--border);}
 .track-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:10px;}
-.track-dot.first{background:rgba(52,211,153,.25);border:2px solid var(--green);color:var(--green);}
-.track-dot.rest{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.track-dot.first{background:rgba(0,191,165,.2);border:2px solid var(--green);color:var(--green);}
+.track-dot.rest{background:var(--surface2);border:1.5px solid var(--border);color:var(--muted);}
 .track-text .track-desc{font-size:12px;color:var(--text);line-height:1.5;}
-.track-text .track-meta{font-size:11px;color:var(--muted);margin-top:3px;}
+.track-text .track-meta{font-size:11px;color:var(--muted);margin-top:2px;}
 .track-status-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-bottom:10px;}
-.track-status-delivered{background:rgba(52,211,153,.15);color:var(--green);}
-.track-status-transit{background:rgba(251,191,36,.15);color:var(--yellow);}
-.track-status-pending{background:rgba(167,139,250,.15);color:var(--accent);}
+.track-status-delivered{background:rgba(0,191,165,.12);color:var(--green);}
+.track-status-transit{background:rgba(255,179,0,.15);color:var(--yellow);}
+.track-status-pending{background:rgba(232,113,154,.12);color:var(--accent);}
 
 /* MODAL TOLAK */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
 .overlay.show{display:flex;}
-.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:420px;max-width:92%;}
-.modal-box h4{font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;}
+.modal-box{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:28px;width:420px;max-width:92%;box-shadow:0 8px 32px rgba(212,84,127,.15);}
+.modal-box h4{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
 .modal-box p{font-size:13px;color:var(--muted);margin-bottom:16px;}
 
 /* LIGHTBOX */
@@ -374,7 +375,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
 .lightbox img{max-width:90vw;max-height:90vh;border-radius:10px;object-fit:contain;}
 
 /* TANDAI SELESAI BOX */
-.selesai-box{background:rgba(52,211,153,.07);border:1.5px solid rgba(52,211,153,.4);border-radius:10px;padding:16px;margin-bottom:4px;}
+.selesai-box{background:rgba(0,191,165,.06);border:1.5px solid rgba(0,191,165,.35);border-radius:10px;padding:16px;margin-bottom:4px;}
 .selesai-box-title{font-size:13px;color:var(--green);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .selesai-box-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;}
 
@@ -396,7 +397,13 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
         <a href="dashboard.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <a href="produk.php" class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
         <a href="pesanan.php" class="nav-item active"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="pembeli.php" class="nav-item"><i class="bi bi-people"></i> Pembeli</a>
+              <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
+        <?php if ($total_unread > 0): ?>
+    <span class="badge-notif"><?= $total_unread ?></span>
+    <?php endif; ?>
+</a>
+
+        <a href="nego.php"      class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php" class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
         <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
@@ -453,7 +460,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                 </div>
                 <div style="margin-top:10px;font-size:12px;color:var(--muted);">
                     <?php if ($row['jumlah_transfer']): ?>
-                    Jumlah transfer: <strong style="color:var(--white);"><?= formatRupiah($row['jumlah_transfer']) ?></strong>
+                    Jumlah transfer: <strong style="color:var(--text);"><?= formatRupiah($row['jumlah_transfer']) ?></strong>
                     — Total seharusnya: <strong style="color:var(--accent);"><?= formatRupiah($row['total_bayar']) ?></strong>
                     <?php if ($row['jumlah_transfer'] < $row['total_bayar']): ?>
                         <span style="color:var(--red);"> ⚠ Kurang <?= formatRupiah($row['total_bayar'] - $row['jumlah_transfer']) ?></span>
@@ -535,10 +542,10 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                     </div>
                     <div class="selesai-box-desc">
                         <?php if ($is_cod): ?>
-                            Klik <strong style="color:var(--white);">Tandai Selesai</strong> setelah kamu mengantar barang dan menerima pembayaran COD dari pembeli.
+                            Klik <strong style="color:var(--text);">Tandai Selesai</strong> setelah kamu mengantar barang dan menerima pembayaran COD dari pembeli.
                             Atau tunggu pembeli menekan tombol <em>"Pesanan Diterima"</em> di halaman pesanan mereka.
                         <?php else: ?>
-                            Klik <strong style="color:var(--white);">Tandai Selesai</strong> jika kamu sudah memastikan barang diterima pembeli.
+                            Klik <strong style="color:var(--text);">Tandai Selesai</strong> jika kamu sudah memastikan barang diterima pembeli.
                             Atau tunggu pembeli menekan tombol <em>"Pesanan Diterima"</em> di halaman pesanan mereka.
                         <?php endif; ?>
                     </div>
@@ -566,7 +573,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                 <!-- INFO PESANAN -->
                 <div class="card">
                     <div class="card-head">
-                        <div class="icon" style="background:rgba(167,139,250,.15);color:var(--accent);"><i class="bi bi-bag-check"></i></div>
+                        <div class="icon" style="background:rgba(232,113,154,.12);color:var(--accent);"><i class="bi bi-bag-check"></i></div>
                         <h3>Informasi Pesanan</h3>
                     </div>
                     <div class="card-body">
@@ -614,7 +621,7 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
                             <span class="info-val">
                                 <?php if (!empty($row['kurir'])): ?>
                                     <i class="bi bi-truck" style="color:var(--green);"></i>
-                                    <strong style="color:var(--white);"><?= strtoupper(escape($row['kurir'])) ?></strong>
+                                    <strong style="color:var(--text);"><?= strtoupper(escape($row['kurir'])) ?></strong>
                                 <?php else: ?>
                                     <span style="color:var(--yellow);">⚠ Belum dipilih</span>
                                 <?php endif; ?>
@@ -908,7 +915,7 @@ $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catata
                 <?php if (!$is_cod && in_array($status, ['dikirim','selesai']) && $row['no_resi']): ?>
                 <div class="card">
                     <div class="card-head">
-                        <div class="icon" style="background:rgba(167,139,250,.15);color:var(--accent);"><i class="bi bi-radar"></i></div>
+                        <div class="icon" style="background:rgba(232,113,154,.12);color:var(--accent);"><i class="bi bi-radar"></i></div>
                         <h3>Lacak Paket — <?= strtoupper(escape($row['kurir'])) ?></h3>
                     </div>
                     <div class="card-body">
@@ -931,12 +938,12 @@ $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catata
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
                                 <div style="background:var(--surface2);border-radius:8px;padding:10px;">
                                     <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">PENGIRIM</div>
-                                    <div style="font-size:12px;font-weight:600;color:var(--white);"><?= escape($detail['shipper'] ?? '-') ?></div>
+                                    <div style="font-size:12px;font-weight:600;color:var(--text);"><?= escape($detail['shipper'] ?? '-') ?></div>
                                     <div style="font-size:11px;color:var(--muted);margin-top:2px;"><?= escape($detail['origin'] ?? '-') ?></div>
                                 </div>
                                 <div style="background:var(--surface2);border-radius:8px;padding:10px;">
                                     <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">PENERIMA</div>
-                                    <div style="font-size:12px;font-weight:600;color:var(--white);"><?= escape($detail['receiver'] ?? '-') ?></div>
+                                    <div style="font-size:12px;font-weight:600;color:var(--text);"><?= escape($detail['receiver'] ?? '-') ?></div>
                                     <div style="font-size:11px;color:var(--muted);margin-top:2px;"><?= escape($detail['destination'] ?? '-') ?></div>
                                 </div>
                             </div>
@@ -979,36 +986,11 @@ $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catata
             <!-- KOLOM KANAN -->
             <div>
 
-                <!-- DATA PEMBELI -->
-                <div class="card">
-                    <div class="card-head">
-                        <div class="icon" style="background:rgba(249,168,212,.15);color:var(--pink);"><i class="bi bi-person"></i></div>
-                        <h3>Data Pembeli</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-row">
-                            <span class="info-label">Nama</span>
-                            <span class="info-val"><?= escape($row['nama_pembeli']) ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Email</span>
-                            <span class="info-val" style="font-size:12px;"><?= escape($row['email_pembeli']) ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">No. HP</span>
-                            <span class="info-val"><?= escape($row['hp_pembeli'] ?? '-') ?></span>
-                        </div>
-                        <?php if ($is_cod): ?>
-            
-                        <?php endif; ?>
-                    </div>
-                </div>
-
                 <!-- BUKTI TRANSFER: hanya non-COD -->
                 <?php if (!$is_cod && ($st_transfer !== 'menunggu' || !$row['bukti_transfer'])): ?>
                 <div class="card">
                     <div class="card-head">
-                        <div class="icon" style="background:rgba(167,139,250,.15);color:var(--accent);"><i class="bi bi-receipt"></i></div>
+                        <div class="icon" style="background:rgba(232,113,154,.12);color:var(--accent);"><i class="bi bi-receipt"></i></div>
                         <h3>Bukti Transfer</h3>
                     </div>
                     <div class="card-body">
@@ -1063,7 +1045,7 @@ $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catata
                 <!-- ALUR PESANAN (TIMELINE) -->
                 <div class="card">
                     <div class="card-head">
-                        <div class="icon" style="background:rgba(167,139,250,.15);color:var(--accent);"><i class="bi bi-clock-history"></i></div>
+                        <div class="icon" style="background:rgba(232,113,154,.12);color:var(--accent);"><i class="bi bi-clock-history"></i></div>
                         <h3>Alur Pesanan</h3>
                     </div>
                     <div class="card-body">
