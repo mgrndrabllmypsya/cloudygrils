@@ -505,17 +505,32 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
         <?php endif; ?>
 
         <!-- AKSI: COD menunggu — siapkan barang langsung -->
-        <?php if ($is_cod && $status === 'menunggu'): ?>
+        <?php if ($is_cod && $status === 'menunggu'):
+            $jenis_cod_notif = '';
+            if (!empty($row['jenis_cod'])) {
+                $jenis_cod_notif = $row['jenis_cod'];
+            } elseif (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m_notif)) {
+                $jenis_cod_notif = $m_notif[1];
+            }
+            $is_antar_pembeli = ($jenis_cod_notif === 'antar_pembeli');
+        ?>
         <div class="card" style="border-color:rgba(52,211,153,.4);">
             <div class="card-head" style="background:rgba(52,211,153,.07);">
                 <div class="icon" style="background:rgba(52,211,153,.2);color:var(--green);"><i class="bi bi-cash-coin"></i></div>
                 <h3 style="color:var(--green);">Pesanan COD Masuk — Siapkan Barang</h3>
             </div>
             <div class="card-body">
+                <?php if ($is_antar_pembeli): ?>
                 <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
                     Pesanan ini menggunakan metode <strong style="color:var(--green);">COD (🛵 Antar ke Rumah)</strong>.
                     Tidak ada konfirmasi transfer. Langsung siapkan barang dan hubungi pembeli untuk koordinasi pengantaran.
                 </p>
+                <?php else: ?>
+                <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
+                    Pesanan ini menggunakan metode <strong style="color:var(--accent);">COD (🏪 Beli ke Rumah Penjual)</strong>.
+                    Tidak ada konfirmasi transfer. Siapkan barang dan tunggu pembeli datang langsung ke toko.
+                </p>
+                <?php endif; ?>
                 <form method="POST">
                     <input type="hidden" name="aksi" value="update_status">
                     <input type="hidden" name="status" value="diproses">
@@ -606,8 +621,19 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
                         <div class="info-row">
                             <span class="info-label">Metode Bayar</span>
                             <span class="info-val">
-                                <?php if ($is_cod): ?>
-                                    <i class="bi bi-cash" style="color:var(--green);"></i> COD (🛵 Antar ke Rumah)
+                                <?php if ($is_cod):
+                                    $jenis_cod_label = '';
+                                    if (!empty($row['jenis_cod'])) {
+                                        $jenis_cod_label = $row['jenis_cod'];
+                                    } elseif (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m_lbl)) {
+                                        $jenis_cod_label = $m_lbl[1];
+                                    }
+                                ?>
+                                    <?php if ($jenis_cod_label === 'antar'): ?>
+                                        <i class="bi bi-cash" style="color:var(--accent);"></i> COD (🏪 Beli ke Rumah Penjual)
+                                    <?php else: ?>
+                                        <i class="bi bi-cash" style="color:var(--green);"></i> COD (🛵 Antar ke Rumah)
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <i class="bi bi-credit-card" style="color:var(--accent);"></i>
                                     Transfer <?= strtoupper(escape($row['metode_transfer'] ?? '')) ?>
@@ -842,7 +868,18 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
                     </div>
                     <div class="card-body">
 
-                        <?php if ($is_cod): ?>
+                        <?php if ($is_cod):
+                            // Deteksi jenis COD
+                            $jenis_cod_info = '';
+                            if (!empty($row['jenis_cod'])) {
+                                $jenis_cod_info = $row['jenis_cod'];
+                            } elseif (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m_info)) {
+                                $jenis_cod_info = $m_info[1];
+                            }
+                            $is_antar_ke_pembeli = ($jenis_cod_info === 'antar_pembeli');
+                            $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catatan'] ?? ''));
+                        ?>
+                            <!-- No. HP & Nama Pembeli selalu tampil untuk kedua jenis COD -->
                             <div class="info-row">
                                 <span class="info-label">No. HP Pembeli</span>
                                 <span class="info-val">
@@ -855,21 +892,37 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
                                 <span class="info-label">Nama Pembeli</span>
                                 <span class="info-val"><?= escape($row['nama_pembeli']) ?></span>
                             </div>
-                             <div class="info-row">
+
+                            <?php if ($is_antar_ke_pembeli): ?>
+                            <!-- ANTAR KE RUMAH: tampilkan alamat pembeli -->
+                            <div class="info-row">
                                 <span class="info-label">Alamat Pembeli</span>
                                 <span class="info-val" style="color:var(--green);max-width:260px;">
-                                    <i class="bi bi-geo-alt-fill"></i> <?= escape($row['detail_alamat']) ?>
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                    <?= $row['detail_alamat'] ? escape($row['detail_alamat']) : '<span style="color:var(--muted);">Belum diisi</span>' ?>
                                 </span>
                             </div>
-                     <?php
-$catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catatan'] ?? ''));
-?>
-<div class="info-row">
-    <span class="info-label">Catatan Pembeli</span>
-    <span class="info-val" style="color:var(--yellow);font-style:italic;">
-        <?= $catatan_murni ? '"' . escape($catatan_murni) . '"' : '<span style="color:var(--muted);">Tidak ada catatan</span>' ?>
-    </span>
-</div>
+                            <?php else: ?>
+                            <!-- BELI KE RUMAH PENJUAL: tidak perlu alamat pembeli, tampilkan info pembeli datang ke toko -->
+                            <div class="info-row">
+                                <span class="info-label">Jenis COD</span>
+                                <span class="info-val" style="color:var(--accent);">
+                                    🏪 Pembeli datang langsung ke toko
+                                </span>
+                            </div>
+                            <div style="background:rgba(232,113,154,.08);border:1.5px solid rgba(232,113,154,.25);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:12px;color:var(--text2);">
+                                <i class="bi bi-info-circle" style="color:var(--accent);margin-right:6px;"></i>
+                                Pembeli akan datang langsung ke tempat Anda. Pastikan barang sudah siap saat pembeli tiba.
+                            </div>
+                            <?php endif; ?>
+
+                            <!-- Catatan pembeli selalu tampil -->
+                            <div class="info-row">
+                                <span class="info-label">Catatan Pembeli</span>
+                                <span class="info-val" style="color:var(--yellow);font-style:italic;">
+                                    <?= $catatan_murni ? '"' . escape($catatan_murni) . '"' : '<span style="color:var(--muted);">Tidak ada catatan</span>' ?>
+                                </span>
+                            </div>
 
                         <?php else: ?>
                             <div class="info-row">
@@ -1024,15 +1077,24 @@ $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catata
                                 <select name="status" class="form-select">
                                     <?php foreach ($all_status as $s): ?>
                                     <option value="<?= $s ?>" <?= $status === $s ? 'selected' : '' ?>>
-                                        <?= match($s) {
+                                        <?php
+                                        $jenis_cod_dd = '';
+                                        if (!empty($row['jenis_cod'])) {
+                                            $jenis_cod_dd = $row['jenis_cod'];
+                                        } elseif (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m_dd)) {
+                                            $jenis_cod_dd = $m_dd[1];
+                                        }
+                                        $is_beli_ke_penjual = ($is_cod && $jenis_cod_dd === 'antar');
+                                        echo match($s) {
                                             'menunggu'     => 'Menunggu',
                                             'dikonfirmasi' => 'Dikonfirmasi',
                                             'diproses'     => 'Diproses',
-                                            'dikirim'      => $is_cod ? 'Dalam Pengantaran' : 'Dikirim',
+                                            'dikirim'      => $is_beli_ke_penjual ? 'Menunggu Pembeli' : ($is_cod ? 'Dalam Pengantaran' : 'Dikirim'),
                                             'selesai'      => 'Selesai',
                                             'dibatalkan'   => 'Dibatalkan',
                                             default        => ucfirst($s)
-                                        } ?>
+                                        };
+                                        ?>
                                     </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -1050,13 +1112,30 @@ $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catata
                     </div>
                     <div class="card-body">
                         <?php
+                        // Deteksi jenis COD untuk alur pesanan
+                        $jenis_cod_flow = '';
+                        if (!empty($row['jenis_cod'])) {
+                            $jenis_cod_flow = $row['jenis_cod'];
+                        } elseif (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m_flow)) {
+                            $jenis_cod_flow = $m_flow[1];
+                        }
+                        $is_antar_ke_pembeli_flow = ($jenis_cod_flow === 'antar_pembeli' || $jenis_cod_flow === '');
+
                         $flow = [];
                         $flow['menunggu'] = ['label'=>'Pesanan Masuk', 'sub'=>'Pembeli sudah checkout'];
 
                         if ($is_cod) {
-                            $flow['diproses'] = ['label'=>'Sedang Diproses',      'sub'=>'Barang disiapkan'];
-                            $flow['dikirim']  = ['label'=>'Dalam Pengantaran',    'sub'=>'Admin mengantar ke pembeli'];
-                            $flow['selesai']  = ['label'=>'Selesai',              'sub'=>'COD lunas, pesanan selesai'];
+                            if ($is_antar_ke_pembeli_flow) {
+                                // Alur: COD Antar ke Rumah
+                                $flow['diproses'] = ['label'=>'Sedang Diproses',   'sub'=>'Barang disiapkan'];
+                                $flow['dikirim']  = ['label'=>'Dalam Pengantaran', 'sub'=>'Penjual mengantar ke alamat pembeli'];
+                                $flow['selesai']  = ['label'=>'Selesai',           'sub'=>'COD lunas, pesanan selesai'];
+                            } else {
+                                // Alur: COD Beli ke Rumah Penjual
+                                $flow['diproses'] = ['label'=>'Sedang Diproses',   'sub'=>'Barang disiapkan oleh penjual'];
+                                $flow['dikirim']  = ['label'=>'Menunggu Pembeli',  'sub'=>'Pembeli akan datang ke toko'];
+                                $flow['selesai']  = ['label'=>'Selesai',           'sub'=>'Pembeli sudah ambil & COD lunas'];
+                            }
                         } else {
                             $flow['dikonfirmasi'] = ['label'=>'Transfer Dikonfirmasi','sub'=>'Pembayaran valid'];
                             $flow['diproses']     = ['label'=>'Sedang Diproses',      'sub'=>'Barang disiapkan'];
@@ -1091,7 +1170,7 @@ $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catata
                                 'menunggu'     => 'bi-bag',
                                 'dikonfirmasi' => 'bi-check-circle',
                                 'diproses'     => 'bi-arrow-repeat',
-                                'dikirim'      => 'bi-truck',
+                                'dikirim'      => ($is_cod && !$is_antar_ke_pembeli_flow) ? 'bi-shop' : 'bi-truck',
                                 'selesai'      => 'bi-check2-all',
                                 'dibatalkan'   => 'bi-x-circle',
                                 default        => 'bi-circle'
