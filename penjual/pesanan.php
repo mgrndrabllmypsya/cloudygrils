@@ -87,37 +87,37 @@ a { text-decoration:none; color:inherit; }
 
 /* SIDEBAR */
 .sidebar {
-    width:240px;
+    width:300px;
     background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
     display:flex; flex-direction:column;
     position:fixed; top:0; left:0; bottom:0; z-index:50;
-    box-shadow: 4px 0 28px rgba(212,84,127,.3);
+    border-radius: 0 28px 28px 0;
+    box-shadow: 6px 0 32px rgba(212,84,127,.28);
+    overflow: hidden;
 }
 .sidebar-logo {
-    padding:24px 24px 20px;
+    padding:28px 28px 22px;
     border-bottom:1.5px solid rgba(255,255,255,.2);
     background:rgba(255,255,255,.12);
 }
-.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:#fff; }
+.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:22px; font-weight:900; color:#fff; }
 .sidebar-logo .logo span { color:#FFE0EF; }
-.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:2px; }
-.sidebar-nav { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
-.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:14px 14px 6px; font-weight:600; }
-.nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); transition:all .2s; }
-.nav-item:hover { background:rgba(255,255,255,.2); color:#fff; }
-.nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; }
-.nav-item i { font-size:16px; width:20px; flex-shrink:0; }
-.badge-notif { background:#fff; color:var(--accent); font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; margin-left:auto; }
-.sidebar-footer { padding:16px 12px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
-.admin-card { display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,.18); border-radius:10px; margin-bottom:8px; border:1.5px solid rgba(255,255,255,.3); }
-.admin-avatar { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.3); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; border:2px solid rgba(255,255,255,.5); }
-.admin-info .name { font-size:13px; font-weight:600; color:#fff; }
-.admin-info .role { font-size:10px; color:rgba(255,255,255,.65); }
-.btn-logout { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:8px; font-size:12px; color:rgba(255,255,255,.85); transition:background .2s; width:100%; }
+.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:3px; }
+.sidebar-nav { flex:1; padding:20px 18px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
+.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:18px 16px 8px; font-weight:600; }
+.nav-item { display:flex; align-items:center; gap:14px; padding:13px 18px; border-radius:12px; font-size:14px; font-weight:500; color:rgba(255,255,255,.85); transition:all .2s; letter-spacing:0.01em; }
+.nav-item:hover { background:rgba(255,255,255,.2); color:#fff; transform:translateX(3px); }
+.nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; padding-left:15px; }
+.nav-item i { font-size:17px; width:22px; flex-shrink:0; }
+.badge-notif { background:#fff; color:var(--accent); font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; margin-left:auto; }
+.sidebar-footer { padding:16px 18px 20px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
+
+.btn-logout { display:flex; align-items:center; gap:10px; padding:11px 16px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.85); transition:background .2s; width:100%; letter-spacing:0.01em; }
+.btn-logout i { font-size:16px; }
 .btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
 
 /* MAIN */
-.main { margin-left:240px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
+.main { margin-left:300px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
 .topbar {
     background:rgba(255,255,255,.95);
     backdrop-filter:blur(12px);
@@ -222,6 +222,7 @@ tr:hover td { background:#FFF0F5; }
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
+        <small>Seller Dashboard</small>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
@@ -239,14 +240,7 @@ tr:hover td { background:#FFF0F5; }
         <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
     </nav>
     <div class="sidebar-footer">
-        <div class="admin-card">
-            <div class="admin-avatar"><?= strtoupper(substr($admin_nama, 0, 1)) ?></div>
-            <div class="admin-info">
-                <div class="name"><?= escape($admin_nama) ?></div>
-                <div class="role">Administrator</div>
-            </div>
-        </div>
-        <a href="../auth/logout_admin.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
     </div>
 </aside>
 
@@ -314,7 +308,7 @@ tr:hover td { background:#FFF0F5; }
                         <option value="menunggu"     <?= $filter_status==='menunggu'     ? 'selected':'' ?>>Menunggu</option>
                         <option value="dikonfirmasi" <?= $filter_status==='dikonfirmasi' ? 'selected':'' ?>>Dikonfirmasi</option>
                         <option value="diproses"     <?= $filter_status==='diproses'     ? 'selected':'' ?>>Diproses</option>
-                        <option value="dikirim"      <?= $filter_status==='dikirim'      ? 'selected':'' ?>>Dikirim</option>
+                        <option value="dikirim"      <?= $filter_status==='dikirim'      ? 'selected':'' ?>>Dikirim / Dalam Pengantaran / Menunggu Pembeli</option>
                         <option value="selesai"      <?= $filter_status==='selesai'      ? 'selected':'' ?>>Selesai</option>
                         <option value="dibatalkan"   <?= $filter_status==='dibatalkan'   ? 'selected':'' ?>>Dibatalkan</option>
                     </select>
@@ -342,11 +336,22 @@ tr:hover td { background:#FFF0F5; }
                         <?php
                         $status = $row['status'] ?? 'menunggu';
                         $badge_class = 'badge-' . $status;
+
+                        // Deteksi jenis COD untuk label status
+                        $is_cod_row = ($row['metode'] === 'cod');
+                        $jenis_cod_row = '';
+                        if (!empty($row['jenis_cod'])) {
+                            $jenis_cod_row = $row['jenis_cod'];
+                        } elseif (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m_row)) {
+                            $jenis_cod_row = $m_row[1];
+                        }
+                        $is_beli_ke_penjual_row = ($is_cod_row && $jenis_cod_row === 'antar');
+
                         $status_label = match($status) {
                             'menunggu'     => 'Menunggu',
                             'dikonfirmasi' => 'Dikonfirmasi',
                             'diproses'     => 'Diproses',
-                            'dikirim'      => 'Dikirim',
+                            'dikirim'      => $is_beli_ke_penjual_row ? 'Menunggu Pembeli' : ($is_cod_row ? 'Dalam Pengantaran' : 'Dikirim'),
                             'selesai'      => 'Selesai',
                             'dibatalkan'   => 'Dibatalkan',
                             default        => ucfirst($status)
@@ -360,7 +365,6 @@ tr:hover td { background:#FFF0F5; }
                                 <?php if ($butuh_aksi): ?><span class="dot-alert" title="Perlu konfirmasi transfer"></span><?php endif; ?>
                                 <div style="font-weight:600;color:var(--text);font-size:12px;"><?= escape($row['kode_pesanan']) ?></div>
                                 <div style="font-size:12px;color:var(--text2);"><?= escape($row['nama_pembeli']) ?></div>
-                                <div style="font-size:10px;color:var(--muted);"><?= escape($row['email_pembeli']) ?></div>
                             </td>
                             <td style="font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= escape($row['nama_produk'] ?? '-') ?></td>
                             <td style="font-weight:600;color:var(--accent);"><?= formatRupiah($row['total_bayar']) ?></td>

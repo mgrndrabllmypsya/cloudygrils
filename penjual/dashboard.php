@@ -124,7 +124,7 @@ a { text-decoration:none; color:inherit; }
 
 /* ── SIDEBAR ── */
 .sidebar {
-    width: 270px; /* diperlebar dari 240px */
+    width: 300px; /* ✅ Diperlebar dari 270px */
     background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
     display: flex;
     flex-direction: column;
@@ -133,121 +133,135 @@ a { text-decoration:none; color:inherit; }
     left: 0;
     bottom: 0;
     z-index: 50;
-    border-radius: 0 28px 28px 0; /* ujung kanan melengkung */
+    border-radius: 0 28px 28px 0;
     box-shadow: 6px 0 32px rgba(212,84,127,.28);
     overflow: hidden;
 }
 .sidebar-logo {
-    padding:24px 24px 20px;
-    border-bottom:1.5px solid rgba(255,255,255,.2);
-    background:rgba(255,255,255,.12);
+    padding: 28px 28px 22px; /* ✅ Padding lebih besar */
+    border-bottom: 1.5px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.12);
 }
 .sidebar-logo .logo {
     font-family:'Playfair Display',serif;
-    font-size:20px; font-weight:900; color:#fff;
+    font-size: 22px; /* ✅ Sedikit lebih besar */
+    font-weight: 900;
+    color: #fff;
 }
 .sidebar-logo .logo span { color:#FFE0EF; }
 .sidebar-logo small {
     display:block; font-size:10px;
     letter-spacing:2px; text-transform:uppercase;
-    color:rgba(255,255,255,.65); margin-top:2px;
+    color:rgba(255,255,255,.65); margin-top:3px;
 }
+
+/* ── SIDEBAR NAV ── */
 .sidebar-nav {
-    flex:1; padding:16px 14px;
-    display:flex; flex-direction:column; gap:2px; overflow-y:auto;
+    flex: 1;
+    padding: 20px 18px; /* ✅ Padding lebih lebar */
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* ✅ Gap antar item lebih besar */
+    overflow-y: auto;
 }
 .nav-section {
-    font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
-    color:rgba(255,255,255,.55); padding:14px 14px 6px; font-weight:600;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+    padding: 18px 16px 8px; /* ✅ Padding atas lebih besar */
+    font-weight: 600;
 }
 .nav-item {
-    display:flex; align-items:center; gap:12px;
-    padding:10px 14px; border-radius:10px;
-    font-size:13px; font-weight:500; color:rgba(255,255,255,.8);
-    transition:all .2s;
+    display: flex;
+    align-items: center;
+    gap: 14px; /* ✅ Gap icon-teks lebih besar */
+    padding: 13px 18px; /* ✅ Padding vertikal & horizontal lebih besar */
+    border-radius: 12px;
+    font-size: 14px; /* ✅ Font lebih besar */
+    font-weight: 500;
+    color: rgba(255,255,255,.85);
+    transition: all .2s;
+    letter-spacing: 0.01em;
 }
-.nav-item:hover { background:rgba(255,255,255,.2); color:#fff; }
+.nav-item:hover {
+    background: rgba(255,255,255,.2);
+    color: #fff;
+    transform: translateX(3px); /* ✅ Efek geser halus saat hover */
+}
 .nav-item.active {
-    background:rgba(255,255,255,.28);
-    color:#fff; font-weight:600;
-    border-left:3px solid #fff;
+    background: rgba(255,255,255,.28);
+    color: #fff;
+    font-weight: 600;
+    border-left: 3px solid #fff;
+    padding-left: 15px; /* kompensasi border */
 }
-.nav-item i { font-size:16px; width:20px; flex-shrink:0; }
+.nav-item i {
+    font-size: 17px; /* ✅ Icon lebih besar */
+    width: 22px;
+    flex-shrink: 0;
+}
 .badge-notif {
-    background:#fff;
-    color:var(--accent);
-    font-size:10px;
-    font-weight:700;
-    padding:1px 6px;
-    border-radius:10px;
-    margin-left:auto;
+    background: #fff;
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: auto;
 }
+.nav-item-toko {
+    margin-top: 0;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.85) !important;
+    font-weight: 500 !important;
+    justify-content: flex-start;
+    border-radius: 12px;
+    box-shadow: none;
+    letter-spacing: 0.01em;
+}
+.nav-item-toko:hover {
+    background: rgba(255,255,255,.2) !important;
+    border-color: transparent !important;
+    box-shadow: none;
+    transform: translateX(3px) !important;
+    color: #fff !important;
+}
+.nav-ext-icon {
+    font-size: 11px !important;
+    width: auto !important;
+    margin-left: auto;
+    opacity: .6;
+}
+
+/* ── SIDEBAR FOOTER (hanya logout) ── */
 .sidebar-footer {
-    padding:16px 14px;
-    border-top:1.5px solid rgba(255,255,255,.2);
-    background:rgba(0,0,0,.1);
+    padding: 16px 18px 20px; /* ✅ Padding disesuaikan */
+    border-top: 1.5px solid rgba(255,255,255,.2);
+    background: rgba(0,0,0,.1);
 }
-.admin-card-wrap { position:relative; margin-bottom:10px; }
-.admin-card {
-    display:flex; align-items:center; gap:10px;
-    padding:10px 12px; background:rgba(255,255,255,.18);
-    border-radius:10px; cursor:pointer; user-select:none;
-    border:1.5px solid rgba(255,255,255,.3); transition:all .2s;
-}
-.admin-card:hover { border-color:#fff; background:rgba(255,255,255,.28); }
-.admin-avatar {
-    width:34px; height:34px; border-radius:50%;
-    background:rgba(255,255,255,.3);
-    display:flex; align-items:center; justify-content:center;
-    font-weight:700; font-size:13px; color:#fff;
-    flex-shrink:0; overflow:hidden;
-    border:2px solid rgba(255,255,255,.5);
-}
-.admin-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-.admin-info { flex:1; min-width:0; }
-.admin-info .name { font-size:13px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.admin-info .role { font-size:10px; color:rgba(255,255,255,.65); }
-.admin-card .chevron { font-size:11px; color:rgba(255,255,255,.7); transition:transform .2s; }
-.admin-card.open .chevron { transform:rotate(180deg); }
-.admin-dropdown {
-    display:none; position:absolute; bottom:calc(100% + 8px); left:0; right:0;
-    background:#fff; border:1.5px solid var(--border); border-radius:12px;
-    overflow:hidden; box-shadow:0 8px 28px rgba(212,84,127,.2); z-index:100;
-}
-.admin-dropdown.show { display:block; }
-.dropdown-header {
-    padding:12px 14px; border-bottom:1px solid var(--border);
-    display:flex; align-items:center; gap:10px;
-    background:linear-gradient(135deg,#FFE0EF,#FFF0F5);
-}
-.dropdown-header .dh-avatar {
-    width:38px; height:38px; border-radius:50%;
-    background:linear-gradient(135deg,#F4A7C3,#E8719A);
-    display:flex; align-items:center; justify-content:center;
-    font-weight:700; font-size:14px; color:#fff; flex-shrink:0; overflow:hidden;
-}
-.dropdown-header .dh-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-.dropdown-header .dh-name { font-size:13px; font-weight:600; color:var(--text); }
-.dropdown-header .dh-role { font-size:10px; color:var(--muted); }
-.dropdown-item {
-    display:flex; align-items:center; gap:10px;
-    padding:10px 14px; font-size:13px; color:var(--text2);
-    transition:background .15s; cursor:pointer;
-}
-.dropdown-item:hover { background:var(--surface2); color:var(--accent); }
-.dropdown-item i { font-size:14px; width:17px; }
-.dropdown-item.danger { color:var(--red); }
-.dropdown-item.danger:hover { background:#FFEBEE; }
-.dropdown-divider { height:1px; background:var(--border); }
 .btn-logout {
-    display:flex; align-items:center; gap:8px;
-    padding:8px 14px; border-radius:8px; font-size:12px;
-    color:rgba(255,255,255,.85); transition:background .2s; width:100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px; /* ✅ Lebih besar */
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,.85);
+    transition: background .2s;
+    width: 100%;
+    letter-spacing: 0.01em;
 }
-.btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
+.btn-logout i { font-size: 16px; }
+.btn-logout:hover {
+    background: rgba(255,255,255,.2);
+    color: #fff;
+}
 
 /* ── MAIN ── */
-.main { margin-left:270px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
+.main { margin-left: 300px; /* ✅ Sesuai lebar sidebar baru */ flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
 .topbar {
     background:rgba(255,255,255,.95);
     backdrop-filter:blur(12px);
@@ -489,7 +503,7 @@ select.form-ctrl option { background:#fff; }
 @media (max-width:900px) {
     .stats-grid { grid-template-columns:repeat(2,1fr); }
     .grid-2 { grid-template-columns:1fr; }
-    .sidebar { border-radius:0; }
+    .sidebar { border-radius:0; width:260px; }
     .main { margin-left:0; }
 }
 </style>
@@ -499,6 +513,7 @@ select.form-ctrl option { background:#fff; }
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
+        <small>Seller Dashboard</small>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
@@ -514,44 +529,16 @@ select.form-ctrl option { background:#fff; }
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
         <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
+        <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
+            <i class="bi bi-shop"></i> Lihat Toko
+        </a>
     </nav>
+
+    <!-- ✅ Footer hanya logout, admin card dihapus -->
     <div class="sidebar-footer">
-        <div class="admin-card-wrap">
-            <div class="admin-dropdown" id="adminDropdown">
-                <div class="dropdown-header">
-                    <div class="dh-avatar">
-                        <?php if ($logo_path && file_exists($logo_path)): ?>
-                            <img src="<?= escape($logo_path) ?>" alt="logo">
-                        <?php else: ?>
-                            <?= strtoupper(substr($admin_nama, 0, 1)) ?>
-                        <?php endif; ?>
-                    </div>
-                    <div>
-                        <div class="dh-name"><?= escape($admin_nama) ?></div>
-                        <div class="dh-role">Administrator</div>
-                    </div>
-                </div>
-                <a href="pengaturan.php" class="dropdown-item"><i class="bi bi-gear"></i> Pengaturan Akun</a>
-                <a href="../pages/home.php" class="dropdown-item" target="_blank"><i class="bi bi-shop"></i> Lihat Toko</a>
-                <div class="dropdown-divider"></div>
-                <a href="../auth/logout_penjual.php" class="dropdown-item danger"><i class="bi bi-box-arrow-left"></i> Keluar</a>
-            </div>
-            <div class="admin-card" id="adminCardBtn" onclick="toggleDropdown()">
-                <div class="admin-avatar">
-                    <?php if ($logo_path && file_exists($logo_path)): ?>
-                        <img src="<?= escape($logo_path) ?>" alt="logo">
-                    <?php else: ?>
-                        <?= strtoupper(substr($admin_nama, 0, 1)) ?>
-                    <?php endif; ?>
-                </div>
-                <div class="admin-info">
-                    <div class="name"><?= escape($admin_nama) ?></div>
-                    <div class="role">Administrator</div>
-                </div>
-                <i class="bi bi-chevron-up chevron"></i>
-            </div>
-        </div>
-        <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        <a href="../auth/logout_penjual.php" class="btn-logout">
+            <i class="bi bi-box-arrow-left"></i> Keluar
+        </a>
     </div>
 </aside>
 
@@ -560,7 +547,6 @@ select.form-ctrl option { background:#fff; }
         <div class="topbar-title">Dashboard</div>
         <div class="topbar-right">
             <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
-            <a href="../index.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
         </div>
     </div>
 
@@ -967,18 +953,6 @@ buildChart('harian');
     });
 })();
 <?php endif; ?>
-
-function toggleDropdown() {
-    document.getElementById('adminDropdown').classList.toggle('show');
-    document.getElementById('adminCardBtn').classList.toggle('open');
-}
-document.addEventListener('click', function(e) {
-    const wrap = document.querySelector('.admin-card-wrap');
-    if (wrap && !wrap.contains(e.target)) {
-        document.getElementById('adminDropdown').classList.remove('show');
-        document.getElementById('adminCardBtn').classList.remove('open');
-    }
-});
 
 function openTambahModal() {
     document.getElementById('dashModalOverlay').classList.add('show');

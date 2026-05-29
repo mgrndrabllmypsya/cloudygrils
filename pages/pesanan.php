@@ -403,5 +403,3 @@ a { text-decoration:none; }
     </div>
     <?php endif; ?>
 </div>
-
-<?php include '../includes/footer.php'; ?>

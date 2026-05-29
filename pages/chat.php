@@ -396,5 +396,3 @@ if (ta) {
     ta.focus();
 }
 </script>
-
-<?php include '../includes/footer.php'; ?>

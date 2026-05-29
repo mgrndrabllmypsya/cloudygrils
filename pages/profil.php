@@ -452,5 +452,3 @@ function cekKekuatan(pw) {
     else bar.classList.add('pw-strong');
 }
 </script>
-
-<?php include '../includes/footer.php'; ?>
