@@ -35,6 +35,7 @@ $kategori_list = ['Atasan','Bawahan','Dress/Gamis','Outer','Hijab & Aksesoris'];
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cloudy Girls</title>
@@ -81,8 +82,28 @@ header {
     max-width: 1280px; margin: 0 auto; padding: 0 40px;
     height: 68px; display: flex; align-items: center; justify-content: space-between;
 }
-.logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--text); }
-.logo span { color: var(--accent); }
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none !important;
+}
+.logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+}
+.logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text);
+}
+.logo-text span {
+    color: var(--accent);
+}
 .auth-btns { display: flex; gap: 8px; align-items: center; }
 .btn-masuk {
     font-size: 13px; font-weight: 500; color: var(--text2);
@@ -99,9 +120,11 @@ header {
 }
 .btn-daftar:hover { opacity: .88; color: #fff; }
 
-/* HERO */
+/* HERO (DIPERBAIKI: Menjadi Satu Halaman Penuh Layar) */
 .hero {
-    min-height: 560px;
+    /* 100vh dikurangi tinggi header (68px) agar pas satu halaman penuh tanpa scrollbar samping jebol */
+    height: calc(100vh - 68px); 
+    min-height: 550px;
     display: flex; align-items: center; justify-content: center;
     text-align: center; position: relative; overflow: hidden;
     background: linear-gradient(180deg, #FF8FAB 0%, #FFB3C6 55%, #FFD6E0 100%);
@@ -117,20 +140,15 @@ header {
 .hero-blob-2 { width: 300px; height: 300px; background: rgba(255,143,171,.25); bottom: -80px; left: -60px; }
 .hero-content {
     position: relative; z-index: 2; color: #fff;
-    padding: 80px 40px; max-width: 680px;
+    padding: 0 40px 100px; /* Disesuaikan agar posisi tulisan pas di tengah layar */
+    max-width: 680px;
     animation: heroIn .8s ease both;
 }
 @keyframes heroIn { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
-.hero-eyebrow {
-    display: inline-block; font-size: 11px; letter-spacing: 3px;
-    text-transform: uppercase; color: var(--text);
-    background: rgba(255,255,255,.45); border: 1px solid rgba(255,255,255,.60);
-    padding: 6px 16px; border-radius: 20px; margin-bottom: 20px;
-}
 .hero-title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 5vw, 62px);
-    font-weight: 900; line-height: 1.08; margin-bottom: 16px;
+    font-size: clamp(34px, 5vw, 56px); /* Sedikit dikompres ukuran fontnya agar pas satu halaman */
+    font-weight: 900; line-height: 1.1; margin-bottom: 16px;
     color: var(--text);
     text-shadow: 0 2px 12px rgba(255,255,255,.5);
 }
@@ -154,49 +172,59 @@ header {
     cursor: pointer;
 }
 .hero-cta-outline:hover { background: rgba(255,255,255,.70); color: var(--text); }
-.hero-cta-outline .bi-arrow-down {
-    transition: transform .3s ease;
+.hero-cta-outline .bi-arrow-down { transition: transform .3s ease; }
+.hero-cta-outline:hover .bi-arrow-down { transform: translateY(3px); }
+
+/* Wadah Animasi Gelombang */
+.waves-container {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    z-index: 3;
 }
-.hero-cta-outline:hover .bi-arrow-down {
-    transform: translateY(3px);
+.waves {
+    position: relative;
+    width: 100%;
+    height: 14vh; /* Dinaikkan ke 14vh */
+    min-height: 80px; /* Dinaikkan ke 80px */
+    max-height: 140px; /* Dinaikkan ke 140px */
+}
+.parallax > use {
+    animation: move-forever 20s cubic-bezier(.55, .5, .45, .5) infinite;
+}
+.parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+.parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+.parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+.parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 16s; }
+
+@keyframes move-forever {
+    0% { transform: translate3d(-90px, 0, 0); }
+    100% { transform: translate3d(85px, 0, 0); }
 }
 
-/* STATS STRIP */
-.stats-strip { background: var(--surface); border-bottom: 1.5px solid var(--border); position: relative; z-index: 2; }
-.stats-inner {
-    max-width: 1280px; margin: 0 auto; padding: 0 40px;
-    display: flex; align-items: center; justify-content: center;
-}
-.stat-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 18px 40px; flex: 1; max-width: 260px;
-    border-right: 1px solid var(--border);
-}
-.stat-item:last-child { border-right: none; }
-.stat-icon-wrap {
-    width: 40px; height: 40px; border-radius: 10px;
-    background: var(--surface2); border: 1.5px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: var(--accent); flex-shrink: 0;
-}
-.stat-text .val { font-size: 18px; font-weight: 700; color: var(--text); }
-.stat-text .lbl { font-size: 11px; color: var(--muted); }
-
-/* CATEGORY BAR */
+/* CATEGORY BAR (DIPERBAIKI: Mengunci Tanpa Celah Transparan) */
 .cat-bar {
-    background: rgba(255,255,255,.97);
-    backdrop-filter: blur(10px);
+    background: #ffffff; /* Menggunakan putih solid murni untuk memblokir konten transparan di belakangnya */
     border-bottom: 1.5px solid var(--border);
-    position: sticky; top: 68px; z-index: 99;
+    position: sticky; 
+    top: 67px; /* Menempel presisi tepat di bawah border header */
+    z-index: 99;
+    margin-top: 0px; 
+    box-shadow: 0 4px 20px rgba(255, 179, 198, 0.12);
 }
 .cat-inner {
     max-width: 1280px; margin: 0 auto; padding: 0 40px;
-    height: 52px; display: flex; align-items: center; gap: 6px; overflow-x: auto;
+    height: 64px; 
+    display: flex; align-items: center; gap: 10px; overflow-x: auto;
 }
 .cat-inner::-webkit-scrollbar { display: none; }
 .cat-link {
-    font-size: 13px; font-weight: 500; color: var(--muted);
-    padding: 6px 16px; border-radius: 20px; white-space: nowrap;
+    font-size: 14px; 
+    font-weight: 500; color: var(--muted);
+    padding: 8px 20px; border-radius: 20px; white-space: nowrap;
     transition: all .2s; border: 1px solid transparent;
 }
 .cat-link:hover { color: var(--accent); background: rgba(217,79,110,.06); border-color: var(--border); }
@@ -208,7 +236,19 @@ header {
 }
 
 /* SECTION */
-.section { max-width: 1280px; margin: 0 auto; padding: 40px 40px 60px; position: relative; z-index: 1; }
+/* SECTION (PRODUK / KOLEKSI) */
+.section { 
+    max-width: 100%; 
+    background: #ffffff; 
+    margin: 0 auto; 
+    padding: 40px max(40px, calc((100% - 1280px) / 2 + 40px)) 120px; 
+    position: relative; 
+    z-index: 1; 
+    
+    /* GANTI / TAMBAHKAN DUA BARIS DI BAWAH INI */
+    height: calc(100vh - 68px - 64px); /* 100vh dikurangi tinggi header (68px) dan cat-bar (64px) */
+    min-height: 500px; /* Batas aman tinggi minimum agar tampilan tidak rusak di layar kecil */
+}
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .section-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
 .section-title span { color: var(--accent); }
@@ -282,7 +322,12 @@ header {
 }
 
 /* FOOTER */
-footer { background: var(--surface); border-top: 1.5px solid var(--border); position: relative; z-index: 1; }
+footer { 
+    background: var(--bg); 
+    border-top: 1.5px solid var(--border); 
+    position: relative; 
+    z-index: 1; 
+}
 .footer-inner {
     max-width: 1280px; margin: 0 auto; padding: 48px 40px 24px;
     display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
@@ -312,7 +357,7 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
 .empty-state i { font-size: 3rem; color: var(--border); display: block; margin-bottom: 12px; }
 .empty-state p { color: var(--muted); font-size: 14px; }
 
-/* SMOOTH SCROLL OVERLAY (flash saat klik) */
+/* SMOOTH SCROLL OVERLAY */
 .scroll-flash {
     position: fixed; inset: 0; z-index: 9999;
     background: linear-gradient(180deg, #FF8FAB, #FFD6E0);
@@ -330,25 +375,27 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
     .testi-section { padding: 40px 16px; }
     .footer-inner { grid-template-columns: 1fr 1fr; padding: 32px 16px 16px; }
     .cat-inner { padding: 0 16px; }
-    .stats-inner { flex-wrap: wrap; }
-    .stat-item { border-right: none; border-bottom: 1px solid var(--border); max-width: 100%; padding: 14px 20px; }
-    .footer-bottom { padding: 14px 16px; flex-direction: column; gap: 10px; }
+    .waves { height: 8px; }
+    .hero { height: calc(100vh - 68px); }
+    .cat-bar { top: 67px; }
 }
 @media (max-width: 480px) {
     .product-grid { gap: 10px; }
-    .hero-title { font-size: 32px; }
+    .hero-title { font-size: 28px; }
 }
 </style>
 </head>
 <body>
 
-<!-- SMOOTH SCROLL FLASH OVERLAY -->
 <div class="scroll-flash" id="scrollFlash"></div>
 
-<!-- HEADER -->
 <header>
-    <div class="header-inner">
-        <a href="index.php" class="logo">Cloudy <span>Girls</span></a>
+    <div class="header-inner"> 
+        <a href="index.php" class="logo-wrapper">
+            <img src="asset/image/logo.png" class="logo-img" >
+            <span class="logo-text">Cloudy <span>Girls</span></span>
+        </a>
+        
         <div class="auth-btns">
             <a href="auth/login.php"    class="btn-masuk">Masuk</a>
             <a href="auth/register.php" class="btn-daftar">Daftar</a>
@@ -356,7 +403,6 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
     </div>
 </header>
 
-<!-- HERO -->
 <section class="hero">
     <div class="hero-dots"></div>
     <div class="hero-blob hero-blob-1"></div>
@@ -369,9 +415,23 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
             <a href="#produk" class="hero-cta-outline" id="lihatKoleksi">Lihat Koleksi <i class="bi bi-arrow-down"></i></a>
         </div>
     </div>
+
+    <div class="waves-container">
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s58 18 88 18 58-18 88-18 58 18 88 18v44h-352z" />
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255, 240, 244, 0.7)" />
+                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255, 240, 244, 0.5)" />
+                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255, 240, 244, 0.3)" />
+                <use xlink:href="#gentle-wave" x="48" y="7" fill="#FFF0F4" /> 
+            </g>
+        </svg>
+    </div>
 </section>
 
-<!-- CATEGORY BAR -->
 <div class="cat-bar" id="catBar">
     <div class="cat-inner">
         <a href="index.php" class="cat-link <?= $filter_kategori === '' ? 'active' : '' ?>">
@@ -386,7 +446,6 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
     </div>
 </div>
 
-<!-- PRODUK -->
 <div class="section" id="produk">
     <div class="section-header">
         <div class="section-title">
@@ -426,7 +485,6 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
     </div>
 </div>
 
-<!-- TESTIMONIAL -->
 <?php if (!empty($ulasan_list)): ?>
 <section class="testi-section">
     <div class="testi-section-header">
@@ -449,7 +507,6 @@ footer { background: var(--surface); border-top: 1.5px solid var(--border); posi
 </section>
 <?php endif; ?>
 
-<!-- FOOTER -->
 <?php include 'includes/footer.php'; ?>
 
 <script>
@@ -463,17 +520,18 @@ document.getElementById('lihatKoleksi').addEventListener('click', function(e) {
 
     if (!target) return;
 
-    // Flash overlay — subtle pink shimmer
+    // Flash overlay
     flash.classList.add('show');
     setTimeout(function() { flash.classList.remove('show'); }, 320);
 
-    // Hitung offset tepat di bawah header + cat-bar
-    var headerH = header  ? header.offsetHeight  : 0;
-    var catH    = catBar  ? catBar.offsetHeight   : 0;
+    // Kalkulasi offset penempatan mendarat yang pas
+    var headerH = header ? header.offsetHeight : 68;
+    var catH    = catBar ? catBar.offsetHeight : 64;
     var targetTop = target.getBoundingClientRect().top + window.scrollY;
-    var scrollTo  = targetTop - headerH - catH - 8;
+    
+    // Dipotong dengan total tinggi header fix dan bar kategori agar teks judul tidak tertutup
+    var scrollTo = targetTop - headerH - catH;
 
-    // Smooth scroll native
     window.scrollTo({ top: scrollTo, behavior: 'smooth' });
 });
 </script>
