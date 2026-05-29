@@ -190,6 +190,30 @@ a { text-decoration:none; color:inherit; }
 .btn-logout { display:flex; align-items:center; gap:10px; padding:11px 16px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.85); transition:background .2s; width:100%; letter-spacing:0.01em; }
 .btn-logout i { font-size:16px; }
 .btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
+.nav-item-toko {
+    margin-top: 0;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.85) !important;
+    font-weight: 500 !important;
+    justify-content: flex-start;
+    border-radius: 12px;
+    box-shadow: none;
+    letter-spacing: 0.01em;
+}
+.nav-item-toko:hover {
+    background: rgba(255,255,255,.2) !important;
+    border-color: transparent !important;
+    box-shadow: none;
+    transform: translateX(3px) !important;
+    color: #fff !important;
+}
+.nav-ext-icon {
+    font-size: 11px !important;
+    width: auto !important;
+    margin-left: auto;
+    opacity: .6;
+}
 
 /* MAIN */
 .main { margin-left:300px; flex:1; display:flex; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
@@ -397,6 +421,9 @@ select.form-control option { background:var(--surface2); }
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
         <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
+        <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
+            <i class="bi bi-shop"></i> Lihat Toko
+        </a>
     </nav>
     <div class="sidebar-footer">
         <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
@@ -411,7 +438,6 @@ select.form-control option { background:var(--surface2); }
         <div class="topbar-title">Manajemen Produk</div>
         <div class="topbar-right">
             <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
-            <a href="../index.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
             <button class="btn-tambah" onclick="openModal()">
                 <span class="plus-icon"><i class="bi bi-plus"></i></span>
                 Tambah Produk
