@@ -76,7 +76,7 @@ header {
     backdrop-filter: blur(12px);
     border-bottom: 1.5px solid var(--border);
     position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 16px rgba(255,143,171,.10);
+    box-shadow: 0 2px 16px rgba(99, 212, 226, 0.1);
 }
 .header-inner {
     max-width: 1280px; margin: 0 auto; padding: 0 40px;
@@ -100,6 +100,7 @@ header {
     font-size: 22px;
     font-weight: 900;
     color: var(--text);
+    color: #1db899b1;
 }
 .logo-text span {
     color: var(--accent);

@@ -76,24 +76,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --violet: #7c3aed;
-            --violet-light: #ede9fe;
-            --violet-dark: #5b21b6;
-            --pink: #ec4899;
-            --bg: #faf9ff;
-            --card-bg: #ffffff;
-            --text: #1e1b2e;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --danger: #ef4444;
-            --danger-bg: #fef2f2;
-            --success: #16a34a;
-            --success-bg: #f0fdf4;
-        }
+    --bg:      #FFF0F4;
+    --surface: #FFFFFF;
+    --surface2:#FFF5F8;
+    --border:  #FFB3C6;
+    --accent:  #D94F6E;
+    --accent2: #C43860;
+    --pink:    #FF8FAB;
+    --pink2:   #FFB3C6;
+    --pink3:   #FFD6E0;
+    --muted:   #C48899;
+    --text:    #2D1520;
+    --text2:   #6B3A4A;
+    --red:     #D94F6E;
+}
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: var(--bg);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -101,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 2rem 1rem;
             position: relative;
             overflow: hidden;
+            background: #FFE2E2;
         }
 
         body::before {
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             right: -120px;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+            /* background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%); */
             pointer-events: none;
         }
 
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .card {
-            background: var(--card-bg);
+            background: rgba(255,255,255,.88);
             border-radius: 24px;
             padding: 2.5rem 2.25rem;
             width: 100%;
@@ -158,13 +158,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-family: 'Syne', sans-serif;
             font-weight: 800;
             font-size: 1.2rem;
-            color: var(--text);
+            color: #1db899b1;
+            letter-spacing: -0.5px;
+        }
+         .logo-text1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #ff009db1;
             letter-spacing: -0.5px;
         }
 
         .logo-text span {
             color: var(--violet);
         }
+
+        .logo-img {
+        width: 45px;       /* Mengatur lebar logo agar pas */
+        height: 45px;      /* Mengatur tinggi logo */
+        object-fit: contain; /* Memastikan gambar tidak gepeng */
+        }
+        
 
         .icon-wrap {
             width: 60px;
@@ -267,7 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn {
             width: 100%;
             padding: 13px;
-            background: linear-gradient(135deg, var(--violet), var(--violet-dark));
+            background: #1db899b1;
             color: white;
             border: none;
             border-radius: 12px;
@@ -282,6 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(124,58,237,0.4);
+            background: #FF4F90;
         }
 
         .btn:active {
@@ -289,18 +304,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .back-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 1.25rem;
-            font-size: 0.875rem;
-            color: var(--muted);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--text2); /* Menggunakan variabel warna gelap bawaan tema kamu */
+    text-decoration: none;
+    transition: color 0.2s;
+    font-weight: 500; /* Opsional: Menambah sedikit ketebalan biar lebih terbaca */
+}
 
-        .back-link:hover { color: var(--violet); }
+        .back-link:hover {  rgba(1, 10, 79, 0.4)}
 
         .divider {
             height: 1px;
@@ -313,7 +329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 12px;
             padding: 12px 14px;
             font-size: 0.8rem;
-            color: #6d28d9;
+            color: #000000;
             line-height: 1.6;
         }
 
@@ -323,13 +339,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="card">
         <div class="logo">
-            <div class="logo-icon">☁️</div>
-            <div class="logo-text">Cloudy<span>Grils</span></div>
+            <img src="../asset/image/logo.png" class="logo-img" >
+            <span class="logo-text">Cloudy</span>
+            <span class="logo-text1">Girls</span>
         </div>
 
         <div class="icon-wrap">🔐</div>
         <h1>Lupa Password?</h1>
-        <p class="subtitle">Tenang, masukkan email kamu dan kami akan kirimkan link untuk mereset password.</p>
+        <p class="subtitle">Tenang, masukkan email yang terdaftar dan kami akan kirimkan link untuk mereset password.</p>
 
         <?php if ($error): ?>
         <div class="alert alert-error">

@@ -42,7 +42,13 @@ a { text-decoration: none; color: inherit; }
     color: #1A1A2E !important; letter-spacing: -.3px;
     display: flex; align-items: center; gap: 2px;
 }
-.navbar-logo span { color: #C43860 !important; }
+.navbar-logo span { color: #c0065c !important; }
+
+.logo-img {
+    width: 45px;       /* Mengatur lebar logo agar pas */
+    height: 45px;      /* Mengatur tinggi logo */
+    object-fit: contain; /* Memastikan gambar tidak gepeng */
+}
 
 /* NAV LINKS (tengah, opsional) */
 .navbar-links {
@@ -224,11 +230,12 @@ if (isset($conn)) {
 
 <nav class="navbar">
 
-    <!-- LOGO -->
+    <div class="navbar-brand">
     <a href="../pages/home.php" class="navbar-logo">
-        Cloudy <span>Girls</span>
+        <img src="../asset/image/logo.png" class="logo-img" alt="Logo">
+        <span>Cloudy <span>Girls</span></span>
     </a>
-
+</div>
 
     <!-- AKSI KANAN -->
     <div class="navbar-actions">
