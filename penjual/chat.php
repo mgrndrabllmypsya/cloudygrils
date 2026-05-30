@@ -70,7 +70,9 @@ $total_unread = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat 
 body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; height:100vh; overflow:hidden; }
 a { text-decoration:none; color:inherit; }
 
-/* ── SIDEBAR ── */
+/* ═══════════════════════════════
+   SIDEBAR — identik dengan dashboard.php
+═══════════════════════════════ */
 .sidebar {
     width: 300px;
     background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
@@ -87,22 +89,73 @@ a { text-decoration:none; color:inherit; }
     border-bottom: 1.5px solid rgba(255,255,255,.2);
     background: rgba(255,255,255,.12);
 }
-.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:22px; font-weight:900; color:#fff; }
+.sidebar-logo .logo {
+    font-family:'Playfair Display',serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+}
 .sidebar-logo .logo span { color:#FFE0EF; }
-.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:3px; }
-.sidebar-nav { flex:1; padding:20px 18px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
-.nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:18px 16px 8px; font-weight:600; }
-.nav-item { display:flex; align-items:center; gap:14px; padding:13px 18px; border-radius:12px; font-size:14px; font-weight:500; color:rgba(255,255,255,.85); transition:all .2s; letter-spacing:0.01em; }
-.nav-item:hover { background:rgba(255,255,255,.2); color:#fff; transform:translateX(3px); }
-.nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; padding-left:15px; }
-.nav-item i { font-size:17px; width:22px; flex-shrink:0; }
-.badge-notif { background:#fff; color:var(--accent); font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; margin-left:auto; }
-.sidebar-footer { padding:16px 18px 20px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
-.btn-logout { display:flex; align-items:center; gap:10px; padding:11px 16px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.85); transition:background .2s; width:100%; letter-spacing:0.01em; }
-.btn-logout i { font-size:16px; }
-.btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
+.sidebar-logo small {
+    display:block; font-size:10px;
+    letter-spacing:2px; text-transform:uppercase;
+    color:rgba(255,255,255,.65); margin-top:3px;
+}
+.sidebar-nav {
+    flex: 1;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+}
+.nav-section {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+    padding: 18px 16px 8px;
+    font-weight: 600;
+}
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,.85);
+    transition: all .2s;
+    letter-spacing: 0.01em;
+}
+.nav-item:hover {
+    background: rgba(255,255,255,.2);
+    color: #fff;
+    transform: translateX(3px);
+}
+.nav-item.active {
+    background: rgba(255,255,255,.28);
+    color: #fff;
+    font-weight: 600;
+    border-left: 3px solid #fff;
+    padding-left: 15px;
+}
+.nav-item i {
+    font-size: 17px;
+    width: 22px;
+    flex-shrink: 0;
+}
+.badge-notif {
+    background: #fff;
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: auto;
+}
 .nav-item-toko {
-    margin-top: 0;
     background: transparent;
     border: none;
     color: rgba(255,255,255,.85) !important;
@@ -114,19 +167,33 @@ a { text-decoration:none; color:inherit; }
 }
 .nav-item-toko:hover {
     background: rgba(255,255,255,.2) !important;
-    border-color: transparent !important;
-    box-shadow: none;
     transform: translateX(3px) !important;
     color: #fff !important;
 }
-.nav-ext-icon {
-    font-size: 11px !important;
-    width: auto !important;
-    margin-left: auto;
-    opacity: .6;
+.sidebar-footer {
+    padding: 16px 18px 20px;
+    border-top: 1.5px solid rgba(255,255,255,.2);
+    background: rgba(0,0,0,.1);
 }
+.btn-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,.85);
+    transition: background .2s;
+    width: 100%;
+    letter-spacing: 0.01em;
+}
+.btn-logout i { font-size: 16px; }
+.btn-logout:hover { background: rgba(255,255,255,.2); color: #fff; }
 
-/* ── MAIN ── */
+/* ═══════════════════════════════
+   MAIN
+═══════════════════════════════ */
 .main { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
 .topbar {
     background:rgba(255,255,255,.95);
@@ -139,10 +206,11 @@ a { text-decoration:none; color:inherit; }
 }
 .topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text); }
 
-/* ── CHAT LAYOUT ── */
+/* ═══════════════════════════════
+   CHAT LAYOUT
+═══════════════════════════════ */
 .chat-layout { flex:1; display:grid; grid-template-columns:300px 1fr; overflow:hidden; }
 
-/* LIST */
 .chat-list { background:var(--surface); border-right:1.5px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
 .chat-list-head { padding:14px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:600; color:var(--text); flex-shrink:0; background:linear-gradient(to right,#FFF0F5,#fff); }
 .chat-list-body { flex:1; overflow-y:auto; }
@@ -158,30 +226,23 @@ a { text-decoration:none; color:inherit; }
 .chat-item-sub { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
 .badge-unread { background:var(--accent2); color:#fff; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:10px; padding:0 5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
 
-/* AREA CHAT */
 .chat-area { display:flex; flex-direction:column; overflow:hidden; }
-
-/* CHAT HEADER */
 .chat-header { padding:14px 20px; border-bottom:1.5px solid var(--border); background:linear-gradient(to right,#FFF0F5,#fff); display:flex; align-items:center; gap:12px; flex-shrink:0; }
 .chat-header-img { width:40px; height:40px; border-radius:10px; object-fit:cover; border:1.5px solid var(--border); flex-shrink:0; }
 .chat-header-info { flex:1; min-width:0; }
 .chat-header-info .nama { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .chat-header-info .sub { font-size:11px; color:var(--muted); margin-top:2px; }
 
-/* MESSAGES */
 .chat-messages { flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; background:var(--bg); }
 .chat-messages::-webkit-scrollbar { width:4px; }
 .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
 
-/* DATE SEPARATOR */
 .date-sep { text-align:center; font-size:11px; color:var(--muted); display:flex; align-items:center; gap:8px; margin:4px 0; }
 .date-sep::before,.date-sep::after { content:''; flex:1; height:1px; background:var(--border); }
 
-/* BUBBLE */
 .bubble-wrap { display:flex; gap:8px; align-items:flex-end; max-width:75%; }
 .bubble-wrap.admin-msg { flex-direction:row-reverse; margin-left:auto; }
 .bubble-wrap.pembeli { margin-right:auto; }
-.bubble-avatar { width:30px; height:30px; border-radius:50%; background:var(--surface2); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent); flex-shrink:0; }
 .bubble-content { display:flex; flex-direction:column; max-width:100%; }
 .bubble { padding:10px 14px; border-radius:16px; font-size:13px; line-height:1.6; word-break:break-word; white-space:pre-wrap; }
 .bubble-wrap.pembeli .bubble { background:var(--surface); border:1.5px solid var(--border); border-bottom-left-radius:4px; color:var(--text); }
@@ -190,7 +251,6 @@ a { text-decoration:none; color:inherit; }
 .bubble-wrap.admin-msg .bubble-time { text-align:right; }
 .bubble-wrap.pembeli .bubble-time { text-align:left; }
 
-/* INPUT */
 .chat-input-area { padding:12px 16px; border-top:1.5px solid var(--border); background:var(--surface); display:flex; gap:8px; align-items:flex-end; flex-shrink:0; }
 .chat-input { flex:1; padding:10px 16px; border:1.5px solid var(--border); border-radius:24px; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; resize:none; max-height:100px; line-height:1.5; color:var(--text); background:var(--surface2); transition:border-color .2s; overflow-y:auto; }
 .chat-input:focus { border-color:var(--accent); background:#fff; }
@@ -205,6 +265,9 @@ a { text-decoration:none; color:inherit; }
 </head>
 <body>
 
+<!-- ════════════════════════════════════════════
+     SIDEBAR — salin persis dari dashboard.php
+════════════════════════════════════════════ -->
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
@@ -225,13 +288,18 @@ a { text-decoration:none; color:inherit; }
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
         <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
+        <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
+            <i class="bi bi-shop"></i> Lihat Toko
         </a>
     </nav>
     <div class="sidebar-footer">
-        <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        <a href="../auth/logout_penjual.php" class="btn-logout">
+            <i class="bi bi-box-arrow-left"></i> Keluar
+        </a>
     </div>
 </aside>
 
+<!-- ════ MAIN ════ -->
 <div class="main">
     <div class="topbar">
         <div class="topbar-title">Chat Pembeli</div>
@@ -244,16 +312,19 @@ a { text-decoration:none; color:inherit; }
 
     <div class="chat-layout">
 
-        <!-- LIST -->
+        <!-- LIST PERCAKAPAN -->
         <div class="chat-list">
             <div class="chat-list-head">💬 Percakapan</div>
             <div class="chat-list-body">
                 <?php if ($q_list && mysqli_num_rows($q_list) > 0):
                     while ($item = mysqli_fetch_assoc($q_list)):
                         $isActive = $item['pembeli_id'] == $pembeli_id && $item['produk_id'] == $produk_id;
-                        $fotoSrc  = !empty($item['foto_utama']) ? '../uploads/produk/' . escape($item['foto_utama']) : 'https://placehold.co/42x42/FFE8F2/E8719A?text=CG';
+                        $fotoSrc  = !empty($item['foto_utama'])
+                            ? '../uploads/produk/' . escape($item['foto_utama'])
+                            : 'https://placehold.co/42x42/FFE8F2/E8719A?text=CG';
                 ?>
-                <a href="chat.php?pembeli_id=<?= $item['pembeli_id'] ?>&produk_id=<?= $item['produk_id'] ?>" class="chat-item <?= $isActive ? 'active' : '' ?>">
+                <a href="chat.php?pembeli_id=<?= $item['pembeli_id'] ?>&produk_id=<?= $item['produk_id'] ?>"
+                   class="chat-item <?= $isActive ? 'active' : '' ?>">
                     <img src="<?= $fotoSrc ?>" class="chat-item-img" alt="produk">
                     <div class="chat-item-info">
                         <div class="chat-item-nama"><?= escape($item['nama_pembeli']) ?></div>
@@ -277,7 +348,9 @@ a { text-decoration:none; color:inherit; }
             <?php if ($pembeli_aktif && $produk_aktif): ?>
 
             <div class="chat-header">
-                <?php $fotoSrc = !empty($produk_aktif['foto_utama']) ? '../uploads/produk/' . escape($produk_aktif['foto_utama']) : 'https://placehold.co/40x40/FFE8F2/E8719A?text=CG'; ?>
+                <?php $fotoSrc = !empty($produk_aktif['foto_utama'])
+                    ? '../uploads/produk/' . escape($produk_aktif['foto_utama'])
+                    : 'https://placehold.co/40x40/FFE8F2/E8719A?text=CG'; ?>
                 <img src="<?= $fotoSrc ?>" class="chat-header-img" alt="produk">
                 <div class="chat-header-info">
                     <div class="nama"><?= escape($pembeli_aktif['nama']) ?></div>
@@ -300,7 +373,6 @@ a { text-decoration:none; color:inherit; }
                 ?>
                 <div class="date-sep"><?= $tgl === date('d M Y') ? 'Hari ini' : $tgl ?></div>
                 <?php endif; ?>
-
                 <div class="bubble-wrap <?= $isAdmin ? 'admin-msg' : 'pembeli' ?>">
                     <div class="bubble-content">
                         <div class="bubble"><?= nl2br(escape($p['pesan'])) ?></div>
@@ -330,7 +402,6 @@ a { text-decoration:none; color:inherit; }
 <script>
 const msgs = document.getElementById('chatMessages');
 if (msgs) msgs.scrollTop = msgs.scrollHeight;
-
 const ta = document.querySelector('.chat-input');
 if (ta) {
     ta.addEventListener('input', function() {
