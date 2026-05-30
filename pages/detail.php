@@ -104,7 +104,7 @@ include '../includes/header.php';
 /* Tombol Beli */
 .btn-beli{
     width:100%;padding:14px;
-    background:#FF6FA3;
+    background:#59B292;
     color:#fff;border:none;border-radius:12px;
     font-size:15px;font-weight:700;cursor:pointer;
     transition:background .2s, transform .1s;
@@ -112,7 +112,7 @@ include '../includes/header.php';
     display:flex;align-items:center;justify-content:center;gap:8px;
     letter-spacing:.3px;
 }
-.btn-beli:hover{background:#E8607A;transform:translateY(-1px);}
+.btn-beli:hover{background:#FF4F90;transform:translateY(-1px);}
 .btn-beli:disabled{background:#F9C8D4;cursor:not-allowed;transform:none;}
 
 /* Tombol Nego */
@@ -139,7 +139,7 @@ include '../includes/header.php';
     display:flex;align-items:center;justify-content:center;gap:8px;
     text-decoration:none;
 }
-.btn-chat:hover{border-color:#FF8FAB;background:#FFF8FA;}
+.btn-chat:hover{border-color:#FF8FAB;background:#59B292;}
 
 /* ── STATUS NEGO ── */
 .nego-status{border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:13px;}
@@ -179,7 +179,7 @@ include '../includes/header.php';
 .modal-btn-batal{flex:1;padding:12px;background:#FFF0F4;border:1.5px solid #FFB3C6;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;color:#C48899;}
 .modal-btn-batal:hover{background:#FFD6E0;}
 .modal-btn-kirim{flex:2;padding:12px;background:#FF6FA3;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
-.modal-btn-kirim:hover{background:#E8607A;}
+.modal-btn-kirim:hover{background:#59B292;}
 .harga-ref{font-size:12px;color:#C48899;margin-bottom:4px;}
 
 /* ── ULASAN ── */

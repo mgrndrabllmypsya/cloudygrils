@@ -99,11 +99,10 @@ header {
     font-family: 'Playfair Display', serif;
     font-size: 22px;
     font-weight: 900;
-    color: var(--text);
     color: #1db899b1;
 }
 .logo-text span {
-    color: var(--accent);
+    color:  #ff009db1;
 }
 .auth-btns { display: flex; gap: 8px; align-items: center; }
 .btn-masuk {
@@ -251,8 +250,11 @@ header {
     min-height: 500px; /* Batas aman tinggi minimum agar tampilan tidak rusak di layar kecil */
 }
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-.section-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
-.section-title span { color: var(--accent); }
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: #1db899b1;
+}
+.section-title span { color: #ff009db1; }
 
 /* PRODUCT GRID */
 .product-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
@@ -333,8 +335,8 @@ footer {
     max-width: 1280px; margin: 0 auto; padding: 48px 40px 24px;
     display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
 }
-.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; display: block; margin-bottom: 10px; }
-.footer-logo span { color: var(--accent); }
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; display: block; margin-bottom: 10px; color: #1db899b1;}
+.footer-logo span { color: #ff009db1; }
 .footer-col h4 { font-size: 12px; font-weight: 700; letter-spacing: .5px; margin-bottom: 14px; color: var(--text); }
 .footer-links { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
 .footer-links a { color: var(--muted); transition: color .2s; }
@@ -393,7 +395,7 @@ footer {
 <header>
     <div class="header-inner"> 
         <a href="index.php" class="logo-wrapper">
-            <img src="asset/image/logo.png" class="logo-img" >
+            <img src="uploads/toko/logo.png" class="logo-img" >
             <span class="logo-text">Cloudy <span>Girls</span></span>
         </a>
         

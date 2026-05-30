@@ -109,7 +109,7 @@ if (!function_exists('sb_esc')) {
 .sidebar-logo {
     padding: 24px 24px 20px;
     border-bottom: 1.5px solid rgba(255,255,255,.2);
-    background: rgba(255,255,255,.12);
+    background: rgba(210, 16, 16, 0.12);
     flex-shrink: 0;
 }
 .sidebar-logo .logo {

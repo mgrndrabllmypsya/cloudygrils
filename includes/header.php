@@ -36,18 +36,27 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* LOGO */
+/* LOGO */
 .navbar-logo {
     font-family: 'Playfair Display', serif;
-    font-size: 22px; font-weight: 900;
-    color: #1A1A2E !important; letter-spacing: -.3px;
-    display: flex; align-items: center; gap: 2px;
+    font-size: 22px; 
+    font-weight: 900;
+    color: #1db899b1 !important; 
+    letter-spacing: -.3px;
+    display: flex; 
+    align-items: center; 
+    gap: 2px;
 }
-.navbar-logo span { color: #c0065c !important; }
+
+/* PERBAIKAN DI SINI: Tanda titik koma dipindah ke paling belakang */
+.navbar-logo span { 
+    color: #ff009db1; !important; 
+}
 
 .logo-img {
-    width: 45px;       /* Mengatur lebar logo agar pas */
-    height: 45px;      /* Mengatur tinggi logo */
-    object-fit: contain; /* Memastikan gambar tidak gepeng */
+    width: 45px;       
+    height: 45px;      
+    object-fit: contain; 
 }
 
 /* NAV LINKS (tengah, opsional) */
@@ -114,7 +123,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ── PROFILE DROPDOWN ── */
-.profile-wrap { position: relative; }
+.profile-wrap { position: relative;  }
 
 .profile-btn {
     display: flex; align-items: center; gap: 8px;
@@ -127,11 +136,21 @@ a { text-decoration: none; color: inherit; }
 .profile-btn:hover { border-color: var(--accent); background: #FFF0F4; }
 
 .profile-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent2), var(--pink));
-    color: #fff; font-size: 13px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; overflow: hidden;
+    width: 32px; 
+    height: 32px; 
+    border-radius: 50%;
+    
+    /* GANTI DI SINI: Ubah gradient ungu menjadi warna pink solid */
+    background: #D94F6E !important; /* Pasang warna pink utama navbarmu */
+    
+    color: #fff; 
+    font-size: 13px; 
+    font-weight: 700;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    flex-shrink: 0; 
+    overflow: hidden; 
 }
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
@@ -163,7 +182,7 @@ a { text-decoration: none; color: inherit; }
 }
 .profile-wrap.open .profile-dropdown {
     opacity: 1; visibility: visible; pointer-events: auto;
-    transform: translateY(0) scale(1);
+    transform: translateY(0) scale(1); color: #D94F6E;
 }
 
 /* DROPDOWN HEADER */
@@ -174,7 +193,7 @@ a { text-decoration: none; color: inherit; }
 }
 .dd-avatar {
     width: 38px; height: 38px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent2), var(--pink));
+    background: #D94F6E;
     color: #fff; font-size: 14px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; overflow: hidden;
@@ -192,12 +211,12 @@ a { text-decoration: none; color: inherit; }
     transition: background .15s, color .15s;
     cursor: pointer;
 }
-.dd-item:hover { background: #FFF0F4; color: #C43860 !important; }
+.dd-item:hover { background: #1db899b1; color: #C43860 !important; }
 .dd-item i { font-size: 15px; width: 18px; color: #C48899 !important; flex-shrink: 0; transition: color .15s; }
 .dd-item:hover i { color: #C43860 !important; }
 .dd-item.danger { color: #D94F6E; }
 .dd-item.danger i { color: #D94F6E; }
-.dd-item.danger:hover { background: rgba(244,63,94,.07); color: #D94F6E; }
+.dd-item.danger:hover { background: #1db899b1; color: #D94F6E; }
 
 .dd-sep { height: 1px; background: #FFB3C6; margin: 4px 6px; }
 </style>
@@ -231,10 +250,10 @@ if (isset($conn)) {
 <nav class="navbar">
 
     <div class="navbar-brand">
-    <a href="../pages/home.php" class="navbar-logo">
-        <img src="../asset/image/logo.png" class="logo-img" alt="Logo">
-        <span>Cloudy <span>Girls</span></span>
-    </a>
+    <a href="#" class="navbar-logo">
+    <img src="../uploads/toko/logo.png" class="logo-img">
+    Cloudy <span>Girls</span>
+</a>
 </div>
 
     <!-- AKSI KANAN -->

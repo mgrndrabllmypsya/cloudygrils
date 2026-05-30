@@ -143,9 +143,9 @@ a { text-decoration: none !important; color: inherit; }
 }
 .section-title {
     font-family: 'Playfair Display', serif;
-    font-size: 22px; font-weight: 700; color: var(--text);
+    font-size: 22px; font-weight: 700; color: #1db899b1;
 }
-.section-title span { color: var(--accent); }
+.section-title span { color: #ff009db1; }
 .section-count { font-size: 13px; color: var(--muted); }
 
 /* ── PRODUCT GRID ── */
@@ -225,8 +225,8 @@ footer {
     padding: 40px 40px 20px;
     display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
 }
-.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; margin-bottom: 10px; display: block; }
-.footer-logo span { color: var(--accent); }
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; display: block; margin-bottom: 10px; color: #1db899b1;}
+.footer-logo span { color: #ff009db1; }
 .footer-links { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
 .footer-links a { color: var(--muted); transition: color .2s; }
 .footer-links a:hover { color: var(--accent); }
