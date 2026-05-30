@@ -1,10 +1,10 @@
 <?php
-$server   = "localhost";
-$username = "root";
-$password = "";
-$db       = "cloudygirls";
+$host = "localhost";
+$user = "mifmyho2_B2";
+$pass = "@MIF2025";
+$db   = "mifmyho2_B2";
  
-$conn = mysqli_connect($server, $username, $password, $db);
+$conn = mysqli_connect($host, $user, $pass, $db);
  
 if (!$conn) {
     die("Koneksi gagal: " . mysqli_connect_error());
@@ -12,4 +12,4 @@ if (!$conn) {
  
 mysqli_set_charset($conn, "utf8mb4");
 ?>
- 
+  

@@ -448,7 +448,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
 <nav>
     <div class="brand">
         <img src="../uploads/toko/logo.png" class="logo-img" alt="Logo">
-        <span>Cloudy</span><span class="pink-text">Girls</span>
+        <span>Cloudy</span> <span class="pink-text">Girls</span>
     </div>
     
     <span class="checkout-text">Checkout Aman 🔒</span>

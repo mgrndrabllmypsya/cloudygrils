@@ -250,7 +250,7 @@ if (isset($conn)) {
 <nav class="navbar">
 
     <div class="navbar-brand">
-    <a href="#" class="navbar-logo">
+    <a href="../pages/home.php" class="navbar-logo">
     <img src="../uploads/toko/logo.png" class="logo-img">
     Cloudy <span>Girls</span>
 </a>

@@ -298,5 +298,3 @@ if (form) {
     });
 }
 </script>
-
-<?php include '../includes/footer.php'; ?>
