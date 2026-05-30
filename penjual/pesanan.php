@@ -102,11 +102,11 @@ a { text-decoration:none; color:inherit; }
 .sidebar-logo .logo-img {
     width: 38px;
     height: 38px;
-    object-fit: contain;     /* Mengatur isi gambar di dalam lingkaran */
-    background: #ffffff;      /* Memberikan latar belakang bulat putih bersih di belakang logo */
-    border-radius: 50%;       /* MEMBUAT BULAT SEMPURNA */
-    flex-shrink: 0;           /* Mencegah gambar menyusut/gepeng */
-    padding: 4px;             /* Memberi jarak manis antara logo dengan tepi lingkaran putih */
+    object-fit: contain;
+    background: #ffffff;
+    border-radius: 50%;
+    flex-shrink: 0;
+    padding: 4px;
     box-sizing: border-box;
     border: 1.5px solid rgba(255, 255, 255, 0.4);
 }
@@ -114,13 +114,13 @@ a { text-decoration:none; color:inherit; }
     font-family: 'Playfair Display', serif;
     font-size: 24px; 
     font-weight: 900;
-    color: #1db899b1 !important; /* Warna Hijau Toska yang fresh */
+    color: #1db899b1 !important;
     letter-spacing: -.3px;
     margin: 0;
     line-height: 1;
 }
 .sidebar-logo .logo span { 
-    color: #ff009db1; !important; /* Warna Pink Terang menyala */
+    color: #ff009db1; !important;
 }
 .sidebar-logo small {
     display: block; 
@@ -177,6 +177,7 @@ a { text-decoration:none; color:inherit; }
     position:sticky; top:0; z-index:40;
     box-shadow:0 2px 12px rgba(212,84,127,.07);
 }
+.topbar-left { display:flex; align-items:center; gap:12px; }
 .topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text); }
 .topbar-right { display:flex; align-items:center; gap:10px; }
 .topbar-date { font-size:12px; color:var(--muted); }
@@ -265,6 +266,7 @@ tr:hover td { background:#FFF0F5; }
 
 .alert-msg { padding:12px 20px; border-radius:10px; font-size:13px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
 .alert-success { background:#E0F2F1; color:#00695C; border:1.5px solid #80CBC4; }
+
 /* RESPONSIVE MOBILE */
 .btn-toggle-sidebar { display:none; background:var(--surface2,#FFF0F5); border:1.5px solid var(--border,#FFD6E7); border-radius:10px; width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--text,#2d2d2d); }
 .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:98; }
@@ -307,9 +309,19 @@ tr:hover td { background:#FFF0F5; }
 </head>
 <body>
 <?php include '../includes/sidebar.php'; ?>
+
+<!-- OVERLAY SIDEBAR (untuk mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <div class="main">
     <div class="topbar">
-        <div class="topbar-title">Pesanan</div>
+        <div class="topbar-left">
+            <!-- TOMBOL HAMBURGER (garis tiga) — hanya muncul di mobile/tablet -->
+            <button class="btn-toggle-sidebar" onclick="toggleSidebar()" id="sidebarToggleBtn">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="topbar-title">Pesanan</div>
+        </div>
         <div class="topbar-right">
             <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
         </div>
@@ -472,6 +484,17 @@ tr:hover td { background:#FFF0F5; }
 
     </div>
 </div>
+
+<script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function closeSidebar() {
+    document.querySelector('.sidebar').classList.remove('active');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+}
+</script>
 
 </body>
 </html>

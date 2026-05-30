@@ -93,7 +93,7 @@ if ($q_set) $settings = mysqli_fetch_assoc($q_set) ?? [];
 $penjual_nama = $_SESSION['penjual_nama'] ?? 'Penjual';
 $logo_path    = !empty($settings['logo']) ? '../uploads/toko/' . $settings['logo'] : null;
 
-$total_unread = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
+$total_unread  = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
 $nego_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='menunggu'"))[0] ?? 0;
 ?>
 <!DOCTYPE html>
@@ -157,35 +157,21 @@ a { text-decoration: none; color: inherit; }
     background: rgba(255,255,255,.12);
 }
 .sidebar-logo .logo-img {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;     /* Mengatur isi gambar di dalam lingkaran */
-    background: #ffffff;      /* Memberikan latar belakang bulat putih bersih di belakang logo */
-    border-radius: 50%;       /* MEMBUAT BULAT SEMPURNA */
-    flex-shrink: 0;           /* Mencegah gambar menyusut/gepeng */
-    padding: 4px;             /* Memberi jarak manis antara logo dengan tepi lingkaran putih */
-    box-sizing: border-box;
-    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    width: 38px; height: 38px; object-fit: contain;
+    background: #ffffff; border-radius: 50%; flex-shrink: 0;
+    padding: 4px; box-sizing: border-box;
+    border: 1.5px solid rgba(255,255,255,.4);
 }
 .sidebar-logo .logo {
     font-family: 'Playfair Display', serif;
-    font-size: 24px; 
-    font-weight: 900;
-    color: #1db899b1 !important; /* Warna Hijau Toska yang fresh */
-    letter-spacing: -.3px;
-    margin: 0;
-    line-height: 1;
+    font-size: 24px; font-weight: 900;
+    color: #1db899b1 !important;
+    letter-spacing: -.3px; margin: 0; line-height: 1;
 }
-.sidebar-logo .logo span { 
-    color: #ff009db1; !important; /* Warna Pink Terang menyala */
-}
+.sidebar-logo .logo span { color: #ff009db1; }
 .sidebar-logo small {
-    display: block; 
-    font-size: 10px;
-    letter-spacing: 2px; 
-    text-transform: uppercase;
-    color: rgba(255,255,255,.65); 
-    margin-top: 8px;
+    display: block; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 8px;
 }
 .sidebar-nav { flex: 1; padding: 20px 18px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
 .nav-section { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.55); padding: 18px 16px 8px; font-weight: 600; }
@@ -194,24 +180,9 @@ a { text-decoration: none; color: inherit; }
 .nav-item.active { background: rgba(255,255,255,.28); color: #fff; font-weight: 600; border-left: 3px solid #fff; padding-left: 15px; }
 .nav-item i { font-size: 17px; width: 22px; flex-shrink: 0; }
 .badge-notif { background: #fff; color: var(--accent); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: auto; }
-.nav-item-toko {
-    margin-top: 0;
-    background: transparent;
-    border: none;
-    color: rgba(255,255,255,.85) !important;
-    font-weight: 500 !important;
-    justify-content: flex-start;
-    border-radius: 12px;
-    box-shadow: none;
-    letter-spacing: 0.01em;
-}
-.nav-item-toko:hover {
-    background: rgba(255,255,255,.2) !important;
-    border-color: transparent !important;
-    box-shadow: none;
-    transform: translateX(3px) !important;
-    color: #fff !important;
-}
+.nav-item-toko { margin-top: 0; background: transparent; border: none; color: rgba(255,255,255,.85) !important; font-weight: 500 !important; justify-content: flex-start; border-radius: 12px; box-shadow: none; letter-spacing: 0.01em; }
+.nav-item-toko:hover { background: rgba(255,255,255,.2) !important; border-color: transparent !important; box-shadow: none; transform: translateX(3px) !important; color: #fff !important; }
+.nav-ext-icon { font-size: 11px !important; width: auto !important; margin-left: auto; opacity: .6; }
 .sidebar-footer { padding: 16px 18px 20px; border-top: 1.5px solid rgba(255,255,255,.2); background: rgba(0,0,0,.1); }
 .btn-logout { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.85); transition: background .2s; width: 100%; letter-spacing: 0.01em; }
 .btn-logout i { font-size: 16px; }
@@ -230,6 +201,7 @@ a { text-decoration: none; color: inherit; }
     position: sticky; top: 0; z-index: 40;
     box-shadow: 0 2px 12px rgba(212,84,127,.07);
 }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
 .topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); }
 .topbar-right { display: flex; align-items: center; gap: 10px; }
 .topbar-date { font-size: 12px; color: var(--muted); }
@@ -290,7 +262,7 @@ a { text-decoration: none; color: inherit; }
     display: flex; align-items: center; gap: 10px;
 }
 .rek-preview .rek-icon { font-size: 22px; flex-shrink: 0; }
-.rek-preview .rek-detail .rek-bank { font-size: 12px; font-weight: 700; color: var(--text); }
+.rek-preview .rek-detail .rek-bank  { font-size: 12px; font-weight: 700; color: var(--text); }
 .rek-preview .rek-detail .rek-nomor { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: .5px; margin-top: 1px; }
 .rek-preview .rek-detail .rek-atas  { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
@@ -344,25 +316,58 @@ a { text-decoration: none; color: inherit; }
 .alert.success { background: rgba(0,191,165,.12); color: var(--green); border: 1px solid rgba(0,191,165,.3); }
 .alert.error   { background: rgba(255,23,68,.1);  color: var(--red);   border: 1px solid rgba(255,23,68,.25); }
 
-/* ── INFO BOX ── */
-.info-box { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 12px; color: var(--text2); line-height: 1.6; }
-.info-box .info-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.info-box .info-row:last-child { margin-bottom: 0; }
-.info-box i { color: var(--accent); font-size: 14px; }
-
 /* ── PASSWORD STRENGTH ── */
 .pw-strength { height: 4px; border-radius: 2px; margin-top: 6px; background: var(--border); overflow: hidden; }
 .pw-strength-bar { height: 100%; border-radius: 2px; transition: width .3s, background .3s; width: 0; }
 
-@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } .rek-grid { grid-template-columns: 1fr; } }
+/* ── RESPONSIVE MOBILE ── */
+.btn-toggle-sidebar {
+    display: none;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 10px; width: 38px; height: 38px;
+    align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; color: var(--text);
+}
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 98; }
+.sidebar-overlay.active { display: block; }
+
+@media (max-width: 1024px) {
+    .main { margin-left: 0 !important; }
+    .sidebar { position: fixed; left: 0; top: 0; height: 100vh; width: 280px; border-radius: 0; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 99; }
+    .sidebar.active { transform: translateX(0); }
+    .btn-toggle-sidebar { display: flex !important; }
+    .topbar { padding: 0 16px; }
+    .content { padding: 16px 14px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .rek-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+    .topbar { padding: 0 14px; height: auto; min-height: 56px; }
+    .content { padding: 14px 12px; }
+}
+@media (max-width: 480px) {
+    .topbar-date { display: none; }
+    .topbar-title { font-size: 15px; }
+    .content { padding: 12px 10px; }
+    .card-body { padding: 14px; }
+}
 </style>
 </head>
 <body>
 <?php include '../includes/sidebar.php'; ?>
 
+<!-- OVERLAY SIDEBAR (untuk mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <div class="main">
     <div class="topbar">
-        <div class="topbar-title">Pengaturan</div>
+        <div class="topbar-left">
+            <!-- TOMBOL HAMBURGER — hanya muncul di mobile/tablet -->
+            <button class="btn-toggle-sidebar" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="topbar-title">Pengaturan</div>
+        </div>
         <div class="topbar-right">
             <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
         </div>
@@ -560,21 +565,6 @@ a { text-decoration: none; color: inherit; }
                     </div>
                 </div>
 
-                <!-- INFO SISTEM -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="bi bi-info-circle" style="color:var(--yellow);margin-right:6px;"></i> Info Sistem</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-box">
-                            <div class="info-row"><i class="bi bi-code-slash"></i> <span><strong>Versi Sistem:</strong> 1.0.0</span></div>
-                            <div class="info-row"><i class="bi bi-calendar3"></i> <span><strong>Tanggal:</strong> <?= date('d M Y, H:i') ?></span></div>
-                            <div class="info-row"><i class="bi bi-person-badge"></i> <span><strong>Penjual:</strong> <?= escape($penjual_nama) ?></span></div>
-                            <div class="info-row"><i class="bi bi-server"></i> <span><strong>PHP:</strong> <?= phpversion() ?></span></div>
-                        </div>
-                    </div>
-                </div>
-
             </div><!-- end kanan -->
 
         </div><!-- end grid-2 -->
@@ -582,6 +572,26 @@ a { text-decoration: none; color: inherit; }
 </div><!-- end main -->
 
 <script>
+/* Sidebar toggle */
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function closeSidebar() {
+    document.querySelector('.sidebar').classList.remove('active');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+/* Tutup sidebar saat klik nav-item di mobile */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth <= 1024) closeSidebar();
+        });
+    });
+});
+
+/* Preview logo */
 function previewLogo(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -596,6 +606,7 @@ function previewLogo(input) {
     }
 }
 
+/* Password strength */
 function checkStrength(val) {
     const bar = document.getElementById('pwBar');
     let score = 0;
@@ -610,6 +621,7 @@ function checkStrength(val) {
     bar.style.background = colors[score - 1] || '#F4A7C3';
 }
 
+/* Live preview rekening */
 function updatePrev(type) {
     if (type === 'BCA') {
         const no   = document.getElementById('inpNoBCA').value.trim();

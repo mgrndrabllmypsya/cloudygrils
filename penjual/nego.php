@@ -255,7 +255,6 @@ a{text-decoration:none;color:inherit;}
         <div style="display:flex;align-items:center;gap:12px;"><button class="btn-toggle-sidebar" onclick="toggleSidebar()"><i class="bi bi-list"></i></button><div class="topbar-title">Nego Harga</div></div>
         <div class="topbar-right">
             <span style="font-size:12px;color:var(--muted);"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
-            <a href="../pages/home.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
         </div>
     </div>
 

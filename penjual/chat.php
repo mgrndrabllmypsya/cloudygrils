@@ -49,8 +49,11 @@ if ($pembeli_id && $produk_id) {
     while ($p = mysqli_fetch_assoc($q_pesan)) $pesan_list[] = $p;
 }
 
-$total_unread = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
+$total_unread  = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
 $nego_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='menunggu'"))[0] ?? 0;
+
+/* Jika ada chat aktif di mobile → tampilkan panel chat, bukan list */
+$mobile_panel = ($pembeli_id && $produk_id) ? 'chat' : 'list';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -73,107 +76,51 @@ a { text-decoration:none; color:inherit; }
 
 /* ── SIDEBAR ── */
 .sidebar {
-    width: 300px;
-    background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    border-radius: 0 28px 28px 0;
-    box-shadow: 6px 0 32px rgba(212,84,127,.28);
-    overflow-y: auto;
-    z-index: 50;
+    width:300px; flex-shrink:0;
+    background:linear-gradient(180deg,#F4A7C3 0%,#E8719A 45%,#D4547F 100%);
+    display:flex; flex-direction:column;
+    border-radius:0 28px 28px 0;
+    box-shadow:6px 0 32px rgba(212,84,127,.28);
+    overflow-y:auto; z-index:50;
 }
-.sidebar-logo {
-    padding: 28px 28px 22px;
-    border-bottom: 1.5px solid rgba(255,255,255,.2);
-    background: rgba(255,255,255,.12);
-}
-.sidebar-logo .logo-img {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;     /* Mengatur isi gambar di dalam lingkaran */
-    background: #ffffff;      /* Memberikan latar belakang bulat putih bersih di belakang logo */
-    border-radius: 50%;       /* MEMBUAT BULAT SEMPURNA */
-    flex-shrink: 0;           /* Mencegah gambar menyusut/gepeng */
-    padding: 4px;             /* Memberi jarak manis antara logo dengan tepi lingkaran putih */
-    box-sizing: border-box;
-    border: 1.5px solid rgba(255, 255, 255, 0.4);
-}
-.sidebar-logo .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px; 
-    font-weight: 900;
-    color: #1db899b1 !important; /* Warna Hijau Toska yang fresh */
-    letter-spacing: -.3px;
-    margin: 0;
-    line-height: 1;
-}
-.sidebar-logo .logo span { 
-    color: #ff009db1; !important; /* Warna Pink Terang menyala */
-}
-.sidebar-logo small {
-    display: block; 
-    font-size: 10px;
-    letter-spacing: 2px; 
-    text-transform: uppercase;
-    color: rgba(255,255,255,.65); 
-    margin-top: 8px;
-}
+.sidebar-logo { padding:28px 28px 22px; border-bottom:1.5px solid rgba(255,255,255,.2); background:rgba(255,255,255,.12); }
+.sidebar-logo .logo-img { width:38px; height:38px; object-fit:contain; background:#fff; border-radius:50%; flex-shrink:0; padding:4px; box-sizing:border-box; border:1.5px solid rgba(255,255,255,.4); }
+.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:#1db899b1 !important; letter-spacing:-.3px; margin:0; line-height:1; }
+.sidebar-logo .logo span { color:#ff009db1; }
+.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:8px; }
 .sidebar-nav { flex:1; padding:20px 18px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
 .nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:18px 16px 8px; font-weight:600; }
-.nav-item { display:flex; align-items:center; gap:14px; padding:13px 18px; border-radius:12px; font-size:14px; font-weight:500; color:rgba(255,255,255,.85); transition:all .2s; letter-spacing:0.01em; }
+.nav-item { display:flex; align-items:center; gap:14px; padding:13px 18px; border-radius:12px; font-size:14px; font-weight:500; color:rgba(255,255,255,.85); transition:all .2s; }
 .nav-item:hover { background:rgba(255,255,255,.2); color:#fff; transform:translateX(3px); }
 .nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; padding-left:15px; }
 .nav-item i { font-size:17px; width:22px; flex-shrink:0; }
 .badge-notif { background:#fff; color:var(--accent); font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; margin-left:auto; }
 .sidebar-footer { padding:16px 18px 20px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
-.btn-logout { display:flex; align-items:center; gap:10px; padding:11px 16px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.85); transition:background .2s; width:100%; letter-spacing:0.01em; }
+.btn-logout { display:flex; align-items:center; gap:10px; padding:11px 16px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.85); transition:background .2s; width:100%; }
 .btn-logout i { font-size:16px; }
 .btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
-.nav-item-toko {
-    margin-top: 0;
-    background: transparent;
-    border: none;
-    color: rgba(255,255,255,.85) !important;
-    font-weight: 500 !important;
-    justify-content: flex-start;
-    border-radius: 12px;
-    box-shadow: none;
-    letter-spacing: 0.01em;
-}
-.nav-item-toko:hover {
-    background: rgba(255,255,255,.2) !important;
-    border-color: transparent !important;
-    box-shadow: none;
-    transform: translateX(3px) !important;
-    color: #fff !important;
-}
-.nav-ext-icon {
-    font-size: 11px !important;
-    width: auto !important;
-    margin-left: auto;
-    opacity: .6;
-}
+.nav-item-toko { margin-top:0; background:transparent; border:none; color:rgba(255,255,255,.85) !important; font-weight:500 !important; justify-content:flex-start; border-radius:12px; box-shadow:none; }
+.nav-item-toko:hover { background:rgba(255,255,255,.2) !important; border-color:transparent !important; box-shadow:none; transform:translateX(3px) !important; color:#fff !important; }
+.nav-ext-icon { font-size:11px !important; width:auto !important; margin-left:auto; opacity:.6; }
 
 /* ── MAIN ── */
 .main { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
 .topbar {
-    background:rgba(255,255,255,.95);
-    backdrop-filter:blur(12px);
+    background:rgba(255,255,255,.95); backdrop-filter:blur(12px);
     border-bottom:1.5px solid var(--border);
     padding:0 32px; height:64px;
     display:flex; align-items:center; justify-content:space-between;
-    flex-shrink:0;
-    box-shadow:0 2px 12px rgba(212,84,127,.07);
+    flex-shrink:0; box-shadow:0 2px 12px rgba(212,84,127,.07);
 }
+.topbar-left { display:flex; align-items:center; gap:12px; }
 .topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text); }
 
 /* ── CHAT LAYOUT ── */
-.chat-layout { flex:1; display:grid; grid-template-columns:300px 1fr; overflow:hidden; }
+.chat-layout { flex:1; display:grid; grid-template-columns:300px 1fr; overflow:hidden; min-height:0; }
 
 /* LIST */
 .chat-list { background:var(--surface); border-right:1.5px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
-.chat-list-head { padding:14px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:600; color:var(--text); flex-shrink:0; background:linear-gradient(to right,#FFF0F5,#fff); }
+.chat-list-head { padding:14px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:600; color:var(--text); flex-shrink:0; background:linear-gradient(to right,#FFF0F5,#fff); display:flex; align-items:center; justify-content:space-between; }
 .chat-list-body { flex:1; overflow-y:auto; }
 .chat-list-body::-webkit-scrollbar { width:3px; }
 .chat-list-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
@@ -188,7 +135,7 @@ a { text-decoration:none; color:inherit; }
 .badge-unread { background:var(--accent2); color:#fff; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:10px; padding:0 5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
 
 /* AREA CHAT */
-.chat-area { display:flex; flex-direction:column; overflow:hidden; }
+.chat-area { display:flex; flex-direction:column; overflow:hidden; min-height:0; }
 
 /* CHAT HEADER */
 .chat-header { padding:14px 20px; border-bottom:1.5px solid var(--border); background:linear-gradient(to right,#FFF0F5,#fff); display:flex; align-items:center; gap:12px; flex-shrink:0; }
@@ -196,9 +143,10 @@ a { text-decoration:none; color:inherit; }
 .chat-header-info { flex:1; min-width:0; }
 .chat-header-info .nama { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .chat-header-info .sub { font-size:11px; color:var(--muted); margin-top:2px; }
+.btn-back-list { display:none; background:var(--surface2); border:1.5px solid var(--border); border-radius:8px; width:34px; height:34px; align-items:center; justify-content:center; cursor:pointer; font-size:16px; color:var(--accent); flex-shrink:0; }
 
 /* MESSAGES */
-.chat-messages { flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; background:var(--bg); }
+.chat-messages { flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; background:var(--bg); min-height:0; }
 .chat-messages::-webkit-scrollbar { width:4px; }
 .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
 
@@ -210,7 +158,6 @@ a { text-decoration:none; color:inherit; }
 .bubble-wrap { display:flex; gap:8px; align-items:flex-end; max-width:75%; }
 .bubble-wrap.admin-msg { flex-direction:row-reverse; margin-left:auto; }
 .bubble-wrap.pembeli { margin-right:auto; }
-.bubble-avatar { width:30px; height:30px; border-radius:50%; background:var(--surface2); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent); flex-shrink:0; }
 .bubble-content { display:flex; flex-direction:column; max-width:100%; }
 .bubble { padding:10px 14px; border-radius:16px; font-size:13px; line-height:1.6; word-break:break-word; white-space:pre-wrap; }
 .bubble-wrap.pembeli .bubble { background:var(--surface); border:1.5px solid var(--border); border-bottom-left-radius:4px; color:var(--text); }
@@ -230,83 +177,111 @@ a { text-decoration:none; color:inherit; }
 .chat-placeholder i { font-size:3rem; margin-bottom:12px; opacity:.25; display:block; }
 .chat-placeholder p { font-size:13px; line-height:1.7; }
 .empty-list { padding:32px 16px; text-align:center; color:var(--muted); font-size:12px; }
-/* RESPONSIVE MOBILE */
-.btn-toggle-sidebar { display:none; background:var(--surface2,#FFF0F5); border:1.5px solid var(--border,#FFD6E7); border-radius:10px; width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--text,#2d2d2d); }
+
+/* ── MOBILE RESPONSIVE ── */
+.btn-toggle-sidebar {
+    display:none;
+    background:var(--surface2); border:1.5px solid var(--border);
+    border-radius:10px; width:38px; height:38px;
+    align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; color:var(--text);
+}
 .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:98; }
 .sidebar-overlay.active { display:block; }
-@media (max-width:900px) {
-    .sidebar { position:fixed; left:0; top:0; height:100vh; width:280px; border-radius:0; transform:translateX(-100%); transition:transform 0.3s ease; z-index:99; }
-    .sidebar.active { transform:translateX(0); }
-    .main { margin-left:0 !important; }
-    .btn-toggle-sidebar { display:flex !important; }
-    .topbar { padding:0 16px !important; }
-    .content { padding:16px 14px !important; }
-    table { font-size:12px; }
-    td, th { padding:8px 10px; }
-}
-@media (max-width:480px) {
-    .topbar-date { display:none; }
-}
 
 @media (max-width:900px) {
-    .grid-2, [style*="grid-template-columns:1fr 1fr"], [style*="grid-template-columns: 1fr 1fr"] {
-        grid-template-columns: 1fr !important;
+    /* Sidebar jadi overlay */
+    .sidebar {
+        position:fixed; left:0; top:0; height:100vh; width:280px;
+        border-radius:0; transform:translateX(-100%);
+        transition:transform 0.3s ease; z-index:99;
     }
-    .stats-grid { grid-template-columns: repeat(2,1fr) !important; }
-    .card { padding: 14px !important; }
-    .card-header { flex-wrap: wrap; gap: 8px; }
-    .modal-box, .modal-content { max-width: 95vw !important; margin: 10px !important; }
-    .form-grid { grid-template-columns: 1fr !important; }
-    .topbar { height: auto !important; min-height: 56px; flex-wrap: wrap; gap: 8px; padding: 10px 16px !important; }
-    .chat-layout, [style*="display:flex"][style*="height"] { flex-direction: column !important; height: auto !important; }
-    .chat-list { width: 100% !important; max-height: 250px; border-right: none !important; border-bottom: 1.5px solid var(--border,#FFD6E7); }
-    .chat-main { width: 100% !important; }
-    .nego-table, .pesanan-table { overflow-x: auto; display: block; }
-    .filter-bar, .search-bar { flex-wrap: wrap; gap: 8px; }
-    .filter-bar select, .filter-bar input { width: 100% !important; }
+    .sidebar.active { transform:translateX(0); }
+    .btn-toggle-sidebar { display:flex !important; }
+    .topbar { padding:0 16px !important; height:56px; }
+
+    /* Chat layout jadi full-width, panel switching */
+    .chat-layout {
+        display:block;
+        position:relative;
+        overflow:hidden;
+        height:100%;
+    }
+
+    /* Panel list */
+    .chat-list {
+        position:absolute; inset:0;
+        width:100%; height:100%;
+        border-right:none;
+        transition:transform 0.3s ease;
+        z-index:2;
+    }
+    .chat-list.hidden-mobile {
+        transform:translateX(-100%);
+        pointer-events:none;
+    }
+
+    /* Panel area chat */
+    .chat-area {
+        position:absolute; inset:0;
+        width:100%; height:100%;
+        transition:transform 0.3s ease;
+        transform:translateX(100%);
+        z-index:1;
+    }
+    .chat-area.show-mobile {
+        transform:translateX(0);
+        z-index:3;
+    }
+
+    /* Tombol kembali ke list */
+    .btn-back-list { display:flex !important; }
+
+    /* Bubble lebih lebar di mobile */
+    .bubble-wrap { max-width:90%; }
 }
 
 @media (max-width:480px) {
-    .stats-grid { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
-    .content { padding: 12px 10px !important; }
-    table { font-size: 11px !important; }
-    td, th { padding: 6px 8px !important; }
-    .badge { font-size: 10px !important; padding: 2px 7px !important; }
-    .btn-tambah, .btn-primary { font-size: 12px !important; padding: 8px 12px !important; }
-    h2, h3 { font-size: 14px !important; }
-    .topbar-title { font-size: 15px !important; }
-    img.produk-thumb { width: 32px !important; height: 32px !important; }
+    .topbar-title { font-size:15px; }
+    .chat-input { font-size:13px; padding:9px 14px; }
+    .bubble { font-size:12px; padding:8px 12px; }
 }
-
 </style>
 </head>
 <body>
 
 <?php include '../includes/sidebar.php'; ?>
-
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <div class="main">
     <div class="topbar">
-        <div style="display:flex;align-items:center;gap:12px;"><button class="btn-toggle-sidebar" onclick="toggleSidebar()"><i class="bi bi-list"></i></button><div class="topbar-title">Chat Pembeli</div></div>
-        <?php if ($total_unread > 0): ?>
-        <span style="font-size:12px;color:var(--red);display:flex;align-items:center;gap:5px;">
-            <i class="bi bi-circle-fill" style="font-size:8px;"></i> <?= $total_unread ?> pesan belum dibaca
-        </span>
-        <?php endif; ?>
+    <div class="topbar-left">
+        <button class="btn-toggle-sidebar" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+        <div class="topbar-title">Chat Pembeli</div>
     </div>
+    <?php if ($total_unread > 0): ?>
+    <span style="font-size:12px;color:var(--red);display:flex;align-items:center;gap:5px;">
+        <i class="bi bi-circle-fill" style="font-size:8px;"></i> <?= $total_unread ?> pesan belum dibaca
+    </span>
+    <?php endif; ?>
+    <span style="font-size:12px;color:var(--muted);"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
+</div>
 
     <div class="chat-layout">
 
-        <!-- LIST -->
-        <div class="chat-list">
-            <div class="chat-list-head">💬 Percakapan</div>
+        <!-- ── PANEL LIST ── -->
+        <div class="chat-list <?= $mobile_panel === 'chat' ? 'hidden-mobile' : '' ?>" id="panelList">
+            <div class="chat-list-head">
+                💬 Percakapan
+            </div>
             <div class="chat-list-body">
                 <?php if ($q_list && mysqli_num_rows($q_list) > 0):
                     while ($item = mysqli_fetch_assoc($q_list)):
                         $isActive = $item['pembeli_id'] == $pembeli_id && $item['produk_id'] == $produk_id;
                         $fotoSrc  = !empty($item['foto_utama']) ? '../uploads/produk/' . escape($item['foto_utama']) : 'https://placehold.co/42x42/FFE8F2/E8719A?text=CG';
                 ?>
-                <a href="chat.php?pembeli_id=<?= $item['pembeli_id'] ?>&produk_id=<?= $item['produk_id'] ?>" class="chat-item <?= $isActive ? 'active' : '' ?>">
+                <a href="chat.php?pembeli_id=<?= $item['pembeli_id'] ?>&produk_id=<?= $item['produk_id'] ?>"
+                   class="chat-item <?= $isActive ? 'active' : '' ?>">
                     <img src="<?= $fotoSrc ?>" class="chat-item-img" alt="produk">
                     <div class="chat-item-info">
                         <div class="chat-item-nama"><?= escape($item['nama_pembeli']) ?></div>
@@ -325,11 +300,15 @@ a { text-decoration:none; color:inherit; }
             </div>
         </div>
 
-        <!-- AREA CHAT -->
-        <div class="chat-area">
+        <!-- ── PANEL AREA CHAT ── -->
+        <div class="chat-area <?= $mobile_panel === 'chat' ? 'show-mobile' : '' ?>" id="panelChat">
             <?php if ($pembeli_aktif && $produk_aktif): ?>
 
             <div class="chat-header">
+                <!-- Tombol kembali (mobile only) -->
+                <a href="chat.php" class="btn-back-list" title="Kembali ke daftar">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
                 <?php $fotoSrc = !empty($produk_aktif['foto_utama']) ? '../uploads/produk/' . escape($produk_aktif['foto_utama']) : 'https://placehold.co/40x40/FFE8F2/E8719A?text=CG'; ?>
                 <img src="<?= $fotoSrc ?>" class="chat-header-img" alt="produk">
                 <div class="chat-header-info">
@@ -377,13 +356,15 @@ a { text-decoration:none; color:inherit; }
             <?php endif; ?>
         </div>
 
-    </div>
-</div>
+    </div><!-- /chat-layout -->
+</div><!-- /main -->
 
 <script>
+/* Scroll ke bawah otomatis */
 const msgs = document.getElementById('chatMessages');
 if (msgs) msgs.scrollTop = msgs.scrollHeight;
 
+/* Auto-resize textarea */
 const ta = document.querySelector('.chat-input');
 if (ta) {
     ta.addEventListener('input', function() {
@@ -391,9 +372,8 @@ if (ta) {
         this.style.height = Math.min(this.scrollHeight, 100) + 'px';
     });
 }
-</script>
 
-<script>
+/* Sidebar toggle */
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('active');
     document.getElementById('sidebarOverlay').classList.toggle('active');
@@ -402,6 +382,8 @@ function closeSidebar() {
     document.querySelector('.sidebar').classList.remove('active');
     document.getElementById('sidebarOverlay').classList.remove('active');
 }
+
+/* Tutup sidebar saat klik nav-item di mobile */
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function(link) {
         link.addEventListener('click', function() {

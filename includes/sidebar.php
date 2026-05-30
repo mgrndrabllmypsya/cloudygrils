@@ -1,38 +1,48 @@
 <?php
 /**
  * sidebar.php — Sidebar terpusat untuk semua halaman penjual
- *
- * CARA PAKAI:
- * Letakkan file ini di: penjual/includes/sidebar.php
- * Lalu di dalam <body> setiap halaman, ganti blok <aside>...</aside> dengan:
- *
- *   <?php include 'includes/sidebar.php'; ?>
- *
- * Tidak perlu require file lain — query notifikasi sudah ada di sini.
  */
 
-// Query notifikasi
 $total_unread     = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
 $nego_menunggu    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='menunggu'"))[0] ?? 0;
 $pesanan_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status='menunggu'"))[0] ?? 0;
-$ulasan_baru = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM ulasan WHERE DATE(created_at) = CURDATE()"))[0] ?? 0;
+$ulasan_baru      = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM ulasan WHERE DATE(created_at) = CURDATE()"))[0] ?? 0;
 
-// Halaman aktif
 $current_page = basename($_SERVER['PHP_SELF']);
 
 function sidebar_active($page, $current) {
     return $page === $current ? 'active' : '';
 }
 ?>
+<style>
+    
+@media (max-width:900px) {
+    .sidebar {
+        position:fixed !important;
+        left:0 !important;
+        top:0 !important;
+        height:100vh !important;
+        width:85vw !important;
+        border-radius:0 28px 28px 0 !important; /* ← sama seperti desktop */
+        transform:translateX(-100%) !important;
+        transition:transform 0.3s ease !important;
+        z-index:99 !important;
+    }
+    .sidebar.active {
+        transform:translateX(0) !important;
+    }
+}
+</style>
 
 <aside class="sidebar">
     <div class="sidebar-logo">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <img src="../uploads/toko/logo.png" class="logo-img" onerror="this.src='https://placehold.co/32x32/FFE4EE/FF4081?text=CG'">
-        <div class="logo" style="line-height: 1; margin: 0;">Cloudy <span>Girls</span></div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <img src="../uploads/toko/logo.png" class="logo-img"
+                 onerror="this.src='https://placehold.co/32x32/FFE4EE/FF4081?text=CG'">
+            <div class="logo" style="line-height:1; margin:0;">Cloudy <span>Girls</span></div>
+        </div>
+        <small>Seller Dashboard</small>
     </div>
-    <small>Seller Dashboard</small>
-</div>
 
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
@@ -90,11 +100,12 @@ function sidebar_active($page, $current) {
 </aside>
 
 <script>
-// Tutup sidebar otomatis saat link diklik di mobile
 document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function(link) {
     link.addEventListener('click', function() {
         if (window.innerWidth <= 900) {
             document.querySelector('.sidebar').classList.remove('active');
+            var overlay = document.getElementById('sidebarOverlay');
+            if (overlay) overlay.classList.remove('active');
         }
     });
 });
