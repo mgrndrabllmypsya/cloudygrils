@@ -81,9 +81,37 @@ a{text-decoration:none;color:inherit;}
     border-bottom: 1.5px solid rgba(255,255,255,.2);
     background: rgba(255,255,255,.12);
 }
-.sidebar-logo .logo { font-family:'Playfair Display',serif; font-size:22px; font-weight:900; color:#fff; }
-.sidebar-logo .logo span { color:#FFE0EF; }
-.sidebar-logo small { display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:3px; }
+.sidebar-logo .logo-img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;     /* Mengatur isi gambar di dalam lingkaran */
+    background: #ffffff;      /* Memberikan latar belakang bulat putih bersih di belakang logo */
+    border-radius: 50%;       /* MEMBUAT BULAT SEMPURNA */
+    flex-shrink: 0;           /* Mencegah gambar menyusut/gepeng */
+    padding: 4px;             /* Memberi jarak manis antara logo dengan tepi lingkaran putih */
+    box-sizing: border-box;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+.sidebar-logo .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; 
+    font-weight: 900;
+    color: #1db899b1 !important; /* Warna Hijau Toska yang fresh */
+    letter-spacing: -.3px;
+    margin: 0;
+    line-height: 1;
+}
+.sidebar-logo .logo span { 
+    color: #ff009db1; !important; /* Warna Pink Terang menyala */
+}
+.sidebar-logo small {
+    display: block; 
+    font-size: 10px;
+    letter-spacing: 2px; 
+    text-transform: uppercase;
+    color: rgba(255,255,255,.65); 
+    margin-top: 8px;
+}
 .sidebar-nav { flex:1; padding:20px 18px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
 .nav-section { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:18px 16px 8px; font-weight:600; }
 .nav-item { display:flex; align-items:center; gap:14px; padding:13px 18px; border-radius:12px; font-size:14px; font-weight:500; color:rgba(255,255,255,.85); transition:all .2s; letter-spacing:0.01em; }

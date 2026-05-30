@@ -139,23 +139,49 @@ a { text-decoration:none; color:inherit; }
     overflow: hidden;
 }
 .sidebar-logo {
-    padding: 28px 28px 22px; /* ✅ Padding lebih besar */
+    padding: 28px 28px 22px;
     border-bottom: 1.5px solid rgba(255,255,255,.2);
-    background: rgba(255,255,255,.12);
-}
-.sidebar-logo .logo {
-    font-family:'Playfair Display',serif;
-    font-size: 22px; /* ✅ Sedikit lebih besar */
-    font-weight: 900;
-    color: #fff;
-}
-.sidebar-logo .logo span { color:#FFE0EF; }
-.sidebar-logo small {
-    display:block; font-size:10px;
-    letter-spacing:2px; text-transform:uppercase;
-    color:rgba(255,255,255,.65); margin-top:3px;
+    background: rgba(255, 254, 254, 0.12);
 }
 
+/* ✅ PERBAIKAN: Khusus untuk mengatur gambar logonya saja */
+.sidebar-logo .logo-img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;     /* Mengatur isi gambar di dalam lingkaran */
+    background: #ffffff;      /* Memberikan latar belakang bulat putih bersih di belakang logo */
+    border-radius: 50%;       /* MEMBUAT BULAT SEMPURNA */
+    flex-shrink: 0;           /* Mencegah gambar menyusut/gepeng */
+    padding: 4px;             /* Memberi jarak manis antara logo dengan tepi lingkaran putih */
+    box-sizing: border-box;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+/* ✅ PERBAIKAN: Mengembalikan teks Cloudy Girls menjadi putih indah */
+/* Mengubah tulisan "Cloudy" menjadi warna Hijau Toska */
+.sidebar-logo .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; 
+    font-weight: 900;
+    color: #1db899b1 !important; /* Warna Hijau Toska yang fresh */
+    letter-spacing: -.3px;
+    margin: 0;
+    line-height: 1;
+}
+
+/* Mengubah tulisan "Girls" menjadi warna Pink Terang */
+.sidebar-logo .logo span { 
+    color: #ff009db1; !important; /* Warna Pink Terang menyala */
+}
+
+.sidebar-logo small {
+    display: block; 
+    font-size: 10px;
+    letter-spacing: 2px; 
+    text-transform: uppercase;
+    color: rgba(255,255,255,.65); 
+    margin-top: 8px;
+}
 /* ── SIDEBAR NAV ── */
 .sidebar-nav {
     flex: 1;
@@ -502,10 +528,34 @@ select.form-ctrl option { background:#fff; }
 .legend-pct   { font-weight:600; color:var(--muted); font-size:12px; }
 
 @media (max-width:900px) {
-    .stats-grid { grid-template-columns:repeat(2,1fr); }
-    .grid-2 { grid-template-columns:1fr; }
-    .sidebar { border-radius:0; width:260px; }
-    .main { margin-left:0; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    
+    /* Modifikasi layout grid chart & donut agar tidak ringsek */
+    div[style*="grid-template-columns:1fr 300px"] { 
+        grid-template-columns: 1fr !important; 
+    }
+
+    /* Sembunyikan sidebar ke kiri secara default di HP */
+    .sidebar { 
+        border-radius: 0; 
+        width: 280px; 
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    /* Class tambahan saat sidebar aktif/muncul di HP */
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    /* Main content memenuhi layar di HP */
+    .main { margin-left: 0; }
+    
+    /* Tampilkan tombol menu di topbar khusus HP */
+    .btn-toggle-sidebar {
+        display: flex !important;
+    }
 }
 </style>
 </head>
@@ -514,11 +564,17 @@ select.form-ctrl option { background:#fff; }
 
 <div class="main">
     <div class="topbar">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <button class="btn-toggle-sidebar" id="toggleSidebar" style="display: none; background: var(--surface2); border: 1.5px solid var(--border); padding: 6px 10px; border-radius: 8px; color: var(--accent); cursor: pointer; font-size: 18px;">
+            <i class="bi bi-list"></i>
+        </button>
         <div class="topbar-title">Dashboard</div>
-        <div class="topbar-right">
-            <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
-        </div>
     </div>
+    
+    <div class="topbar-right">
+        <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
+    </div>
+</div>
 
     <div class="content">
 
@@ -809,6 +865,27 @@ select.form-ctrl option { background:#fff; }
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+    
+    document.addEventListener("DOMContentLoaded", function() {
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.querySelector('.sidebar');
+
+    if(toggleBtn && sidebar) {
+        // Aksi ketika tombol hamburger diklik
+        toggleBtn.addEventListener('click', function(e) {
+            sidebar.classList.toggle('active');
+            e.stopPropagation();
+        });
+
+
+        // Klik di luar sidebar untuk menutup kembali (khusus HP)
+        document.addEventListener('click', function(e) {
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    }
+});
 const chartData = {
     harian:   <?= json_encode($data_harian) ?>,
     mingguan: <?= json_encode($data_mingguan) ?>,
