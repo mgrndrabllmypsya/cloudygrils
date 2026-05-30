@@ -196,14 +196,63 @@ a{text-decoration:none;color:inherit;}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end;}
 .btn-cancel{padding:8px 16px;border-radius:8px;background:var(--surface2);border:1.5px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .btn-cancel:hover{color:var(--text);border-color:var(--accent);}
+/* RESPONSIVE MOBILE */
+.btn-toggle-sidebar { display:none; background:var(--surface2,#FFF0F5); border:1.5px solid var(--border,#FFD6E7); border-radius:10px; width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--text,#2d2d2d); }
+.sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:98; }
+.sidebar-overlay.active { display:block; }
+@media (max-width:900px) {
+    .sidebar { position:fixed; left:0; top:0; height:100vh; width:280px; border-radius:0; transform:translateX(-100%); transition:transform 0.3s ease; z-index:99; }
+    .sidebar.active { transform:translateX(0); }
+    .main { margin-left:0 !important; }
+    .btn-toggle-sidebar { display:flex !important; }
+    .topbar { padding:0 16px !important; }
+    .content { padding:16px 14px !important; }
+    table { font-size:12px; }
+    td, th { padding:8px 10px; }
+}
+@media (max-width:480px) {
+    .topbar-date { display:none; }
+}
+
+@media (max-width:900px) {
+    .grid-2, [style*="grid-template-columns:1fr 1fr"], [style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    .stats-grid { grid-template-columns: repeat(2,1fr) !important; }
+    .card { padding: 14px !important; }
+    .card-header { flex-wrap: wrap; gap: 8px; }
+    .modal-box, .modal-content { max-width: 95vw !important; margin: 10px !important; }
+    .form-grid { grid-template-columns: 1fr !important; }
+    .topbar { height: auto !important; min-height: 56px; flex-wrap: wrap; gap: 8px; padding: 10px 16px !important; }
+    .chat-layout, [style*="display:flex"][style*="height"] { flex-direction: column !important; height: auto !important; }
+    .chat-list { width: 100% !important; max-height: 250px; border-right: none !important; border-bottom: 1.5px solid var(--border,#FFD6E7); }
+    .chat-main { width: 100% !important; }
+    .nego-table, .pesanan-table { overflow-x: auto; display: block; }
+    .filter-bar, .search-bar { flex-wrap: wrap; gap: 8px; }
+    .filter-bar select, .filter-bar input { width: 100% !important; }
+}
+
+@media (max-width:480px) {
+    .stats-grid { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
+    .content { padding: 12px 10px !important; }
+    table { font-size: 11px !important; }
+    td, th { padding: 6px 8px !important; }
+    .badge { font-size: 10px !important; padding: 2px 7px !important; }
+    .btn-tambah, .btn-primary { font-size: 12px !important; padding: 8px 12px !important; }
+    h2, h3 { font-size: 14px !important; }
+    .topbar-title { font-size: 15px !important; }
+    img.produk-thumb { width: 32px !important; height: 32px !important; }
+}
+
 </style>
 </head>
 <body>
 <?php include '../includes/sidebar.php'; ?>
 
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="main">
     <div class="topbar">
-        <div class="topbar-title">Nego Harga</div>
+        <div style="display:flex;align-items:center;gap:12px;"><button class="btn-toggle-sidebar" onclick="toggleSidebar()"><i class="bi bi-list"></i></button><div class="topbar-title">Nego Harga</div></div>
         <div class="topbar-right">
             <span style="font-size:12px;color:var(--muted);"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
             <a href="../pages/home.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
@@ -410,6 +459,24 @@ function closeTolak() {
 }
 document.getElementById('modalTolak').addEventListener('click', function(e){
     if (e.target === this) closeTolak();
+});
+</script>
+
+<script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function closeSidebar() {
+    document.querySelector('.sidebar').classList.remove('active');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function(link) {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 900) closeSidebar();
+        });
+    });
 });
 </script>
 </body>

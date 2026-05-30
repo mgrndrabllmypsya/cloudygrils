@@ -427,17 +427,60 @@ select.form-control option { background:var(--surface2); }
 .confirm-btns .btn-c:hover { color:var(--text); border-color:var(--accent); }
 .confirm-btns .btn-d { flex:1; padding:10px; border-radius:8px; background:var(--red); color:#fff; font-size:13px; font-weight:600; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; transition:opacity .2s; }
 .confirm-btns .btn-d:hover { opacity:.85; }
+/* RESPONSIVE MOBILE */
+.btn-toggle-sidebar { display:none; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--text); }
+.sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:98; }
+.sidebar-overlay.active { display:block; }
+
+@media (max-width:1024px) {
+    .main { margin-left:0 !important; }
+    .sidebar { position:fixed; left:0; top:0; height:100vh; width:280px; border-radius:0; transform:translateX(-100%); transition:transform 0.3s ease; z-index:99; }
+    .sidebar.active { transform:translateX(0); }
+    .btn-toggle-sidebar { display:flex !important; }
+    .stats-grid { grid-template-columns:repeat(2,1fr) !important; gap:10px; }
+    .topbar { padding:0 16px; }
+}
+@media (max-width:768px) {
+    .topbar { padding:0 14px; height:auto; min-height:56px; }
+    .content { padding:14px 12px; }
+    .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .stats-grid { grid-template-columns:repeat(2,1fr) !important; gap:8px; }
+    .stat-card { padding:12px 14px; }
+    table th:nth-child(3), table td:nth-child(3),
+    table th:nth-child(4), table td:nth-child(4) { display:none; }
+}
+@media (max-width:480px) {
+    .stats-grid { grid-template-columns:repeat(2,1fr) !important; gap:8px; }
+    .content { padding:12px 10px; }
+    .topbar-date { display:none; }
+    .btn-toko { display:none; }
+    .card-header { flex-wrap:wrap; gap:6px; }
+    .btn-tambah { font-size:12px; padding:8px 10px; }
+    .btn-tambah .plus-icon { display:none; }
+    .topbar-title { font-size:15px; }
+    .filter-bar { padding:10px 12px; gap:8px; }
+    .filter-input, .filter-select { font-size:12px; padding:7px 10px; min-width:0; }
+    table th:nth-child(3), table td:nth-child(3),
+    table th:nth-child(4), table td:nth-child(4),
+    table th:nth-child(5), table td:nth-child(5) { display:none; }
+    .prod-name { font-size:12px; }
+    .btn-action { padding:4px 8px; font-size:11px; }
+}
 </style>
 </head>
 <body>
 
 <?php include '../includes/sidebar.php'; ?>
 <!-- MAIN -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="main">
 
     <!-- TOPBAR -->
     <div class="topbar">
-        <div class="topbar-title">Manajemen Produk</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="btn-toggle-sidebar" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+            <div class="topbar-title">Manajemen Produk</div>
+        </div>
         <div class="topbar-right">
             <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
             <button class="btn-tambah" onclick="openModal()">
@@ -785,6 +828,24 @@ setTimeout(() => {
         setTimeout(() => el.remove(), 400);
     });
 }, 4000);
+</script>
+
+<script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function closeSidebar() {
+    document.querySelector('.sidebar').classList.remove('active');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function(link) {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 1024) closeSidebar();
+        });
+    });
+});
 </script>
 </body>
 </html>
