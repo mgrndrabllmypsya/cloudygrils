@@ -387,35 +387,7 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
 </style>
 </head>
 <body>
-
-<aside class="sidebar">
-    <div class="sidebar-logo">
-        <div class="logo">Cloudy <span>Girls</span></div>
-        <small>Seller Dashboard</small>
-    </div>
-    <nav class="sidebar-nav">
-        <div class="nav-section">Menu</div>
-        <a href="dashboard.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
-        <a href="produk.php"    class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
-        <a href="pesanan.php"   class="nav-item active"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
-            <?php if ($total_unread > 0): ?>
-            <span class="badge-notif"><?= $total_unread ?></span>
-            <?php endif; ?>
-        </a>
-        <a href="nego.php"      class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
-        <div class="nav-section">Lainnya</div>
-        <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
-        <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
-        <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
-            <i class="bi bi-shop"></i> Lihat Toko
-        </a>
-    </nav>
-    <div class="sidebar-footer">
-        <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
-    </div>
-</aside>
-
+<?php include '../includes/sidebar.php'; ?>
 <div class="main">
     <div class="topbar">
         <div class="topbar-left">

@@ -14,7 +14,8 @@ $total_produk     = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM p
 $total_pesanan    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan"))[0] ?? 0;
 $total_pendapatan = mysqli_fetch_row(mysqli_query($conn, "SELECT SUM(total_bayar) FROM pesanan WHERE status='selesai'"))[0] ?? 0;
 $pesanan_pending  = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status='menunggu'"))[0] ?? 0;
-$total_unread = mysqli_fetch_row(mysqli_query($conn,"SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
+$total_unread = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
+$nego_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='menunggu'"))[0] ?? 0;
 
 $q_pesanan = mysqli_query($conn, "
     SELECT ps.*, pb.nama AS nama_pembeli
@@ -508,39 +509,8 @@ select.form-ctrl option { background:#fff; }
 }
 </style>
 </head>
-<body>
 
-<aside class="sidebar">
-    <div class="sidebar-logo">
-        <div class="logo">Cloudy <span>Girls</span></div>
-        <small>Seller Dashboard</small>
-    </div>
-    <nav class="sidebar-nav">
-        <div class="nav-section">Menu</div>
-        <a href="dashboard.php" class="nav-item active"><i class="bi bi-grid-1x2"></i> Dashboard</a>
-        <a href="produk.php"    class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
-        <a href="pesanan.php"   class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
-            <?php if ($total_unread > 0): ?>
-                <span class="badge-notif"><?= $total_unread ?></span>
-            <?php endif; ?>
-        </a>
-        <a href="nego.php"      class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
-        <div class="nav-section">Lainnya</div>
-        <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
-        <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
-        <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
-            <i class="bi bi-shop"></i> Lihat Toko
-        </a>
-    </nav>
-
-    <!-- ✅ Footer hanya logout, admin card dihapus -->
-    <div class="sidebar-footer">
-        <a href="../auth/logout_penjual.php" class="btn-logout">
-            <i class="bi bi-box-arrow-left"></i> Keluar
-        </a>
-    </div>
-</aside>
+<?php include '../includes/sidebar.php'; ?>
 
 <div class="main">
     <div class="topbar">
