@@ -85,7 +85,7 @@ include '../includes/header.php';
 .container-detail{max-width:1100px;margin:40px auto;padding:0 40px;display:grid;grid-template-columns:1fr 1fr;gap:48px;}
 
 /* Foto */
-.foto-utama{aspect-ratio:3/4;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#FFD6E0,#FFF0F4);border:1.5px solid #FFB3C6;}
+.foto-utama{aspect-ratio:3/4;border-radius:20px;overflow:hidden;background: #f9cfcf;border:1.5px}
 .foto-utama img{width:100%;height:100%;object-fit:cover;}
 
 /* Info produk */
@@ -190,6 +190,7 @@ include '../includes/header.php';
     border:1.5px solid #FFB3C6;
     border-radius:14px;padding:18px;margin-bottom:14px;
 }
+
 .ulasan-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
 .ulasan-avatar{
     width:36px;height:36px;border-radius:50%;

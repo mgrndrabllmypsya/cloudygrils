@@ -90,8 +90,6 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             color: var(--text);
             min-height: 100vh;
         }
-
-        /* ── NAVBAR ── */
         nav {
     background: rgba(255, 255, 255, .90);
     backdrop-filter: blur(10px);
