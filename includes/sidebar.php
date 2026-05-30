@@ -15,7 +15,30 @@ function sidebar_active($page, $current) {
 }
 ?>
 <style>
-    
+
+/* Pastikan footer selalu nempel di bawah di semua ukuran layar */
+.sidebar {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.sidebar-logo {
+    flex-shrink: 0;
+}
+.sidebar-nav {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.sidebar-nav::-webkit-scrollbar {
+    display: none;
+}
+.sidebar-footer {
+    flex-shrink: 0;
+}
+
 @media (max-width:900px) {
     .sidebar {
         position:fixed !important;
@@ -121,6 +144,7 @@ document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(fu
             document.querySelector('.sidebar').classList.remove('active');
             var overlay = document.getElementById('sidebarOverlay');
             if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
         }
     });
 });
