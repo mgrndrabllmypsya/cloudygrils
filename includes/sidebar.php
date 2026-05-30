@@ -22,14 +22,29 @@ function sidebar_active($page, $current) {
         left:0 !important;
         top:0 !important;
         height:100vh !important;
-        width:85vw !important;
-        border-radius:0 28px 28px 0 !important; /* ← sama seperti desktop */
+        width:220px !important;
+        max-width:65vw !important;
+        border-radius:0 24px 24px 0 !important;
+        overflow:hidden !important;
+        display:flex !important;
+        flex-direction:column !important; /* ← sama seperti desktop */
         transform:translateX(-100%) !important;
         transition:transform 0.3s ease !important;
         z-index:99 !important;
     }
     .sidebar.active {
         transform:translateX(0) !important;
+    }
+    .sidebar-nav {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        scrollbar-width: none !important;
+    }
+    .sidebar-nav::-webkit-scrollbar {
+        display: none !important;
+    }
+    .sidebar-footer {
+        flex-shrink: 0 !important;
     }
 }
 </style>

@@ -530,33 +530,48 @@ select.form-ctrl option { background:#fff; }
 @media (max-width:900px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .grid-2 { grid-template-columns: 1fr !important; }
-    
-    /* Modifikasi layout grid chart & donut agar tidak ringsek */
-    div[style*="grid-template-columns:1fr 300px"] { 
-        grid-template-columns: 1fr !important; 
+
+    div[style*="grid-template-columns:1fr 300px"] {
+        grid-template-columns: 1fr !important;
     }
 
-    /* Sembunyikan sidebar ke kiri secara default di HP */
-    .sidebar { 
-        border-radius: 0; 
-        width: 280px; 
+    /* ── SIDEBAR MOBILE FIX ── */
+    .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        height: 100vh !important;
+        width: 220px !important;
+        max-width: 65vw !important;
+        border-radius: 0 24px 24px 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
         transform: translateX(-100%);
         transition: transform 0.3s ease;
+        z-index: 99;
     }
-    
-    /* Class tambahan saat sidebar aktif/muncul di HP */
     .sidebar.active {
         transform: translateX(0);
     }
-    
-    /* Main content memenuhi layar di HP */
-    .main { margin-left: 0; }
-    
-    /* Tampilkan tombol menu di topbar khusus HP */
-    .btn-toggle-sidebar {
-        display: flex !important;
+
+    /* Nav boleh scroll tapi scrollbar disembunyikan */
+    .sidebar-nav {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        scrollbar-width: none !important;
+    }
+    .sidebar-nav::-webkit-scrollbar {
+        display: none !important;
     }
 
+    /* Footer logout selalu nempel di bawah */
+    .sidebar-footer {
+        flex-shrink: 0 !important;
+    }
+
+    .main { margin-left: 0; }
+    .btn-toggle-sidebar { display: flex !important; }
     .stats-grid .stat-card { padding: 14px; }
     .chart-tabs { flex-wrap: wrap; }
     table { font-size: 12px; }
