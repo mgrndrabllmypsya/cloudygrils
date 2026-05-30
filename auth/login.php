@@ -28,6 +28,8 @@ body {
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
     font-family: 'DM Sans', sans-serif;
+
+    
     /* Pink soft gradient persis seperti gambar — atas ke bawah */
     background: #f9cfcf;
     padding: 24px;

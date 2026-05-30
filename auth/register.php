@@ -73,6 +73,7 @@ body::before {
 }
 .logo span { color: var(--accent); }
 
+
 .card-top { text-align: center; margin-bottom: 28px; }
 .card-top h1 {
     font-family: 'Playfair Display', serif;
