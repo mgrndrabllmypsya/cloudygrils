@@ -28,7 +28,7 @@ body {
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
     font-family: 'DM Sans', sans-serif;
-    background: linear-gradient(180deg, #FF8FAB 0%, #FFB3C6 45%, #FFD6E0 100%);
+    background: #f9cfcf;
     padding: 24px;
     position: relative;
 }
@@ -49,7 +49,7 @@ body::before {
 
 .card {
     width: 100%; max-width: 400px;
-    background: rgba(255,255,255,.88);
+    background: rgba(249, 242, 242, 0.9);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1.5px solid rgba(255,179,198,.6);
@@ -73,6 +73,7 @@ body::before {
 }
 .logo span { color: var(--accent); }
 
+
 .card-top { text-align: center; margin-bottom: 28px; }
 .card-top h1 {
     font-family: 'Playfair Display', serif;
@@ -80,6 +81,50 @@ body::before {
     color: var(--text); margin-bottom: 4px;
 }
 .card-top p { font-size: 12px; color: var(--muted); }
+
+/* Container utama untuk menyatukan logo dan teks kesamping */
+.logo-container {
+    display: flex;
+    align-items: center;       /* Membuat logo dan teks rata tengah secara vertikal */
+    justify-content: center;   /* Membuat posisi elemen tepat di tengah card*/
+    gap: 15px;                 /* Memberikan jarak antara logo bulat dan tulisan */
+    /* margin-bottom: 5px; */
+    text-decoration: none;      /* Menghilangkan garis bawah link */
+    width: 100%;
+}
+
+/* Container dibuat menumpuk ke bawah (column) agar logo di atas teks */
+.logo-container {
+    display: flex;
+    flex-direction: column;    /* Membuat elemen menyusun ke bawah */
+    align-items: center;       /* Membuat logo dan teks otomatis lurus di tengah */
+    justify-content: center;
+    text-decoration: none;
+    margin-bottom: 5px;       /* Jarak dari teks 'Cloudy Girls' ke 'Selamat Datang' */
+    width: 100%;
+}
+
+/* Mengatur ukuran logo hanger asli tanpa bingkai bulat */
+.logo-img {
+    width: 110px;              /* Sedikit diperkecil agar proporsional */
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 4px;        /* Memperkecil jarak bawah logo ke teks Cloudy Girls */
+}
+
+/* Mengatur tampilan teks Cloudy Girls di bawah logo */
+.logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;           /* Ukuran font teks */
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.2;
+}
+
+.logo-text span {
+    color: var(--accent);
+}
 
 /* TABS */
 .tabs {
@@ -134,13 +179,13 @@ body::before {
     width: 100%; padding: 11px 14px 11px 40px;
     border: 2px solid #F48FB1; border-radius: 10px;
     font-family: 'DM Sans', sans-serif; font-size: 13px;
-    color: var(--text); background: #FFF0F4;
+    color: var(--text); background: #fffef4;
     outline: none; transition: border-color .2s, box-shadow .2s, background .2s;
 }
 .field input:focus {
-    border-color: #FF6FA3;
+    border-color: #47cbd0;
     box-shadow: 0 0 0 4px rgba(255,111,163,.15);
-    background: #FFFFFF;
+    background: #1db899b1;
 }
 .field input::placeholder { color: #D4809A; }
 
@@ -154,12 +199,12 @@ body::before {
 
 /* SUBMIT */
 .btn-submit {
-    width: 100%; padding: 13px; margin-top: 4px;
-    background: #FF6FA3;
+    width: 100%; padding: 13px;
+    background: #59B292;
     color: #fff; border: none; border-radius: 12px;
     font-family: 'DM Sans', sans-serif;
     font-size: 13px; font-weight: 700;
-    letter-spacing: 1.2px; text-transform: uppercase;
+    letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer;
     box-shadow: 0 6px 22px rgba(255,111,163,.45);
     transition: background .2s, transform .15s, box-shadow .2s;
@@ -171,13 +216,13 @@ body::before {
 }
 .btn-submit:active { transform: scale(.985); }
 
-.card-bottom { text-align: center; margin-top: 20px; font-size: 12px; color: var(--muted); }
-.card-bottom a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.card-bottom { text-align: center; margin-top: 20px; font-size: 12px; color: #59B292; }
+.card-bottom a { color: #59B292; font-weight: 600; text-decoration: none; }
 .card-bottom a:hover { text-decoration: underline; }
 
 .back-home {
     display: flex; align-items: center; justify-content: center; gap: 5px;
-    margin-top: 18px; font-size: 11px; color: var(--muted);
+    margin-top: 18px; font-size: 11px; color: #59B292;
     text-decoration: none; transition: color .2s;
 }
 .back-home:hover { color: var(--accent); }
@@ -188,7 +233,10 @@ body::before {
 <div class="blob blob-2"></div>
 
 <div class="card">
-    <a href="../index.php" class="logo">Cloudy <span>Girls</span></a>
+    <a href="../index.php" class="logo-container">
+        <img src="../uploads/toko/logo.png" class="logo-img" alt="Logo">
+        <span class="logo-text">Cloudy <span>Girls</span></span>
+    </a>
 
     <div class="card-top">
         <h1>Buat Akun</h1>

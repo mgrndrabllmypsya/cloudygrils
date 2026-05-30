@@ -94,28 +94,24 @@ $stmt->execute();
     --red:     #D94F6E;
 }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem;
-            position: relative;
-            overflow: hidden;
-            background: #FFE2E2;
-        }
+   body {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    /* Pink soft gradient persis seperti gambar — atas ke bawah */
+    background: #f9cfcf;
+    padding: 24px;
+    position: relative;
+}
 
         body::before {
-            content: '';
-            position: fixed;
-            top: -120px;
-            right: -120px;
-            width: 400px;
-            height: 400px;
-            /* background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%); */
-            pointer-events: none;
-        }
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,.18) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+}
+
 
         body::after {
             content: '';
@@ -124,63 +120,97 @@ $stmt->execute();
             left: -100px;
             width: 350px;
             height: 350px;
-            background: radial-gradient(circle, rgba(236,72,153,0.10) 0%, transparent 70%);
+            background-image: radial-gradient(circle, rgba(255,255,255,.18) 1px, transparent 1px);
             pointer-events: none;
         }
 
         .card {
-            background: rgba(255,255,255,.88);
-            border-radius: 24px;
-            padding: 2.5rem 2.25rem;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 4px 24px rgba(124,58,237,0.10), 0 1px 4px rgba(0,0,0,0.06);
-            position: relative;
-            z-index: 1;
-        }
-
+    width: 100%; max-width: 380px;
+    background: rgba(249, 242, 242, 0.9); 
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255,179,198,.6);
+    border-radius: 24px;
+    padding: 40px 36px;
+    animation: fadeUp .45s ease both;
+    position: relative; z-index: 1;
+    box-shadow: 0 24px 64px rgba(255,143,171,.25), 0 4px 16px rgba(255,179,198,.2);
+}
+@keyframes fadeUp {
+    from { opacity:0; transform:translateY(18px) }
+    to   { opacity:1; transform:translateY(0) }
+}
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 2rem;
-        }
+    display: block; text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--text); margin-bottom: 24px;
+    text-decoration: none;
+}
+.logo span { color: var(--accent); }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--violet), var(--pink));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
+/* Container untuk Logo Hanger paling atas */
+.logo-top-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 8px; /* Jarak rapat ke teks di bawahnya */
+    width: 100%;
+}
 
-        .logo-text {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: #1db899b1;
-            letter-spacing: -0.5px;
-        }
-         .logo-text1 {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: #ff009db1;
-            letter-spacing: -0.5px;
-        }
+/* Ukuran logo hanger asli */
+.logo-img {
+    width: 110px;
+    height: auto;
+    object-fit: contain;
+}
 
-        .logo-text span {
-            color: var(--violet);
-        }
+/* Baris sakti yang membuat Gembok dan Cloudy Girls sejajar horizontal */
+.brand-title-row {
+    display: flex;
+    align-items: center;       /* Membuat icon gembok dan teks rata tengah vertikal */
+    justify-content: center;   /* Posisi pas di tengah-tengah card */
+    gap: 8px;                  /* Jarak spasi antara gembok dan tulisan */
+    margin-bottom: 16px;       /* Jarak ke tulisan 'Lupa Password?' */
+}
+
+/* Pengaturan khusus Icon Gembok agar ukurannya pas dengan teks */
+.gembok-icon {
+    font-size: 24px;           /* Menyesuaikan ukuran gembok dengan font tulisan */
+    line-height: 1;
+}
+
+/* Mengatur teks Cloudy Girls */
+.logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: #1db899b1;          /* Warna gelap utama */
+    margin-bottom: 0 !important; /* Menghapus margin bawaan h1 agar tidak merusak baris */
+    line-height: 1;
+}
+
+/* Pewarnaan kata Girls */
+.pink-text {
+    color: #ff009db1; !important; /* Hijau toska sesuai request kode barumu, ganti hex jika mau pink */
+}
+
+/* Mengatur judul halaman utama agar tidak tabrakan */
+.page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
 
         .logo-img {
-        width: 45px;       /* Mengatur lebar logo agar pas */
-        height: 45px;      /* Mengatur tinggi logo */
-        object-fit: contain; /* Memastikan gambar tidak gepeng */
-        }
+    width: 110px;              /* Sedikit diperkecil agar proporsional */
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 4px;        /* Memperkecil jarak bawah logo ke teks Cloudy Girls */
+}
         
 
         .icon-wrap {
@@ -246,7 +276,7 @@ $stmt->execute();
         }
 
         .input-wrap {
-            position: relative;
+            position: relative; 
         }
 
         .input-wrap svg {
@@ -256,6 +286,7 @@ $stmt->execute();
             transform: translateY(-50%);
             color: var(--muted);
             pointer-events: none;
+            
         }
 
         input[type="email"] {
@@ -272,9 +303,11 @@ $stmt->execute();
         }
 
         input[type="email"]:focus {
-            border-color: var(--violet);
-            box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
-            background: #fff;
+            width: 100%; padding: 11px 14px 11px 40px;
+    border: 2px solid #F48FB1; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    color: var(--text); background: #fffef4;
+    outline: none; transition: border-color .2s, box-shadow .2s, background .2s;
         }
 
         input[type="email"]::placeholder {
@@ -290,7 +323,7 @@ $stmt->execute();
             border-radius: 12px;
             font-size: 0.95rem;
             font-weight: 600;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
             transition: transform 0.15s, box-shadow 0.2s;
             box-shadow: 0 4px 14px rgba(124,58,237,0.35);
@@ -341,14 +374,16 @@ $stmt->execute();
 </head>
 <body>
     <div class="card">
-        <div class="logo">
-            <img src="../asset/image/logo.png" class="logo-img" >
-            <span class="logo-text">Cloudy</span>
-            <span class="logo-text1">Girls</span>
+        <div class="logo-top-container">
+            <img src="../uploads/toko/logo.png" class="logo-img" alt="Logo">
         </div>
 
-        <div class="icon-wrap">🔐</div>
-        <h1>Lupa Password?</h1>
+        <div class="brand-title-row">
+            <span class="gembok-icon">🔐</span>
+            <h1 class="logo-text">Cloudy <span class="pink-text">Girls</span></h1>
+        </div>
+
+        <h1 class="page-title">Lupa Password?</h1>
         <p class="subtitle">Tenang, masukkan email yang terdaftar dan kami akan kirimkan link untuk mereset password.</p>
 
         <?php if ($error): ?>

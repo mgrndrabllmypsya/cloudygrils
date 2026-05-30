@@ -85,7 +85,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
 
         body {
             font-family: 'DM Sans', sans-serif;
-            background: linear-gradient(160deg, var(--pink-3) 0%, var(--bg) 40%, #fff 100%);
+            background: #f9cfcf;
             background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
@@ -93,18 +93,53 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
 
         /* ── NAVBAR ── */
         nav {
-            background: rgba(255,255,255,.90);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            padding: 0 2rem;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky; top: 0; z-index: 100;
-        }
-        .brand { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--pink-1); }
-        .brand span { color: var(--pink-deep); }
+    background: rgba(255, 255, 255, .90);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Membuat .brand di kiri dan Checkout di kanan */
+    position: sticky; 
+    top: 0; 
+    z-index: 100;
+}
+
+.brand { 
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: #1db899b1; 
+    
+    /* Tambahan di bawah ini agar logo & teks bersebelahan rapi */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Memberikan jarak horizontal antara logo dan teks */
+}
+
+/* Warna hijau untuk kata 'Cloudy' (mengikuti warna utama .brand) */
+.brand span { 
+    color: #1db899b1; 
+}
+
+/* Warna pink khusus untuk kata 'Girls' */
+.brand span.pink-text { 
+    color: #ff009db1;
+}
+
+.logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+}
+
+.checkout-text {
+    font-size: .85rem;
+    color: var(--muted);
+}
 
         /* ── LAYOUT ── */
         .container {
@@ -222,7 +257,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             transition: all .2s;
             background: #fff;
         }
-        .metode-tab:hover { border-color: var(--pink-1); background: var(--pink-4); }
+        .metode-tab:hover { border-color: var(--pink-1); background: #1db899b1; }
         .metode-tab.selected {
             border-color: var(--pink-deep);
             background: linear-gradient(135deg, var(--pink-4), #fff8fa);
@@ -249,8 +284,8 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             cursor: pointer;
             transition: all .2s;
         }
-        .rek-card:hover { border-color: var(--pink-1); }
-        .rek-card.selected { border-color: var(--pink-deep); background: var(--pink-4); }
+        .rek-card:hover { border-color: var(--pink-1); background: #1db899b1; }
+        .rek-card.selected { border-color: var(--pink-deep); background: #1db899b1; }
         .rek-card .rek-name { font-weight: 600; font-size: .9rem; }
         .rek-card .rek-no { font-size: .8rem; color: var(--muted); margin-top: .2rem; }
 
@@ -348,7 +383,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             cursor: pointer;
             transition: all .2s;
         }
-        .eks-card:hover { border-color: var(--pink-1); }
+        .eks-card:hover { border-color: var(--pink-1); background: #1db899b1; }
         .eks-card.selected { border-color: var(--pink-deep); background: var(--pink-4); }
         .eks-card .eks-name { font-weight: 600; font-size: .88rem; }
         .eks-card .eks-ongkir { font-size: .78rem; color: var(--muted); margin-top: .15rem; }
@@ -385,7 +420,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             color: #fff;
             box-shadow: 0 4px 14px rgba(255,111,163,.30);
         }
-        .btn-primary:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,111,163,.35); }
+        .btn-primary:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 6px 18px; background: #1db899b1;  }
         .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* ── COD JENIS ── */
@@ -403,7 +438,7 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
             text-align: center;
             transition: all .2s;
         }
-        .cod-jenis-card:hover { border-color: var(--pink-1); background: var(--pink-4); }
+        .cod-jenis-card:hover { border-color: var(--pink-1); background: #1db899b1; }
         .cod-jenis-card.selected { border-color: var(--pink-deep); background: var(--pink-4); }
         .cod-jenis-card .cj-icon { font-size: 1.4rem; }
         .cod-jenis-card .cj-label { font-weight: 600; font-size: .85rem; margin-top: .3rem; color: var(--text); }
@@ -413,8 +448,12 @@ $diskon_nominal = $ada_diskon ? 10000 : 0;
 <body>
 
 <nav>
-    <div class="brand">Cloudy<span>Girls</span></div>
-    <span style="font-size:.85rem;color:var(--muted);">Checkout Aman 🔒</span>
+    <div class="brand">
+        <img src="../uploads/toko/logo.png" class="logo-img" alt="Logo">
+        <span>Cloudy</span><span class="pink-text">Girls</span>
+    </div>
+    
+    <span class="checkout-text">Checkout Aman 🔒</span>
 </nav>
 
 <form method="POST" action="proses_checkout.php" enctype="multipart/form-data" id="checkoutForm">
