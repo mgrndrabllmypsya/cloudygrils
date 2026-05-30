@@ -227,7 +227,6 @@ a { text-decoration:none; color:inherit; }
         <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
         <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
             <i class="bi bi-shop"></i> Lihat Toko
-            <i class="bi bi-box-arrow-up-right nav-ext-icon"></i>
         </a>
     </nav>
     <div class="sidebar-footer">

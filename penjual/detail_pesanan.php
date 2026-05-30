@@ -36,7 +36,7 @@ function getWilayahName($type, $id, $parent_id = null) {
     $response = curl_exec($ch);
     curl_close($ch);
 
-    if (!$response) return $id; // fallback ke ID jika koneksi gagal
+    if (!$response) return $id;
 
     $json = json_decode($response, true);
     if (!isset($json['value']) || !is_array($json['value'])) return $id;
@@ -47,7 +47,7 @@ function getWilayahName($type, $id, $parent_id = null) {
         }
     }
 
-    return $id; // fallback jika tidak ditemukan
+    return $id;
 }
 
 // Mapping nama kurir ke kode BinderByte
@@ -85,9 +85,8 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tolak_transfer') {
         status='menunggu'
         WHERE id=$id");
 
-mysqli_query($conn, "UPDATE produk SET status='aktif'
+    mysqli_query($conn, "UPDATE produk SET status='aktif'
         WHERE id = (SELECT produk_id FROM pesanan WHERE id=$id)");
-    
 
     header("Location: detail_pesanan.php?id=$id&msg=tolak"); exit;
 }
@@ -113,7 +112,7 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'update_status') {
     header("Location: detail_pesanan.php?id=$id&msg=status"); exit;
 }
 
-// ── 5. TANDAI SELESAI oleh Admin ────────────────────────────────────────────
+// ── 5. TANDAI SELESAI oleh Penjual ────────────────────────────────────────────
 if (isset($_POST['aksi']) && $_POST['aksi'] === 'tandai_selesai_admin') {
     mysqli_query($conn, "UPDATE pesanan SET
         status='selesai',
@@ -138,7 +137,6 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, "
 if (!$row) { header("Location: pesanan.php"); exit; }
 
 // ── RESOLVE NAMA WILAYAH via BinderByte ────────────────────────────────────
-// Hanya resolve jika nilainya tampak seperti ID numerik (bukan sudah berupa nama)
 function isWilayahId($val) {
     return $val && preg_match('/^\d[\d\.]*$/', trim($val));
 }
@@ -166,10 +164,10 @@ if (!empty($row['kecamatan'])) {
 }
 
 // ── VARIABEL HALAMAN ────────────────────────────────────────────────────────
-$admin_nama  = $_SESSION['admin_nama'] ?? 'Admin';
-$status      = $row['status'];
-$st_transfer = $row['status_transfer'];
-$is_cod      = ($row['metode'] === 'cod');
+$penjual_nama = $_SESSION['penjual_nama'] ?? 'Penjual';
+$status       = $row['status'];
+$st_transfer  = $row['status_transfer'];
+$is_cod       = ($row['metode'] === 'cod');
 
 $status_label = match($status) {
     'menunggu'     => 'Menunggu',
@@ -222,7 +220,7 @@ if (!$is_cod && $row['no_resi'] && $row['kurir'] && in_array($status, ['dikirim'
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Detail Pesanan <?= escape($row['kode_pesanan']) ?> — Cloudy Girls Admin</title>
+<title>Detail Pesanan <?= escape($row['kode_pesanan']) ?> — Cloudy Girls</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
@@ -238,27 +236,27 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 a{text-decoration:none;color:inherit;}
 
 /* SIDEBAR */
-.sidebar{width:240px;background:linear-gradient(180deg,#F4A7C3 0%,#E8719A 45%,#D4547F 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:4px 0 28px rgba(212,84,127,.3);}
-.sidebar-logo{padding:24px 24px 20px;border-bottom:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);}
-.sidebar-logo .logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:#fff;}
+.sidebar{width:300px;background:linear-gradient(180deg,#F4A7C3 0%,#E8719A 45%,#D4547F 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;border-radius:0 28px 28px 0;box-shadow:6px 0 32px rgba(212,84,127,.28);overflow:hidden;}
+.sidebar-logo{padding:28px 28px 22px;border-bottom:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);}
+.sidebar-logo .logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#fff;}
 .sidebar-logo .logo span{color:#FFE0EF;}
-.sidebar-logo small{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:2px;}
-.sidebar-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
-.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500;color:rgba(255,255,255,.8);transition:all .2s;}
-.nav-item:hover{background:rgba(255,255,255,.2);color:#fff;}
-.nav-item.active{background:rgba(255,255,255,.28);color:#fff;font-weight:600;border-left:3px solid #fff;}
-.nav-item i{font-size:16px;width:20px;flex-shrink:0;}
-.nav-section{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.55);padding:14px 14px 6px;font-weight:600;}
-.sidebar-footer{padding:16px 12px;border-top:1.5px solid rgba(255,255,255,.2);background:rgba(0,0,0,.1);}
-.admin-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.18);border-radius:10px;margin-bottom:10px;border:1.5px solid rgba(255,255,255,.3);}
-.admin-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.5);}
-.admin-info .name{font-size:13px;font-weight:600;color:#fff;}
-.admin-info .role{font-size:10px;color:rgba(255,255,255,.65);}
-.btn-logout{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:12px;color:rgba(255,255,255,.85);transition:background .2s;width:100%;}
+.sidebar-logo small{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:3px;}
+.sidebar-nav{flex:1;padding:20px 18px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+.nav-section{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.55);padding:18px 16px 8px;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:14px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:500;color:rgba(255,255,255,.85);transition:all .2s;letter-spacing:0.01em;}
+.nav-item:hover{background:rgba(255,255,255,.2);color:#fff;transform:translateX(3px);}
+.nav-item.active{background:rgba(255,255,255,.28);color:#fff;font-weight:600;border-left:3px solid #fff;padding-left:15px;}
+.nav-item i{font-size:17px;width:22px;flex-shrink:0;}
+.badge-notif{background:#fff;color:var(--accent);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto;}
+.nav-item-toko{margin-top:0;background:transparent;border:none;color:rgba(255,255,255,.85)!important;font-weight:500!important;justify-content:flex-start;border-radius:12px;box-shadow:none;letter-spacing:0.01em;}
+.nav-item-toko:hover{background:rgba(255,255,255,.2)!important;border-color:transparent!important;box-shadow:none;transform:translateX(3px)!important;color:#fff!important;}
+.sidebar-footer{padding:16px 18px 20px;border-top:1.5px solid rgba(255,255,255,.2);background:rgba(0,0,0,.1);}
+.btn-logout{display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:10px;font-size:13px;font-weight:500;color:rgba(255,255,255,.85);transition:background .2s;width:100%;letter-spacing:0.01em;}
+.btn-logout i{font-size:16px;}
 .btn-logout:hover{background:rgba(255,255,255,.2);color:#fff;}
 
 /* MAIN */
-.main{margin-left:240px;flex:1;display:flex;flex-direction:column;position:relative;z-index:1;}
+.main{margin-left:300px;flex:1;display:flex;flex-direction:column;position:relative;z-index:1;}
 .topbar{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1.5px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 12px rgba(212,84,127,.07);}
 .topbar-left{display:flex;align-items:center;gap:12px;}
 .topbar-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text);}
@@ -390,7 +388,33 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
 </head>
 <body>
 
-<?php include '../includes/sidebar.php'; ?>
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo">Cloudy <span>Girls</span></div>
+        <small>Seller Dashboard</small>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section">Menu</div>
+        <a href="dashboard.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+        <a href="produk.php"    class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
+        <a href="pesanan.php"   class="nav-item active"><i class="bi bi-bag-check"></i> Pesanan</a>
+        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
+            <?php if ($total_unread > 0): ?>
+            <span class="badge-notif"><?= $total_unread ?></span>
+            <?php endif; ?>
+        </a>
+        <a href="nego.php"      class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
+        <div class="nav-section">Lainnya</div>
+        <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
+        <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
+        <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
+            <i class="bi bi-shop"></i> Lihat Toko
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+    </div>
+</aside>
 
 <div class="main">
     <div class="topbar">
@@ -411,7 +435,7 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
             <?php elseif ($_GET['msg'] === 'status'): ?>
             <div class="alert-msg alert-success"><i class="bi bi-check-circle-fill"></i> Status berhasil diperbarui.</div>
             <?php elseif ($_GET['msg'] === 'selesai'): ?>
-            <div class="alert-msg alert-success"><i class="bi bi-check2-all"></i> Pesanan ditandai <strong>Selesai</strong> oleh admin. Pembeli kini bisa memberi ulasan.</div>
+            <div class="alert-msg alert-success"><i class="bi bi-check2-all"></i> Pesanan ditandai <strong>Selesai</strong> oleh penjual. Pembeli kini bisa memberi ulasan.</div>
             <?php endif; ?>
         <?php endif; ?>
 
@@ -497,7 +521,7 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
         </div>
         <?php endif; ?>
 
-        <!-- AKSI: TANDAI SELESAI oleh Admin (muncul saat status = dikirim) -->
+        <!-- AKSI: TANDAI SELESAI oleh Penjual (muncul saat status = dikirim) -->
         <?php if ($status === 'dikirim'): ?>
         <div class="card" style="border-color:rgba(52,211,153,.5);">
             <div class="card-head" style="background:rgba(52,211,153,.08);">
@@ -565,7 +589,7 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
                         <div class="info-row">
                             <span class="info-label">Diselesaikan Oleh</span>
                             <span class="info-val" style="color:var(--green);">
-                                <?= $row['diselesaikan_oleh'] === 'admin' ? '👤 Admin' : '🙋 Pembeli' ?>
+                                <?= $row['diselesaikan_oleh'] === 'admin' ? '👤 Penjual' : '🙋 Pembeli' ?>
                             </span>
                         </div>
                         <?php endif; ?>
@@ -639,14 +663,12 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
 
                         <?php if ($is_cod): ?>
                             <?php
-                            // Deteksi jenis COD dari kolom catatan
                             $cod_jenis_val = '';
                             if (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m)) {
-                                $cod_jenis_val = $m[1]; // antar_pembeli atau antar
+                                $cod_jenis_val = $m[1];
                             }
                             ?>
-                            <?php if ($cod_jenis_val === 'antar_pembeli' && $row['detail_alamat']): ?>
-                            <?php elseif ($cod_jenis_val === 'antar'): ?>
+                            <?php if ($cod_jenis_val === 'antar'): ?>
                             <div class="info-row">
                                 <span class="info-label">Jenis COD</span>
                                 <span class="info-val" style="color:var(--accent);">
@@ -654,9 +676,6 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
                                 </span>
                             </div>
                             <?php endif; ?>
-                        <?php endif; ?>
-
-                        <?php if ($row['catatan']): ?>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -706,7 +725,7 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
                     </div>
                 </div>
 
-                <!-- ── ALAMAT PENGIRIMAN (hanya non-COD) ── -->
+                <!-- ALAMAT PENGIRIMAN (hanya non-COD) -->
                 <?php if (!$is_cod && ($row['nama_penerima'] || $row['kota_tujuan'])): ?>
                 <div class="card">
                     <div class="card-head">
@@ -783,27 +802,29 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
                 </div>
                 <?php endif; ?>
 
+                <!-- ALAMAT PENGANTARAN COD -->
+                <?php if ($is_cod && !empty($row['alamat_cod'])): ?>
+                <div class="card">
+                    <div class="card-head">
+                        <div class="icon" style="background:rgba(52,211,153,.15);color:var(--green);"><i class="bi bi-geo-alt"></i></div>
+                        <h3>Alamat Pengantaran</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="info-label">Jenis COD</span>
+                            <span class="info-val" style="color:var(--green);">
+                                <?= escape($row['jenis_cod'] ?? '-') === 'antar_pembeli' ? '🛵 Antar ke Rumah' : '🏪 Beli ke Rumah Penjual' ?>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Alamat Lengkap</span>
+                            <span class="info-val"><?= escape($row['alamat_cod']) ?></span>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <!-- PENGIRIMAN & RESI / INFO COD -->
-                 <?php if ($is_cod && !empty($row['alamat_cod'])): ?>
-<div class="card">
-    <div class="card-head">
-        <div class="icon" style="background:rgba(52,211,153,.15);color:var(--green);"><i class="bi bi-geo-alt"></i></div>
-        <h3>Alamat Pengantaran</h3>
-    </div>
-    <div class="card-body">
-        <div class="info-row">
-            <span class="info-label">Jenis COD</span>
-            <span class="info-val" style="color:var(--green);">
-                <?= escape($row['jenis_cod'] ?? '-') === 'antar_pembeli' ? '🛵 Antar ke Rumah' : '🏪 Beli ke Rumah Penjual' ?>
-            </span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Alamat Lengkap</span>
-            <span class="info-val"><?= escape($row['alamat_cod']) ?></span>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
                 <?php if (in_array($status, ['diproses','dikirim','selesai']) || ($is_cod && $status === 'menunggu')): ?>
                 <div class="card">
                     <div class="card-head">
@@ -827,21 +848,21 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
                                 <span class="info-label">Nama Pembeli</span>
                                 <span class="info-val"><?= escape($row['nama_pembeli']) ?></span>
                             </div>
-                             <div class="info-row">
+                            <div class="info-row">
                                 <span class="info-label">Alamat Pembeli</span>
                                 <span class="info-val" style="color:var(--green);max-width:260px;">
                                     <i class="bi bi-geo-alt-fill"></i> <?= escape($row['detail_alamat']) ?>
                                 </span>
                             </div>
-                     <?php
-$catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catatan'] ?? ''));
-?>
-<div class="info-row">
-    <span class="info-label">Catatan Pembeli</span>
-    <span class="info-val" style="color:var(--yellow);font-style:italic;">
-        <?= $catatan_murni ? '"' . escape($catatan_murni) . '"' : '<span style="color:var(--muted);">Tidak ada catatan</span>' ?>
-    </span>
-</div>
+                            <?php
+                            $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catatan'] ?? ''));
+                            ?>
+                            <div class="info-row">
+                                <span class="info-label">Catatan Pembeli</span>
+                                <span class="info-val" style="color:var(--yellow);font-style:italic;">
+                                    <?= $catatan_murni ? '"' . escape($catatan_murni) . '"' : '<span style="color:var(--muted);">Tidak ada catatan</span>' ?>
+                                </span>
+                            </div>
 
                         <?php else: ?>
                             <div class="info-row">
@@ -1027,7 +1048,7 @@ $catatan_murni = trim(preg_replace('/Jenis COD:\s*\w+\.?\s*/i', '', $row['catata
 
                         if ($is_cod) {
                             $flow['diproses'] = ['label'=>'Sedang Diproses',      'sub'=>'Barang disiapkan'];
-                            $flow['dikirim']  = ['label'=>'Dalam Pengantaran',    'sub'=>'Admin mengantar ke pembeli'];
+                            $flow['dikirim']  = ['label'=>'Dalam Pengantaran',    'sub'=>'Penjual mengantar ke pembeli'];
                             $flow['selesai']  = ['label'=>'Selesai',              'sub'=>'COD lunas, pesanan selesai'];
                         } else {
                             $flow['dikonfirmasi'] = ['label'=>'Transfer Dikonfirmasi','sub'=>'Pembayaran valid'];

@@ -8,69 +8,60 @@ if (!isset($_SESSION['login']) || $_SESSION['user_role'] !== 'penjual') {
 }
 
 function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
+function formatRupiah($angka) { return 'Rp ' . number_format($angka, 0, ',', '.'); }
 
-$admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
-$pembeli_id = (int)($_GET['pembeli_id'] ?? 0);
-$produk_id  = (int)($_GET['produk_id'] ?? 0);
+$penjual_nama = $_SESSION['penjual_nama'] ?? 'Penjual';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pembeli_id && $produk_id) {
-    $pesan = trim($_POST['pesan'] ?? '');
-    if ($pesan !== '') {
-        $pesan_esc = $conn->real_escape_string($pesan);
-        $conn->query("INSERT INTO chat (produk_id, pembeli_id, pengirim, pesan, tipe, sudah_dibaca, created_at)
-                      VALUES ($produk_id, $pembeli_id, 'admin', '$pesan_esc', 'teks', 0, NOW())");
-    }
-    header("Location: chat.php?pembeli_id=$pembeli_id&produk_id=$produk_id"); exit;
-}
+$filter = $_GET['status'] ?? 'semua';
+$where  = $filter !== 'semua' ? "WHERE nh.status = '" . mysqli_real_escape_string($conn, $filter) . "'" : "";
 
-$q_list = mysqli_query($conn, "
-    SELECT c.pembeli_id, c.produk_id,
-           pb.nama AS nama_pembeli, pb.email AS email_pembeli,
-           pr.nama_barang, pr.foto_utama,
-           (SELECT pesan FROM chat WHERE pembeli_id=c.pembeli_id AND produk_id=c.produk_id ORDER BY created_at DESC LIMIT 1) AS pesan_terakhir,
-           (SELECT created_at FROM chat WHERE pembeli_id=c.pembeli_id AND produk_id=c.produk_id ORDER BY created_at DESC LIMIT 1) AS waktu_terakhir,
-           (SELECT COUNT(*) FROM chat WHERE pembeli_id=c.pembeli_id AND produk_id=c.produk_id AND pengirim='pembeli' AND sudah_dibaca=0) AS belum_dibaca
-    FROM chat c
-    JOIN pembeli pb ON pb.id = c.pembeli_id
-    JOIN produk pr ON pr.id = c.produk_id
-    GROUP BY c.pembeli_id, c.produk_id
-    ORDER BY waktu_terakhir DESC
+$q = mysqli_query($conn, "
+    SELECT nh.*, pb.nama AS nama_pembeli, pb.no_hp AS hp_pembeli,
+           pr.nama_barang, pr.foto_utama, pr.harga AS harga_produk
+    FROM nego_harga nh
+    JOIN pembeli pb ON pb.id = nh.pembeli_id
+    JOIN produk pr ON pr.id = nh.produk_id
+    $where
+    ORDER BY nh.created_at DESC
 ");
 
-$pesan_list    = [];
-$pembeli_aktif = null;
-$produk_aktif  = null;
-
-if ($pembeli_id && $produk_id) {
-    $conn->query("UPDATE chat SET sudah_dibaca=1 WHERE pembeli_id=$pembeli_id AND produk_id=$produk_id AND pengirim='pembeli'");
-    $pembeli_aktif = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM pembeli WHERE id=$pembeli_id LIMIT 1"));
-    $produk_aktif  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM produk WHERE id=$produk_id LIMIT 1"));
-    $q_pesan = mysqli_query($conn, "SELECT * FROM chat WHERE pembeli_id=$pembeli_id AND produk_id=$produk_id ORDER BY created_at ASC");
-    while ($p = mysqli_fetch_assoc($q_pesan)) $pesan_list[] = $p;
-}
-
-$total_unread = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
+$total_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='menunggu'"))[0] ?? 0;
+$total_counter  = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='counter'"))[0] ?? 0;
+$total_setuju   = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='disetujui'"))[0] ?? 0;
+$total_tolak    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='ditolak'"))[0] ?? 0;
+$total_unread = mysqli_fetch_row(mysqli_query($conn,"SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat — Cloudy Girls Admin</title>
+<title>Nego Harga — Cloudy Girls</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --bg:#FFF0F5; --surface:#FFFFFF; --surface2:#FFE8F2; --border:#F4A7C3;
-    --accent:#E8719A; --accent2:#D4547F; --pink:#F4A7C3; --pink2:#E8719A;
-    --green:#00BFA5; --yellow:#FFB300; --red:#FF1744;
-    --text:#1A1A1A; --text2:#444444; --muted:#BBA0B0; --white:#FFFFFF;
+    --bg:       #FFF0F5;
+    --surface:  #FFFFFF;
+    --surface2: #FFE8F2;
+    --border:   #F4A7C3;
+    --accent:   #E8719A;
+    --accent2:  #D4547F;
+    --pink:     #F4A7C3;
+    --pink2:    #E8719A;
+    --green:    #00BFA5;
+    --yellow:   #FFB300;
+    --red:      #FF1744;
+    --orange:   #FF6D00;
+    --text:     #1A1A1A;
+    --text2:    #444444;
+    --muted:    #BBA0B0;
+    --white:    #FFFFFF;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; height:100vh; overflow:hidden; }
-a { text-decoration:none; color:inherit; }
-
-/* ── SIDEBAR ── */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,#F4A7C3 1px,transparent 1px);background-size:28px 28px;opacity:.15;pointer-events:none;z-index:0;}
+a{text-decoration:none;color:inherit;}
 .sidebar {
     width: 300px;
     background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
@@ -81,6 +72,9 @@ a { text-decoration:none; color:inherit; }
     box-shadow: 6px 0 32px rgba(212,84,127,.28);
     overflow-y: auto;
     z-index: 50;
+    height: 100vh;
+    position: sticky;
+    top: 0;
 }
 .sidebar-logo {
     padding: 28px 28px 22px;
@@ -97,110 +91,83 @@ a { text-decoration:none; color:inherit; }
 .nav-item.active { background:rgba(255,255,255,.28); color:#fff; font-weight:600; border-left:3px solid #fff; padding-left:15px; }
 .nav-item i { font-size:17px; width:22px; flex-shrink:0; }
 .badge-notif { background:#fff; color:var(--accent); font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; margin-left:auto; }
+.nav-item-toko { margin-top:0; background:transparent; border:none; color:rgba(255,255,255,.85) !important; font-weight:500 !important; justify-content:flex-start; border-radius:12px; box-shadow:none; letter-spacing:0.01em; }
+.nav-item-toko:hover { background:rgba(255,255,255,.2) !important; border-color:transparent !important; box-shadow:none; transform:translateX(3px) !important; color:#fff !important; }
+.nav-ext-icon { font-size:11px !important; width:auto !important; margin-left:auto; opacity:.6; }
 .sidebar-footer { padding:16px 18px 20px; border-top:1.5px solid rgba(255,255,255,.2); background:rgba(0,0,0,.1); }
+.admin-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.18);border-radius:10px;margin-bottom:10px;border:1.5px solid rgba(255,255,255,.3);}
+.admin-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.5);}
+.admin-info .name{font-size:13px;font-weight:600;color:#fff;}
+.admin-info .role{font-size:10px;color:rgba(255,255,255,.65);}
 .btn-logout { display:flex; align-items:center; gap:10px; padding:11px 16px; border-radius:10px; font-size:13px; font-weight:500; color:rgba(255,255,255,.85); transition:background .2s; width:100%; letter-spacing:0.01em; }
 .btn-logout i { font-size:16px; }
 .btn-logout:hover { background:rgba(255,255,255,.2); color:#fff; }
-.nav-item-toko {
-    margin-top: 0;
-    background: transparent;
-    border: none;
-    color: rgba(255,255,255,.85) !important;
-    font-weight: 500 !important;
-    justify-content: flex-start;
-    border-radius: 12px;
-    box-shadow: none;
-    letter-spacing: 0.01em;
-}
-.nav-item-toko:hover {
-    background: rgba(255,255,255,.2) !important;
-    border-color: transparent !important;
-    box-shadow: none;
-    transform: translateX(3px) !important;
-    color: #fff !important;
-}
-.nav-ext-icon {
-    font-size: 11px !important;
-    width: auto !important;
-    margin-left: auto;
-    opacity: .6;
-}
-
-/* ── MAIN ── */
-.main { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
-.topbar {
-    background:rgba(255,255,255,.95);
-    backdrop-filter:blur(12px);
-    border-bottom:1.5px solid var(--border);
-    padding:0 32px; height:64px;
-    display:flex; align-items:center; justify-content:space-between;
-    flex-shrink:0;
-    box-shadow:0 2px 12px rgba(212,84,127,.07);
-}
-.topbar-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text); }
-
-/* ── CHAT LAYOUT ── */
-.chat-layout { flex:1; display:grid; grid-template-columns:300px 1fr; overflow:hidden; }
-
-/* LIST */
-.chat-list { background:var(--surface); border-right:1.5px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
-.chat-list-head { padding:14px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:600; color:var(--text); flex-shrink:0; background:linear-gradient(to right,#FFF0F5,#fff); }
-.chat-list-body { flex:1; overflow-y:auto; }
-.chat-list-body::-webkit-scrollbar { width:3px; }
-.chat-list-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
-
-.chat-item { display:flex; gap:10px; padding:12px 14px; border-bottom:1px solid rgba(255,214,224,.5); cursor:pointer; transition:background .15s; align-items:center; text-decoration:none; color:inherit; }
-.chat-item:hover { background:var(--surface2); }
-.chat-item.active { background:rgba(212,84,127,.08); border-left:3px solid var(--accent); }
-.chat-item-img { width:42px; height:42px; border-radius:10px; object-fit:cover; border:1.5px solid var(--border); flex-shrink:0; }
-.chat-item-info { flex:1; min-width:0; }
-.chat-item-nama { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.chat-item-sub { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
-.badge-unread { background:var(--accent2); color:#fff; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:10px; padding:0 5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-
-/* AREA CHAT */
-.chat-area { display:flex; flex-direction:column; overflow:hidden; }
-
-/* CHAT HEADER */
-.chat-header { padding:14px 20px; border-bottom:1.5px solid var(--border); background:linear-gradient(to right,#FFF0F5,#fff); display:flex; align-items:center; gap:12px; flex-shrink:0; }
-.chat-header-img { width:40px; height:40px; border-radius:10px; object-fit:cover; border:1.5px solid var(--border); flex-shrink:0; }
-.chat-header-info { flex:1; min-width:0; }
-.chat-header-info .nama { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.chat-header-info .sub { font-size:11px; color:var(--muted); margin-top:2px; }
-
-/* MESSAGES */
-.chat-messages { flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; background:var(--bg); }
-.chat-messages::-webkit-scrollbar { width:4px; }
-.chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
-
-/* DATE SEPARATOR */
-.date-sep { text-align:center; font-size:11px; color:var(--muted); display:flex; align-items:center; gap:8px; margin:4px 0; }
-.date-sep::before,.date-sep::after { content:''; flex:1; height:1px; background:var(--border); }
-
-/* BUBBLE */
-.bubble-wrap { display:flex; gap:8px; align-items:flex-end; max-width:75%; }
-.bubble-wrap.admin-msg { flex-direction:row-reverse; margin-left:auto; }
-.bubble-wrap.pembeli { margin-right:auto; }
-.bubble-avatar { width:30px; height:30px; border-radius:50%; background:var(--surface2); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent); flex-shrink:0; }
-.bubble-content { display:flex; flex-direction:column; max-width:100%; }
-.bubble { padding:10px 14px; border-radius:16px; font-size:13px; line-height:1.6; word-break:break-word; white-space:pre-wrap; }
-.bubble-wrap.pembeli .bubble { background:var(--surface); border:1.5px solid var(--border); border-bottom-left-radius:4px; color:var(--text); }
-.bubble-wrap.admin-msg .bubble { background:linear-gradient(135deg,var(--accent2),var(--pink2)); color:#fff; border-bottom-right-radius:4px; }
-.bubble-time { font-size:10px; color:var(--muted); margin-top:4px; padding:0 2px; }
-.bubble-wrap.admin-msg .bubble-time { text-align:right; }
-.bubble-wrap.pembeli .bubble-time { text-align:left; }
-
-/* INPUT */
-.chat-input-area { padding:12px 16px; border-top:1.5px solid var(--border); background:var(--surface); display:flex; gap:8px; align-items:flex-end; flex-shrink:0; }
-.chat-input { flex:1; padding:10px 16px; border:1.5px solid var(--border); border-radius:24px; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; resize:none; max-height:100px; line-height:1.5; color:var(--text); background:var(--surface2); transition:border-color .2s; overflow-y:auto; }
-.chat-input:focus { border-color:var(--accent); background:#fff; }
-.btn-kirim { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--accent2),var(--pink2)); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px; flex-shrink:0; transition:opacity .2s,transform .15s; }
-.btn-kirim:hover { opacity:.85; transform:scale(1.06); }
-
-.chat-placeholder { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:40px; }
-.chat-placeholder i { font-size:3rem; margin-bottom:12px; opacity:.25; display:block; }
-.chat-placeholder p { font-size:13px; line-height:1.7; }
-.empty-list { padding:32px 16px; text-align:center; color:var(--muted); font-size:12px; }
+.main{flex:1;display:flex;flex-direction:column;position:relative;z-index:1;min-width:0;}
+.topbar{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1.5px solid var(--border);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 12px rgba(212,84,127,.07);}
+.topbar-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.btn-toko{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;background:linear-gradient(135deg,#F4A7C3,#E8719A);font-size:12px;font-weight:600;color:#fff;box-shadow:0 3px 12px rgba(212,84,127,.35);transition:opacity .2s;}
+.btn-toko:hover{opacity:.88;}
+.content{padding:26px 28px;flex:1;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:all .2s;display:block;text-decoration:none;box-shadow:0 2px 12px rgba(212,84,127,.08);}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(212,84,127,.15);}
+.stat-card.active-filter{border-color:var(--accent);background:#FFE0EF;}
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px;}
+.stat-value{font-size:24px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.stat-label{font-size:12px;color:var(--muted);}
+.filter-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-tab{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s;text-decoration:none;background:var(--white);}
+.filter-tab:hover{border-color:var(--accent);color:var(--accent);}
+.filter-tab.active{background:linear-gradient(135deg,#F4A7C3,#E8719A);border-color:transparent;color:#fff;box-shadow:0 3px 10px rgba(212,84,127,.3);}
+.nego-list{display:flex;flex-direction:column;gap:14px;}
+.nego-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(212,84,127,.07);}
+.nego-card:hover{border-color:var(--pink);box-shadow:0 6px 20px rgba(212,84,127,.12);}
+.nego-card-head{padding:14px 20px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:linear-gradient(to right,#FFF0F5,#fff);}
+.nego-card-body{padding:16px 20px;display:flex;gap:16px;align-items:flex-start;}
+.nego-card-foot{padding:12px 20px;border-top:1.5px solid var(--border);background:#FFF2F7;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.produk-thumb{width:56px;height:64px;border-radius:8px;object-fit:cover;border:1.5px solid var(--border);flex-shrink:0;}
+.nego-info{flex:1;}
+.nego-produk{font-weight:600;font-size:14px;color:var(--text);margin-bottom:4px;}
+.nego-pembeli{font-size:12px;color:var(--muted);margin-bottom:10px;}
+.harga-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:10px;}
+.harga-box{background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border);}
+.harga-box .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.harga-box .val{font-size:14px;font-weight:700;}
+.harga-asli .val{color:var(--text);}
+.harga-tawar .val{color:var(--yellow);}
+.harga-deal .val{color:var(--green);}
+.harga-counter .val{color:var(--orange);}
+.nego-pesan{font-size:13px;color:var(--text2);font-style:italic;padding:10px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--border);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-menunggu{background:#FFF8E1;color:#F9A825;}
+.badge-disetujui{background:#E0F2F1;color:#00897B;}
+.badge-ditolak{background:#FFEBEE;color:#E53935;}
+.badge-counter{background:#FBE9E7;color:#E64A19;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.btn-green{background:#E0F2F1;color:#00695C;border:1.5px solid #80CBC4 !important;}
+.btn-green:hover{background:#B2DFDB;}
+.btn-red{background:#FFEBEE;color:#C62828;border:1.5px solid #EF9A9A !important;}
+.btn-red:hover{background:#FFCDD2;}
+.btn-orange{background:#FBE9E7;color:#BF360C;border:1.5px solid #FFAB91 !important;}
+.btn-orange:hover{background:#FFCCBC;}
+.form-inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.form-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:7px 12px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;width:160px;}
+.form-input:focus{border-color:var(--accent);}
+.empty-box{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-box i{font-size:3rem;display:block;margin-bottom:12px;color:var(--pink);}
+.empty-box p{font-size:14px;}
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.alert-success{background:#E0F2F1;color:#00695C;border:1.5px solid #80CBC4;}
+.alert-danger{background:#FFEBEE;color:#C62828;border:1.5px solid #EF9A9A;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.modal-box{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:28px;width:420px;max-width:92%;box-shadow:0 25px 60px rgba(212,84,127,.2);}
+.modal-box h4{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.modal-box p{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;}
+.btn-cancel{padding:8px 16px;border-radius:8px;background:var(--surface2);border:1.5px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-cancel:hover{color:var(--text);border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -215,19 +182,22 @@ a { text-decoration:none; color:inherit; }
         <a href="dashboard.php" class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <a href="produk.php"    class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
         <a href="pesanan.php"   class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="chat.php"      class="nav-item active">
-            <i class="bi bi-chat-dots"></i> Chat
+        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
             <?php if ($total_unread > 0): ?>
             <span class="badge-notif"><?= $total_unread ?></span>
             <?php endif; ?>
         </a>
-        <a href="nego.php"      class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
+        <a href="nego.php"      class="nav-item active">
+            <i class="bi bi-tags"></i> Nego Harga
+            <?php if ($total_menunggu > 0): ?>
+            <span class="badge-notif"><?= $total_menunggu ?></span>
+            <?php endif; ?>
+        </a>
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
         <a href="pengaturan.php" class="nav-item"><i class="bi bi-gear"></i> Pengaturan</a>
         <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
             <i class="bi bi-shop"></i> Lihat Toko
-            <i class="bi bi-box-arrow-up-right nav-ext-icon"></i>
         </a>
     </nav>
     <div class="sidebar-footer">
@@ -237,110 +207,214 @@ a { text-decoration:none; color:inherit; }
 
 <div class="main">
     <div class="topbar">
-        <div class="topbar-title">Chat Pembeli</div>
-        <?php if ($total_unread > 0): ?>
-        <span style="font-size:12px;color:var(--red);display:flex;align-items:center;gap:5px;">
-            <i class="bi bi-circle-fill" style="font-size:8px;"></i> <?= $total_unread ?> pesan belum dibaca
-        </span>
-        <?php endif; ?>
+        <div class="topbar-title">Nego Harga</div>
+        <div class="topbar-right">
+            <span style="font-size:12px;color:var(--muted);"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
+            <a href="../pages/home.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
+        </div>
     </div>
 
-    <div class="chat-layout">
+    <div class="content">
 
-        <!-- LIST -->
-        <div class="chat-list">
-            <div class="chat-list-head">💬 Percakapan</div>
-            <div class="chat-list-body">
-                <?php if ($q_list && mysqli_num_rows($q_list) > 0):
-                    while ($item = mysqli_fetch_assoc($q_list)):
-                        $isActive = $item['pembeli_id'] == $pembeli_id && $item['produk_id'] == $produk_id;
-                        $fotoSrc  = !empty($item['foto_utama']) ? '../uploads/produk/' . escape($item['foto_utama']) : 'https://placehold.co/42x42/FFE8F2/E8719A?text=CG';
-                ?>
-                <a href="chat.php?pembeli_id=<?= $item['pembeli_id'] ?>&produk_id=<?= $item['produk_id'] ?>" class="chat-item <?= $isActive ? 'active' : '' ?>">
-                    <img src="<?= $fotoSrc ?>" class="chat-item-img" alt="produk">
-                    <div class="chat-item-info">
-                        <div class="chat-item-nama"><?= escape($item['nama_pembeli']) ?></div>
-                        <div class="chat-item-sub"><?= escape(substr($item['nama_barang'],0,22)) ?> · <?= escape(substr($item['pesan_terakhir']??'...',0,18)) ?></div>
-                    </div>
-                    <?php if ($item['belum_dibaca'] > 0): ?>
-                    <span class="badge-unread"><?= $item['belum_dibaca'] ?></span>
-                    <?php endif; ?>
-                </a>
-                <?php endwhile; else: ?>
-                <div class="empty-list">
-                    <i class="bi bi-chat-dots" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.3;"></i>
-                    Belum ada percakapan
-                </div>
-                <?php endif; ?>
-            </div>
+        <?php if (isset($_GET['msg'])): ?>
+            <?php if ($_GET['msg'] === 'setuju'): ?>
+            <div class="alert alert-success"><i class="bi bi-check-circle-fill"></i> Nego disetujui!</div>
+            <?php elseif ($_GET['msg'] === 'tolak'): ?>
+            <div class="alert alert-danger"><i class="bi bi-x-circle-fill"></i> Nego ditolak.</div>
+            <?php elseif ($_GET['msg'] === 'counter'): ?>
+            <div class="alert alert-success"><i class="bi bi-arrow-left-right"></i> Counter harga berhasil dikirim.</div>
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <div class="stats-grid">
+            <a href="nego.php?status=menunggu" class="stat-card <?= $filter==='menunggu'?'active-filter':'' ?>">
+                <div class="stat-icon" style="background:#FFF8E1;color:#F9A825;"><i class="bi bi-hourglass-split"></i></div>
+                <div class="stat-value"><?= $total_menunggu ?></div>
+                <div class="stat-label">Menunggu Respon</div>
+            </a>
+            <a href="nego.php?status=counter" class="stat-card <?= $filter==='counter'?'active-filter':'' ?>">
+                <div class="stat-icon" style="background:#FBE9E7;color:#E64A19;"><i class="bi bi-arrow-left-right"></i></div>
+                <div class="stat-value"><?= $total_counter ?></div>
+                <div class="stat-label">Counter Dikirim</div>
+            </a>
+            <a href="nego.php?status=disetujui" class="stat-card <?= $filter==='disetujui'?'active-filter':'' ?>">
+                <div class="stat-icon" style="background:#E0F2F1;color:#00897B;"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-value"><?= $total_setuju ?></div>
+                <div class="stat-label">Disetujui</div>
+            </a>
+            <a href="nego.php?status=ditolak" class="stat-card <?= $filter==='ditolak'?'active-filter':'' ?>">
+                <div class="stat-icon" style="background:#FFEBEE;color:#E53935;"><i class="bi bi-x-circle"></i></div>
+                <div class="stat-value"><?= $total_tolak ?></div>
+                <div class="stat-label">Ditolak</div>
+            </a>
         </div>
 
-        <!-- AREA CHAT -->
-        <div class="chat-area">
-            <?php if ($pembeli_aktif && $produk_aktif): ?>
+        <div class="filter-tabs">
+            <a href="nego.php?status=semua"     class="filter-tab <?= $filter==='semua'    ?'active':'' ?>">Semua</a>
+            <a href="nego.php?status=menunggu"  class="filter-tab <?= $filter==='menunggu' ?'active':'' ?>">⏳ Menunggu</a>
+            <a href="nego.php?status=counter"   class="filter-tab <?= $filter==='counter'  ?'active':'' ?>">↔ Counter</a>
+            <a href="nego.php?status=disetujui" class="filter-tab <?= $filter==='disetujui'?'active':'' ?>">✅ Disetujui</a>
+            <a href="nego.php?status=ditolak"   class="filter-tab <?= $filter==='ditolak'  ?'active':'' ?>">❌ Ditolak</a>
+        </div>
 
-            <div class="chat-header">
-                <?php $fotoSrc = !empty($produk_aktif['foto_utama']) ? '../uploads/produk/' . escape($produk_aktif['foto_utama']) : 'https://placehold.co/40x40/FFE8F2/E8719A?text=CG'; ?>
-                <img src="<?= $fotoSrc ?>" class="chat-header-img" alt="produk">
-                <div class="chat-header-info">
-                    <div class="nama"><?= escape($pembeli_aktif['nama']) ?></div>
-                    <div class="sub"><?= escape($produk_aktif['nama_barang']) ?></div>
-                </div>
-            </div>
-
-            <div class="chat-messages" id="chatMessages">
-                <?php if (empty($pesan_list)): ?>
-                <div style="text-align:center;color:var(--muted);font-size:13px;padding:32px;">Belum ada pesan.</div>
-                <?php endif; ?>
-
-                <?php
-                $prev_date = '';
-                foreach ($pesan_list as $p):
-                    $isAdmin = $p['pengirim'] === 'admin';
-                    $waktu   = date('H:i', strtotime($p['created_at']));
-                    $tgl     = date('d M Y', strtotime($p['created_at']));
-                    if ($tgl !== $prev_date): $prev_date = $tgl;
-                ?>
-                <div class="date-sep"><?= $tgl === date('d M Y') ? 'Hari ini' : $tgl ?></div>
-                <?php endif; ?>
-
-                <div class="bubble-wrap <?= $isAdmin ? 'admin-msg' : 'pembeli' ?>">
-                    <div class="bubble-content">
-                        <div class="bubble"><?= nl2br(escape($p['pesan'])) ?></div>
-                        <div class="bubble-time"><?= $waktu ?></div>
+        <?php if ($q && mysqli_num_rows($q) > 0): ?>
+        <div class="nego-list">
+        <?php while ($row = mysqli_fetch_assoc($q)): ?>
+        <?php $persen_tawar = round((1 - $row['harga_tawar'] / $row['harga_asli']) * 100); ?>
+        <div class="nego-card">
+            <div class="nego-card-head">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F4A7C3,#E8719A);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;">
+                        <?= strtoupper(substr($row['nama_pembeli'], 0, 1)) ?>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;font-size:13px;color:var(--text);"><?= escape($row['nama_pembeli']) ?></div>
+                        <div style="font-size:11px;color:var(--muted);"><?= escape($row['hp_pembeli'] ?? '-') ?> · <?= date('d M Y, H:i', strtotime($row['created_at'])) ?></div>
                     </div>
                 </div>
-                <?php endforeach; ?>
+                <?php
+                $badge_class = match($row['status']) {
+                    'menunggu'  => 'badge-menunggu',
+                    'disetujui' => 'badge-disetujui',
+                    'ditolak'   => 'badge-ditolak',
+                    'counter'   => 'badge-counter',
+                    default     => ''
+                };
+                $badge_label = match($row['status']) {
+                    'menunggu'  => '⏳ Menunggu',
+                    'disetujui' => '✅ Disetujui',
+                    'ditolak'   => '❌ Ditolak',
+                    'counter'   => '↔ Counter',
+                    default     => $row['status']
+                };
+                ?>
+                <span class="badge <?= $badge_class ?>"><?= $badge_label ?></span>
             </div>
 
-            <form method="POST" class="chat-input-area">
-                <textarea name="pesan" class="chat-input" placeholder="Balas pesan..." rows="1"
-                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.form.submit();}"></textarea>
-                <button type="submit" class="btn-kirim"><i class="bi bi-send-fill"></i></button>
-            </form>
+            <div class="nego-card-body">
+                <img src="../uploads/produk/<?= escape($row['foto_utama'] ?? '') ?>"
+                     class="produk-thumb"
+                     onerror="this.src='https://placehold.co/56x64/FFF0F5/E8719A?text=CG'">
+                <div class="nego-info">
+                    <div class="nego-produk"><?= escape($row['nama_barang']) ?></div>
+                    <div class="nego-pembeli">Penawaran turun <strong style="color:var(--yellow);"><?= $persen_tawar ?>%</strong> dari harga asli</div>
+                    <div class="harga-row">
+                        <div class="harga-box harga-asli">
+                            <div class="lbl">Harga Asli</div>
+                            <div class="val"><?= formatRupiah($row['harga_asli']) ?></div>
+                        </div>
+                        <div class="harga-box harga-tawar">
+                            <div class="lbl">Ditawar</div>
+                            <div class="val"><?= formatRupiah($row['harga_tawar']) ?></div>
+                        </div>
+                        <?php if ($row['harga_deal']): ?>
+                        <div class="harga-box harga-deal">
+                            <div class="lbl">Harga Deal</div>
+                            <div class="val"><?= formatRupiah($row['harga_deal']) ?></div>
+                        </div>
+                        <?php elseif ($row['harga_counter']): ?>
+                        <div class="harga-box harga-counter">
+                            <div class="lbl">Counter Penjual</div>
+                            <div class="val"><?= formatRupiah($row['harga_counter']) ?></div>
+                        </div>
+                        <?php else: ?>
+                        <div class="harga-box">
+                            <div class="lbl">Selisih</div>
+                            <div class="val" style="color:var(--red);">- <?= formatRupiah($row['harga_asli'] - $row['harga_tawar']) ?></div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($row['pesan']): ?>
+                    <div class="nego-pesan">"<?= escape($row['pesan']) ?>"</div>
+                    <?php endif; ?>
+                    <?php if ($row['pesan_admin']): ?>
+                    <div class="nego-pesan" style="border-left-color:var(--accent);margin-top:8px;">
+                        <span style="font-size:11px;color:var(--accent);font-style:normal;font-weight:600;">Balasan Penjual:</span><br>
+                        "<?= escape($row['pesan_admin']) ?>"
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
 
-            <?php else: ?>
-            <div class="chat-placeholder">
-                <i class="bi bi-chat-dots"></i>
-                <p>Pilih percakapan untuk mulai membalas</p>
+            <?php if ($row['status'] === 'menunggu'): ?>
+            <div class="nego-card-foot">
+                <form method="POST" action="../transaksi/proses_nego.php">
+                    <input type="hidden" name="nego_id" value="<?= $row['id'] ?>">
+                    <input type="hidden" name="aksi" value="setuju">
+                    <input type="hidden" name="harga_deal" value="<?= $row['harga_tawar'] ?>">
+                    <button type="submit" class="btn btn-green"><i class="bi bi-check-circle-fill"></i> Setuju</button>
+                </form>
+                <form method="POST" action="../transaksi/proses_nego.php" class="form-inline">
+                    <input type="hidden" name="nego_id" value="<?= $row['id'] ?>">
+                    <input type="hidden" name="aksi" value="counter">
+                    <input type="number" name="harga_counter" class="form-input"
+                           placeholder="Harga counter..." min="1"
+                           value="<?= round(($row['harga_asli'] + $row['harga_tawar']) / 2) ?>">
+                    <input type="text" name="pesan_admin" class="form-input" placeholder="Pesan (opsional)">
+                    <button type="submit" class="btn btn-orange"><i class="bi bi-arrow-left-right"></i> Counter</button>
+                </form>
+                <button class="btn btn-red" onclick="openTolak(<?= $row['id'] ?>)">
+                    <i class="bi bi-x-circle-fill"></i> Tolak
+                </button>
+            </div>
+            <?php elseif ($row['status'] === 'counter'): ?>
+            <div class="nego-card-foot">
+                <span style="font-size:12px;color:var(--muted);"><i class="bi bi-clock"></i> Menunggu respon pembeli atas counter harga</span>
+            </div>
+            <?php elseif ($row['status'] === 'disetujui'): ?>
+            <div class="nego-card-foot">
+                <span style="font-size:12px;color:var(--green);"><i class="bi bi-check-circle-fill"></i> Deal pada <?= formatRupiah($row['harga_deal']) ?></span>
+            </div>
+            <?php elseif ($row['status'] === 'ditolak'): ?>
+            <div class="nego-card-foot">
+                <span style="font-size:12px;color:var(--red);"><i class="bi bi-x-circle-fill"></i> Nego ditolak</span>
             </div>
             <?php endif; ?>
         </div>
+        <?php endwhile; ?>
+        </div>
+
+        <?php else: ?>
+        <div class="empty-box">
+            <i class="bi bi-tags"></i>
+            <p>Belum ada pengajuan nego<?= $filter !== 'semua' ? ' dengan status ini' : '' ?>.</p>
+        </div>
+        <?php endif; ?>
 
     </div>
 </div>
 
-<script>
-const msgs = document.getElementById('chatMessages');
-if (msgs) msgs.scrollTop = msgs.scrollHeight;
+<!-- MODAL TOLAK -->
+<div class="overlay" id="modalTolak">
+    <div class="modal-box">
+        <h4><i class="bi bi-x-circle" style="color:var(--red);margin-right:6px;"></i> Tolak Nego</h4>
+        <p>Berikan alasan penolakan kepada pembeli (opsional).</p>
+        <form method="POST" action="../transaksi/proses_nego.php">
+            <input type="hidden" name="nego_id" id="tolakNegoId">
+            <input type="hidden" name="aksi" value="tolak">
+            <div style="margin-bottom:14px;">
+                <textarea name="pesan_admin" class="form-input" style="width:100%;min-height:80px;resize:vertical;"
+                    placeholder="Contoh: Harga terlalu rendah, minimal nego 10% dari harga asli."></textarea>
+            </div>
+            <div class="modal-btns">
+                <button type="button" class="btn-cancel" onclick="closeTolak()">Batal</button>
+                <button type="submit" class="btn btn-red"><i class="bi bi-x-circle-fill"></i> Tolak Nego</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-const ta = document.querySelector('.chat-input');
-if (ta) {
-    ta.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-    });
+<script>
+function openTolak(id) {
+    document.getElementById('tolakNegoId').value = id;
+    document.getElementById('modalTolak').classList.add('show');
 }
+function closeTolak() {
+    document.getElementById('modalTolak').classList.remove('show');
+}
+document.getElementById('modalTolak').addEventListener('click', function(e){
+    if (e.target === this) closeTolak();
+});
 </script>
 </body>
 </html>

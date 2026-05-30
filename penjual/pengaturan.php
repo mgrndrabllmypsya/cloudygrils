@@ -69,8 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ganti_password'])) {
     $pw_baru  = $_POST['pw_baru']  ?? '';
     $pw_ulang = $_POST['pw_ulang'] ?? '';
 
-    $admin_id = $_SESSION['admin_id'] ?? 0;
-    $q = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM admin WHERE id=$admin_id"));
+    $penjual_id = $_SESSION['penjual_id'] ?? 0;
+    $q = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM penjual WHERE id=$penjual_id"));
 
     if (!$q || !password_verify($pw_lama, $q['password'])) {
         $msg = 'Password lama tidak sesuai.'; $msg_type = 'error';
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ganti_password'])) {
         $msg = 'Password baru minimal 6 karakter.'; $msg_type = 'error';
     } else {
         $hash = password_hash($pw_baru, PASSWORD_DEFAULT);
-        mysqli_query($conn, "UPDATE admin SET password='$hash' WHERE id=$admin_id");
+        mysqli_query($conn, "UPDATE penjual SET password='$hash' WHERE id=$penjual_id");
         $msg = 'Password berhasil diperbarui.'; $msg_type = 'success';
     }
 }
@@ -90,15 +90,19 @@ $settings = [];
 $q_set = mysqli_query($conn, "SELECT * FROM pengaturan_toko WHERE id=1");
 if ($q_set) $settings = mysqli_fetch_assoc($q_set) ?? [];
 
-$admin_nama = $_SESSION['admin_nama'] ?? 'Admin';
-$logo_path  = !empty($settings['logo']) ? '../uploads/toko/' . $settings['logo'] : null;
+$penjual_nama = $_SESSION['penjual_nama'] ?? 'Penjual';
+$logo_path    = !empty($settings['logo']) ? '../uploads/toko/' . $settings['logo'] : null;
+
+$total_unread = mysqli_fetch_row(mysqli_query($conn,
+    "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"
+))[0] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pengaturan — Cloudy Girls Admin</title>
+<title>Pengaturan — Cloudy Girls</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
@@ -140,37 +144,54 @@ a { text-decoration: none; color: inherit; }
 
 /* ── SIDEBAR ── */
 .sidebar {
-    width: 240px;
+    width: 300px;
     background: linear-gradient(180deg, #F4A7C3 0%, #E8719A 45%, #D4547F 100%);
     display: flex; flex-direction: column;
     position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
-    box-shadow: 4px 0 28px rgba(212,84,127,.3);
+    border-radius: 0 28px 28px 0;
+    box-shadow: 6px 0 32px rgba(212,84,127,.28);
+    overflow: hidden;
 }
 .sidebar-logo {
-    padding: 24px 24px 20px;
+    padding: 28px 28px 22px;
     border-bottom: 1.5px solid rgba(255,255,255,.2);
     background: rgba(255,255,255,.12);
 }
-.sidebar-logo .logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #fff; }
+.sidebar-logo .logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: #fff; }
 .sidebar-logo .logo span { color: #FFE0EF; }
-.sidebar-logo small { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 2px; }
-.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
-.nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.8); transition: all .2s; }
-.nav-item:hover { background: rgba(255,255,255,.2); color: #fff; }
-.nav-item.active { background: rgba(255,255,255,.28); color: #fff; font-weight: 600; border-left: 3px solid #fff; }
-.nav-item i { font-size: 16px; width: 20px; }
-.nav-section { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.55); padding: 14px 14px 6px; font-weight: 600; }
-.sidebar-footer { padding: 16px 12px; border-top: 1.5px solid rgba(255,255,255,.2); background: rgba(0,0,0,.1); }
-.admin-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,.18); border-radius: 10px; margin-bottom: 10px; border: 1.5px solid rgba(255,255,255,.3); }
-.admin-avatar { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; border: 2px solid rgba(255,255,255,.5); overflow: hidden; }
-.admin-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-.admin-info .name { font-size: 13px; font-weight: 600; color: #fff; }
-.admin-info .role { font-size: 10px; color: rgba(255,255,255,.65); }
-.btn-logout { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; font-size: 12px; color: rgba(255,255,255,.85); transition: background .2s; width: 100%; }
+.sidebar-logo small { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 3px; }
+.sidebar-nav { flex: 1; padding: 20px 18px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+.nav-section { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.55); padding: 18px 16px 8px; font-weight: 600; }
+.nav-item { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-radius: 12px; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.85); transition: all .2s; letter-spacing: 0.01em; }
+.nav-item:hover { background: rgba(255,255,255,.2); color: #fff; transform: translateX(3px); }
+.nav-item.active { background: rgba(255,255,255,.28); color: #fff; font-weight: 600; border-left: 3px solid #fff; padding-left: 15px; }
+.nav-item i { font-size: 17px; width: 22px; flex-shrink: 0; }
+.badge-notif { background: #fff; color: var(--accent); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: auto; }
+.nav-item-toko {
+    margin-top: 0;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.85) !important;
+    font-weight: 500 !important;
+    justify-content: flex-start;
+    border-radius: 12px;
+    box-shadow: none;
+    letter-spacing: 0.01em;
+}
+.nav-item-toko:hover {
+    background: rgba(255,255,255,.2) !important;
+    border-color: transparent !important;
+    box-shadow: none;
+    transform: translateX(3px) !important;
+    color: #fff !important;
+}
+.sidebar-footer { padding: 16px 18px 20px; border-top: 1.5px solid rgba(255,255,255,.2); background: rgba(0,0,0,.1); }
+.btn-logout { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.85); transition: background .2s; width: 100%; letter-spacing: 0.01em; }
+.btn-logout i { font-size: 16px; }
 .btn-logout:hover { background: rgba(255,255,255,.2); color: #fff; }
 
 /* ── MAIN ── */
-.main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
+.main { margin-left: 300px; flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
 
 /* ── TOPBAR ── */
 .topbar {
@@ -185,8 +206,6 @@ a { text-decoration: none; color: inherit; }
 .topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); }
 .topbar-right { display: flex; align-items: center; gap: 10px; }
 .topbar-date { font-size: 12px; color: var(--muted); }
-.btn-toko { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: linear-gradient(135deg,#F4A7C3,#E8719A); font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 3px 12px rgba(212,84,127,.35); transition: opacity .2s; }
-.btn-toko:hover { opacity: .88; }
 
 /* ── CONTENT ── */
 .content { padding: 28px 32px; flex: 1; }
@@ -230,11 +249,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ── REKENING SECTION ── */
-.rek-divider {
-    margin: 20px 0 16px;
-    padding-top: 18px;
-    border-top: 1.5px dashed var(--border);
-}
+.rek-divider { margin: 20px 0 16px; padding-top: 18px; border-top: 1.5px dashed var(--border); }
 .rek-divider-title {
     font-size: 12px; font-weight: 700; color: var(--accent);
     display: flex; align-items: center; gap: 6px;
@@ -243,11 +258,8 @@ a { text-decoration: none; color: inherit; }
 }
 .rek-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .rek-preview {
-    background: var(--surface2);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 14px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
     display: flex; align-items: center; gap: 10px;
 }
 .rek-preview .rek-icon { font-size: 22px; flex-shrink: 0; }
@@ -279,11 +291,8 @@ a { text-decoration: none; color: inherit; }
 
 /* ── MAPS INFO BOX ── */
 .maps-info {
-    background: rgba(212,84,127,.05);
-    border: 1px solid rgba(212,84,127,.2);
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-top: 6px;
+    background: rgba(212,84,127,.05); border: 1px solid rgba(212,84,127,.2);
+    border-radius: 8px; padding: 10px 12px; margin-top: 6px;
 }
 .maps-info-title { font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
 .maps-info ol { font-size: 11px; color: var(--muted); padding-left: 14px; line-height: 1.9; margin: 0; }
@@ -309,12 +318,7 @@ a { text-decoration: none; color: inherit; }
 .alert.error   { background: rgba(255,23,68,.1);  color: var(--red);   border: 1px solid rgba(255,23,68,.25); }
 
 /* ── INFO BOX ── */
-.info-box {
-    background: var(--surface2);
-    border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 14px 16px;
-    font-size: 12px; color: var(--text2); line-height: 1.6;
-}
+.info-box { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 12px; color: var(--text2); line-height: 1.6; }
 .info-box .info-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .info-box .info-row:last-child { margin-bottom: 0; }
 .info-box i { color: var(--accent); font-size: 14px; }
@@ -331,33 +335,28 @@ a { text-decoration: none; color: inherit; }
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="logo">Cloudy <span>Girls</span></div>
+        <small>Seller Dashboard</small>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
         <a href="dashboard.php"  class="nav-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <a href="produk.php"     class="nav-item"><i class="bi bi-handbag"></i> Produk</a>
         <a href="pesanan.php"    class="nav-item"><i class="bi bi-bag-check"></i> Pesanan</a>
-        <a href="chat.php"       class="nav-item"><i class="bi bi-chat-dots"></i> Chat</a>
+        <a href="chat.php" class="nav-item"><i class="bi bi-chat-dots"></i> Chat
+            <?php if ($total_unread > 0): ?>
+            <span class="badge-notif"><?= $total_unread ?></span>
+            <?php endif; ?>
+        </a>
         <a href="nego.php"       class="nav-item"><i class="bi bi-tags"></i> Nego Harga</a>
         <div class="nav-section">Lainnya</div>
         <a href="ulasan.php"     class="nav-item"><i class="bi bi-star"></i> Ulasan</a>
         <a href="pengaturan.php" class="nav-item active"><i class="bi bi-gear"></i> Pengaturan</a>
+        <a href="../index.php" target="_blank" class="nav-item nav-item-toko">
+            <i class="bi bi-shop"></i> Lihat Toko
+        </a>
     </nav>
     <div class="sidebar-footer">
-        <div class="admin-card">
-            <div class="admin-avatar">
-                <?php if ($logo_path && file_exists($logo_path)): ?>
-                    <img src="<?= escape($logo_path) ?>" alt="logo">
-                <?php else: ?>
-                    <?= strtoupper(substr($admin_nama, 0, 1)) ?>
-                <?php endif; ?>
-            </div>
-            <div class="admin-info">
-                <div class="name"><?= escape($admin_nama) ?></div>
-                <div class="role">Administrator</div>
-            </div>
-        </div>
-        <a href="../auth/logout_admin.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        <a href="../auth/logout_penjual.php" class="btn-logout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
     </div>
 </aside>
 
@@ -366,7 +365,6 @@ a { text-decoration: none; color: inherit; }
         <div class="topbar-title">Pengaturan</div>
         <div class="topbar-right">
             <span class="topbar-date"><i class="bi bi-calendar3"></i> <?= date('d M Y') ?></span>
-            <a href="../index.php" class="btn-toko"><i class="bi bi-shop"></i> Lihat Toko</a>
         </div>
     </div>
 
@@ -458,7 +456,6 @@ a { text-decoration: none; color: inherit; }
                                 <i class="bi bi-credit-card-2-front"></i> Rekening Pembayaran Transfer
                             </div>
 
-                            <!-- Preview rekening (live update) -->
                             <div class="rek-preview" id="prevBCA">
                                 <div class="rek-icon">🏦</div>
                                 <div class="rek-detail">
@@ -491,7 +488,6 @@ a { text-decoration: none; color: inherit; }
                                 </div>
                             </div>
 
-                            <!-- Preview DANA -->
                             <div class="rek-preview" id="prevDANA" style="margin-top:4px;">
                                 <div class="rek-icon">💜</div>
                                 <div class="rek-detail">
@@ -524,7 +520,6 @@ a { text-decoration: none; color: inherit; }
                                 </div>
                             </div>
                         </div>
-                        <!-- end rekening -->
 
                         <button type="submit" class="btn-save">
                             <i class="bi bi-floppy"></i> Simpan Pengaturan
@@ -539,7 +534,7 @@ a { text-decoration: none; color: inherit; }
                 <!-- GANTI PASSWORD -->
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="bi bi-shield-lock" style="color:var(--pink2);margin-right:6px;"></i> Ganti Password Admin</h3>
+                        <h3><i class="bi bi-shield-lock" style="color:var(--pink2);margin-right:6px;"></i> Ganti Password</h3>
                         <p>Perbarui kata sandi akun Anda</p>
                     </div>
                     <div class="card-body">
@@ -574,7 +569,7 @@ a { text-decoration: none; color: inherit; }
                         <div class="info-box">
                             <div class="info-row"><i class="bi bi-code-slash"></i> <span><strong>Versi Sistem:</strong> 1.0.0</span></div>
                             <div class="info-row"><i class="bi bi-calendar3"></i> <span><strong>Tanggal:</strong> <?= date('d M Y, H:i') ?></span></div>
-                            <div class="info-row"><i class="bi bi-person-badge"></i> <span><strong>Admin:</strong> <?= escape($admin_nama) ?></span></div>
+                            <div class="info-row"><i class="bi bi-person-badge"></i> <span><strong>Penjual:</strong> <?= escape($penjual_nama) ?></span></div>
                             <div class="info-row"><i class="bi bi-server"></i> <span><strong>PHP:</strong> <?= phpversion() ?></span></div>
                         </div>
                     </div>
@@ -615,7 +610,6 @@ function checkStrength(val) {
     bar.style.background = colors[score - 1] || '#F4A7C3';
 }
 
-// Live preview rekening saat mengetik
 function updatePrev(type) {
     if (type === 'BCA') {
         const no   = document.getElementById('inpNoBCA').value.trim();
