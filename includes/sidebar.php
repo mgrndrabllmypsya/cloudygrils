@@ -27,9 +27,12 @@ function sidebar_active($page, $current) {
 
 <aside class="sidebar">
     <div class="sidebar-logo">
-        <div class="logo">Cloudy <span>Girls</span></div>
-        <small>Seller Dashboard</small>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="../uploads/toko/logo.png" class="logo-img" onerror="this.src='https://placehold.co/32x32/FFE4EE/FF4081?text=CG'">
+        <div class="logo" style="line-height: 1; margin: 0;">Cloudy <span>Girls</span></div>
     </div>
+    <small>Seller Dashboard</small>
+</div>
 
     <nav class="sidebar-nav">
         <div class="nav-section">Menu</div>
