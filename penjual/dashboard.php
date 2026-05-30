@@ -529,7 +529,7 @@ select.form-ctrl option { background:#fff; }
 
 @media (max-width:900px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .grid-2 { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr !important; }
     
     /* Modifikasi layout grid chart & donut agar tidak ringsek */
     div[style*="grid-template-columns:1fr 300px"] { 
@@ -555,6 +555,25 @@ select.form-ctrl option { background:#fff; }
     /* Tampilkan tombol menu di topbar khusus HP */
     .btn-toggle-sidebar {
         display: flex !important;
+    }
+
+    .stats-grid .stat-card { padding: 14px; }
+    .chart-tabs { flex-wrap: wrap; }
+    table { font-size: 12px; }
+    td, th { padding: 8px 6px; }
+}
+
+@media (max-width:480px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .content { padding: 14px 12px; }
+    .topbar { padding: 10px 14px; }
+    .card { padding: 14px; }
+    .card-header { flex-wrap: wrap; gap: 6px; }
+    .donut-wrap { flex-direction: column; }
+    .donut-legend { padding-left: 0; padding-top: 12px; width: 100%; }
+    .actions-grid { grid-template-columns: 1fr 1fr; }
+    div[style*="grid-template-columns:1fr 300px"] { 
+        grid-template-columns: 1fr !important; 
     }
 }
 </style>
@@ -656,7 +675,7 @@ select.form-ctrl option { background:#fff; }
 
         </div>
 
-        <div class="grid-2" style="grid-template-columns:1fr 1fr;">
+        <div class="grid-2">
             <div class="card">
                 <div class="card-header">
                     <h3><i class="bi bi-bag-check" style="color:var(--accent);margin-right:6px;"></i> Pesanan Terbaru</h3>

@@ -88,3 +88,14 @@ function sidebar_active($page, $current) {
         </a>
     </div>
 </aside>
+
+<script>
+// Tutup sidebar otomatis saat link diklik di mobile
+document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function(link) {
+    link.addEventListener('click', function() {
+        if (window.innerWidth <= 900) {
+            document.querySelector('.sidebar').classList.remove('active');
+        }
+    });
+});
+</script>

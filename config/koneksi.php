@@ -1,15 +1,21 @@
 <?php
-$host = "localhost";
-$user = "mifmyho2_B2";
-$pass = "@MIF2025";
-$db   = "mifmyho2_B2";
- 
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    $host = "localhost";
+    $user = "root";
+    $pass = "";
+    $db   = "cloudygirls"; // nama db di localhost kamu
+} else {
+    $host = "localhost";
+    $user = "mifmyho2_B2";
+    $pass = "@MIF2025";
+    $db   = "mifmyho2_B2";
+}
+
 $conn = mysqli_connect($host, $user, $pass, $db);
- 
+
 if (!$conn) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
- 
+
 mysqli_set_charset($conn, "utf8mb4");
 ?>
-  
