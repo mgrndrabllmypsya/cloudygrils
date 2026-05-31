@@ -11,7 +11,7 @@ if (!$destination) {
     exit;
 }
 
-// Tambah prefix dist_ jika belum ada
+// Tamb~ah prefix dist_ jika belum ada
 if (!str_starts_with($destination, 'dist_') && !str_starts_with($destination, 'village_')) {
     $destination = 'dist_' . $destination;
 }
