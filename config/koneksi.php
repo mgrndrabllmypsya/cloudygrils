@@ -1,15 +1,8 @@
 <?php
-if ($_SERVER['HTTP_HOST'] == 'localhost') {
-    $host = "localhost";
-    $user = "root";
-    $pass = "";
-    $db   = "cloudygirls"; // nama db di localhost kamu
-} else {
-    $host = "localhost";
-    $user = "mifmyho2_B2";
-    $pass = "@MIF2025";
-    $db   = "mifmyho2_B2";
-}
+$host = "localhost";
+$user = "mifmyho2_B2";
+$pass = "@MIF2025";
+$db   = "mifmyho2_B2";
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 
