@@ -14,11 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Format email tidak valid.';
     } else {
         // Cek apakah email ada di tabel pembeli
-        $stmt = $conn->prepare("SELECT id, nama FROM pembeli WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
-$pembeli = $result->fetch_assoc();
+        $stmt = $pdo->prepare("SELECT id, nama FROM pembeli WHERE email = ?");
+        $stmt->execute([$email]);
+        $pembeli = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($pembeli) {
             // Buat token unik
@@ -26,9 +24,8 @@ $pembeli = $result->fetch_assoc();
             $expired_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
             // Simpan token langsung ke kolom tabel pembeli
-            $stmt = $conn->prepare("UPDATE pembeli SET reset_token = ?, reset_expired = ? WHERE email = ?");
-$stmt->bind_param("sss", $token, $expired_at, $email);
-$stmt->execute();
+            $stmt = $pdo->prepare("UPDATE pembeli SET reset_token = ?, reset_expired = ? WHERE email = ?");
+            $stmt->execute([$token, $expired_at, $email]);
 
             $reset_link = "http://localhost/cloudygrils/auth/reset_password.php?token=" . $token;
             $subject = "Reset Password - CloudyGrils";

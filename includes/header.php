@@ -8,8 +8,16 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
-    --red: #F43F5E;
+    --cream: #FAF7F2;
+    --white: #FFFFFF;
+    --dark: #1A1A2E;
+    --border: #E8E0D5;
+    --muted: #9B8FA8;
     --accent: #A78BFA;
+    --accent2: #7C3AED;
+    --pink: #EC4899;
+    --red: #F43F5E;
+    --surface: #F3EEF8;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'DM Sans', sans-serif; background: #FFF0F4; color: #2D1520; }
@@ -18,134 +26,153 @@ a { text-decoration: none; color: inherit; }
 /* ── NAVBAR ── */
 .navbar {
     position: sticky; top: 0; z-index: 999;
-    background: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid #FFB3C6;
-    padding: 0 clamp(12px, 4vw, 48px);
+    padding: 0 48px;
     height: 64px;
     display: flex; align-items: center; justify-content: space-between;
-    gap: 8px;
 }
 
-/* ── LOGO ── */
+/* LOGO */
+/* LOGO */
 .navbar-logo {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(16px, 3vw, 22px);
+    font-size: 22px; 
     font-weight: 900;
-    color: #1db899b1;
+    color: #1db899b1 !important; 
     letter-spacing: -.3px;
-    display: flex; align-items: center; gap: 4px;
-    flex-shrink: 0;
+    display: flex; 
+    align-items: center; 
+    gap: 2px;
 }
-.navbar-logo span { color: #ff009db1; }
+
+/* PERBAIKAN DI SINI: Tanda titik koma dipindah ke paling belakang */
+.navbar-logo span { 
+    color: #ff009db1; !important; 
+}
+
 .logo-img {
-    width: clamp(32px, 5vw, 45px);
-    height: clamp(32px, 5vw, 45px);
-    object-fit: contain;
-}
-@media (max-width: 320px) {
-    .navbar-logo .logo-text { display: none; }
+    width: 45px;       
+    height: 45px;      
+    object-fit: contain; 
 }
 
-/* ── AKSI KANAN ── */
+/* NAV LINKS (tengah, opsional) */
+.navbar-links {
+    display: flex; gap: 28px; align-items: center;
+}
+.navbar-links a {
+    font-size: 13px; font-weight: 500; color: #C48899 !important;
+    transition: color .2s; position: relative;
+}
+.navbar-links a:hover { color: #2D1520; }
+.navbar-links a.active { color: #C43860 !important; font-weight: 600; }
+.navbar-links a.active::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+    height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--pink));
+}
+
+/* AKSI KANAN */
 .navbar-actions {
-    display: flex; align-items: center; gap: 4px;
-    flex-shrink: 0;
+    display: flex; align-items: center; gap: 6px;
 }
 
-/* ── ICON BUTTON ── */
+/* ICON BUTTON BASE */
 .nav-icon-btn {
     position: relative;
     width: 40px; height: 40px; border-radius: 12px;
     background: transparent; border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    color: #C48899; font-size: 18px;
+    color: #C48899 !important; font-size: 18px;
     transition: background .2s, color .2s, transform .15s;
-    -webkit-tap-highlight-color: transparent;
-    flex-shrink: 0;
 }
-@media (max-width: 639px) {
-    .nav-icon-btn { width: 36px; height: 36px; font-size: 17px; }
-}
-@media (hover: hover) {
-    .nav-icon-btn:hover { background: #FFF0F4; color: #2D1520; transform: translateY(-1px); }
-    .nav-icon-btn.love:hover { color: #D94F6E; background: rgba(244,63,94,.08); }
-    .nav-icon-btn.msg:hover  { color: #C43860; background: rgba(217,79,110,.08); }
+.nav-icon-btn:hover {
+    background: #FFF0F4;
+    color: #2D1520;
+    transform: translateY(-1px);
 }
 
-/* ── BADGE ── */
+/* BADGE (notif) */
 .nav-badge {
     position: absolute; top: -4px; right: -4px;
-    min-width: 16px; height: 16px;
-    border-radius: 10px; padding: 0 3px;
+    min-width: 17px; height: 17px;
+    border-radius: 10px; padding: 0 4px;
     background: var(--red); color: #fff;
     font-size: 9px; font-weight: 700;
     border: 2px solid #fff;
     display: flex; align-items: center; justify-content: center;
-    pointer-events: none;
 }
 
-/* ── DIVIDER ── */
+/* LOVE BUTTON */
+.nav-icon-btn.love { color: #C48899 !important; }
+.nav-icon-btn.love:hover { color: #D94F6E; background: rgba(244,63,94,.08); }
+.nav-icon-btn.love.active { color: #D94F6E; }
+.nav-icon-btn.love.active i::before { content: "\f415"; }
+
+/* MESSAGE BUTTON */
+.nav-icon-btn.msg:hover { color: #C43860 !important; background: rgba(124,58,237,.08); }
+
+/* DIVIDER */
 .nav-divider {
     width: 1px; height: 24px;
     background: #FFB3C6;
-    margin: 0 2px;
-    flex-shrink: 0;
+    margin: 0 4px;
 }
-@media (max-width: 360px) { .nav-divider { display: none; } }
 
 /* ── PROFILE DROPDOWN ── */
-.profile-wrap { position: relative; }
+.profile-wrap { position: relative;  }
 
 .profile-btn {
-    display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; gap: 8px;
     padding: 5px 10px 5px 5px;
     border-radius: 40px;
     background: transparent; border: 1.5px solid #FFB3C6;
     cursor: pointer; transition: border-color .2s, background .2s;
     font-family: 'DM Sans', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-    max-width: 180px;
 }
-@media (hover: hover) {
-    .profile-btn:hover { border-color: var(--accent); background: #FFF0F4; }
-}
+.profile-btn:hover { border-color: var(--accent); background: #FFF0F4; }
 
 .profile-avatar {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: #D94F6E;
-    color: #fff; font-size: 12px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; overflow: hidden;
+    width: 32px; 
+    height: 32px; 
+    border-radius: 50%;
+    
+    /* GANTI DI SINI: Ubah gradient ungu menjadi warna pink solid */
+    background: #D94F6E !important; /* Pasang warna pink utama navbarmu */
+    
+    color: #fff; 
+    font-size: 13px; 
+    font-weight: 700;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    flex-shrink: 0; 
+    overflow: hidden; 
 }
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 .profile-name {
     font-size: 13px; font-weight: 600; color: #2D1520;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    max-width: 90px;
+    max-width: 120px; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
 }
-@media (max-width: 420px) {
-    .profile-name { display: none; }
-    .profile-caret { display: none; }
-    .profile-btn { padding: 4px; border-radius: 50%; }
-}
-
 .profile-caret {
-    font-size: 11px; color: #C48899;
-    transition: transform .25s; flex-shrink: 0;
+    font-size: 12px; color: #C48899 !important;
+    transition: transform .25s;
 }
 .profile-wrap.open .profile-caret { transform: rotate(180deg); }
 
-/* ── DROPDOWN MENU ── */
+/* DROPDOWN MENU */
 .profile-dropdown {
     position: absolute; top: calc(100% + 10px); right: 0;
-    width: 210px;
+    width: 220px;
     background: #fff;
     border: 1px solid #FFB3C6;
     border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(217,79,110,.14), 0 2px 8px rgba(0,0,0,.06);
+    box-shadow: 0 16px 40px rgba(100,60,180,.12), 0 2px 8px rgba(0,0,0,.06);
     overflow: hidden;
     opacity: 0; visibility: hidden; pointer-events: none;
     transform: translateY(8px) scale(.97);
@@ -155,28 +182,27 @@ a { text-decoration: none; color: inherit; }
 }
 .profile-wrap.open .profile-dropdown {
     opacity: 1; visibility: visible; pointer-events: auto;
-    transform: translateY(0) scale(1);
-}
-@media (max-width: 420px) {
-    .profile-dropdown { right: -8px; width: calc(100vw - 24px); max-width: 240px; }
+    transform: translateY(0) scale(1); color: #D94F6E;
 }
 
+/* DROPDOWN HEADER */
 .dd-header {
-    padding: 12px 14px 10px;
+    padding: 14px 16px 12px;
     border-bottom: 1px solid #FFB3C6;
     display: flex; align-items: center; gap: 10px;
 }
 .dd-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
+    width: 38px; height: 38px; border-radius: 50%;
     background: #D94F6E;
-    color: #fff; font-size: 13px; font-weight: 700;
+    color: #fff; font-size: 14px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; overflow: hidden;
 }
 .dd-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .dd-info .dd-name { font-size: 13px; font-weight: 700; color: #2D1520; }
-.dd-info .dd-role { font-size: 11px; color: #C48899; margin-top: 1px; }
+.dd-info .dd-role { font-size: 11px; color: #C48899 !important; margin-top: 1px; }
 
+/* DROPDOWN ITEMS */
 .dd-body { padding: 6px; }
 .dd-item {
     display: flex; align-items: center; gap: 10px;
@@ -185,12 +211,12 @@ a { text-decoration: none; color: inherit; }
     transition: background .15s, color .15s;
     cursor: pointer;
 }
-.dd-item:hover { background: #FFF0F4; color: #C43860; }
-.dd-item i { font-size: 15px; width: 18px; color: #C48899; flex-shrink: 0; transition: color .15s; }
-.dd-item:hover i { color: #C43860; }
+.dd-item:hover { background: #1db899b1; color: #C43860 !important; }
+.dd-item i { font-size: 15px; width: 18px; color: #C48899 !important; flex-shrink: 0; transition: color .15s; }
+.dd-item:hover i { color: #C43860 !important; }
 .dd-item.danger { color: #D94F6E; }
 .dd-item.danger i { color: #D94F6E; }
-.dd-item.danger:hover { background: #FFF0F4; }
+.dd-item.danger:hover { background: #1db899b1; color: #D94F6E; }
 
 .dd-sep { height: 1px; background: #FFB3C6; margin: 4px 6px; }
 </style>
@@ -198,17 +224,11 @@ a { text-decoration: none; color: inherit; }
 <body>
 
 <?php
-// Ambil data user — selalu query fresh dari DB agar nama tidak salah
-$uid = (int)($_SESSION['user_id'] ?? 0);
-if ($uid > 0) {
-    if (!isset($user) || empty($user['nama'])) {
-        $q_u  = mysqli_query($conn, "SELECT * FROM pembeli WHERE id=$uid LIMIT 1");
-        $user = ($q_u && mysqli_num_rows($q_u) > 0) ? mysqli_fetch_assoc($q_u) : [];
-    }
-    // Sync nama ke session agar konsisten di semua halaman
-    if (!empty($user['nama'])) {
-        $_SESSION['nama'] = $user['nama'];
-    }
+// Ambil data user jika belum ada
+if (!isset($user) && isset($_SESSION['user_id'])) {
+    $uid = (int)$_SESSION['user_id'];
+    $q_u = mysqli_query($conn, "SELECT * FROM pembeli WHERE id=$uid LIMIT 1");
+    $user = $q_u ? mysqli_fetch_assoc($q_u) : [];
 }
 $nama_user   = $user['nama'] ?? ($_SESSION['nama'] ?? 'User');
 $foto_profil = $user['foto_profil'] ?? '';
@@ -218,8 +238,8 @@ $inisial     = strtoupper(substr($nama_user, 0, 1));
 $unread_msg = 0;
 if (isset($conn)) {
     try {
-        $uid_msg = (int)($_SESSION['user_id'] ?? 0);
-        $q_msg   = mysqli_query($conn, "SELECT COUNT(*) as c FROM chat WHERE pembeli_id=$uid_msg AND pengirim='admin' AND sudah_dibaca=0");
+        $uid   = (int)($_SESSION['user_id'] ?? 0);
+        $q_msg = mysqli_query($conn, "SELECT COUNT(*) as c FROM chat WHERE pembeli_id=$uid AND pengirim='admin' AND sudah_dibaca=0");
         if ($q_msg) $unread_msg = mysqli_fetch_assoc($q_msg)['c'] ?? 0;
     } catch (Exception $e) {
         $unread_msg = 0;
@@ -230,11 +250,11 @@ if (isset($conn)) {
 <nav class="navbar">
 
     <div class="navbar-brand">
-        <a href="../pages/home.php" class="navbar-logo">
-            <img src="../uploads/toko/logo.png" class="logo-img" alt="logo">
-            <span class="logo-text">Cloudy <span>Girls</span></span>
-        </a>
-    </div>
+    <a href="#" class="navbar-logo">
+    <img src="../uploads/toko/logo.png" class="logo-img">
+    Cloudy <span>Girls</span>
+</a>
+</div>
 
     <!-- AKSI KANAN -->
     <div class="navbar-actions">
@@ -269,6 +289,7 @@ if (isset($conn)) {
             </button>
 
             <div class="profile-dropdown" id="profileDropdown">
+                <!-- HEADER -->
                 <div class="dd-header">
                     <div class="dd-avatar">
                         <?php if ($foto_profil): ?>
@@ -279,9 +300,11 @@ if (isset($conn)) {
                     </div>
                     <div class="dd-info">
                         <div class="dd-name"><?= htmlspecialchars($nama_user, ENT_QUOTES) ?></div>
+                     
                     </div>
                 </div>
 
+                <!-- MENU ITEMS -->
                 <div class="dd-body">
                     <a href="../pages/profil.php" class="dd-item">
                         <i class="bi bi-person"></i> Profil Saya
@@ -289,6 +312,7 @@ if (isset($conn)) {
                     <a href="../pages/pesanan.php" class="dd-item">
                         <i class="bi bi-bag-check"></i> Pesanan Saya
                     </a>
+                   
                     <div class="dd-sep"></div>
                     <a href="../auth/logout.php" class="dd-item danger">
                         <i class="bi bi-box-arrow-right"></i> Keluar
@@ -307,6 +331,8 @@ function toggleDropdown() {
     const isOpen = wrap.classList.toggle('open');
     btn.setAttribute('aria-expanded', isOpen);
 }
+
+// Tutup dropdown saat klik di luar
 document.addEventListener('click', function(e) {
     const wrap = document.getElementById('profileWrap');
     if (wrap && !wrap.contains(e.target)) {
@@ -314,6 +340,8 @@ document.addEventListener('click', function(e) {
         document.getElementById('profileBtn').setAttribute('aria-expanded', false);
     }
 });
+
+// Tutup dengan Escape
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         const wrap = document.getElementById('profileWrap');
