@@ -14,19 +14,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Format email tidak valid.';
     } else {
+<<<<<<< HEAD
         $stmt = $conn->prepare("SELECT id, nama FROM pembeli WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result  = $stmt->get_result();
         $pembeli = $result->fetch_assoc();
+=======
+        // Cek apakah email ada di tabel pembeli
+        $stmt = $pdo->prepare("SELECT id, nama FROM pembeli WHERE email = ?");
+        $stmt->execute([$email]);
+        $pembeli = $stmt->fetch(PDO::FETCH_ASSOC);
+>>>>>>> 13fd55fa054d9dcf379e49d7810a40816e571a55
 
         if ($pembeli) {
             $otp        = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $expired_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
+<<<<<<< HEAD
             $stmt2 = $conn->prepare("UPDATE pembeli SET reset_token = ?, reset_expired = ? WHERE email = ?");
             $stmt2->bind_param("sss", $otp, $expired_at, $email);
             $stmt2->execute();
+=======
+            // Simpan token langsung ke kolom tabel pembeli
+            $stmt = $pdo->prepare("UPDATE pembeli SET reset_token = ?, reset_expired = ? WHERE email = ?");
+            $stmt->execute([$token, $expired_at, $email]);
+>>>>>>> 13fd55fa054d9dcf379e49d7810a40816e571a55
 
             // Kirim pakai mail() PHP biasa
             $from    = 'noreply@claudygirls.mif.myhost.id';
