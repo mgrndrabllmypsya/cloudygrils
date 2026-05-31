@@ -73,6 +73,8 @@ $base_url   = '../';
 $page_title = escape($produk['nama_barang']);
 include '../includes/header.php';
 ?>
+<!-- PASTIKAN tag berikut ada di dalam header.php agar responsive bekerja:
+     <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
 <style>
 /* ── PINK SOFT GRADIENT PALETTE ──
    Top:    #FF8FAB  (pink medium)
@@ -85,8 +87,8 @@ include '../includes/header.php';
 .container-detail{max-width:1100px;margin:40px auto;padding:0 40px;display:grid;grid-template-columns:1fr 1fr;gap:48px;}
 
 /* Foto */
-.foto-utama{aspect-ratio:3/4;border-radius:20px;overflow:hidden;background: #f9cfcf;border:1.5px}
-.foto-utama img{width:100%;height:100%;object-fit:cover;}
+.foto-utama{border-radius:20px;overflow:hidden;background:#f9cfcf;border:1.5px solid #FFB3C6;}
+.foto-utama img{width:100%;height:auto;display:block;object-fit:cover;}
 
 /* Info produk */
 .produk-info{}
@@ -203,9 +205,99 @@ include '../includes/header.php';
 .ulasan-tgl{font-size:11px;color:#C48899;margin-top:2px;}
 .ulasan-text{font-size:13px;color:#C48899;line-height:1.6;margin-top:8px;}
 
+/* ── RESPONSIVE ── */
+
+/* Tablet (≤ 1024px) */
+@media(max-width:1024px){
+    .container-detail{
+        max-width:100%;
+        padding:0 24px;
+        gap:32px;
+    }
+    .ulasan-section{padding:0 24px;}
+    .produk-nama{font-size:24px;}
+    .produk-harga{font-size:24px;}
+}
+
+/* Mobile & small tablet (≤ 768px) */
 @media(max-width:768px){
-    .container-detail{grid-template-columns:1fr;gap:24px;padding:0 16px;}
-    .ulasan-section{padding:0 16px;}
+    .container-detail{
+        grid-template-columns:1fr;
+        gap:20px;
+        padding:0 16px;
+        margin:16px auto;
+    }
+
+    .foto-utama{border-radius:14px;}
+
+    .produk-kategori{font-size:10px;}
+    .produk-nama{font-size:22px;}
+    .produk-harga{font-size:22px;}
+    .harga-asli{font-size:14px;}
+
+    .btn-beli, .btn-nego, .btn-chat{
+        padding:13px 10px;
+        font-size:14px;
+    }
+
+    /* Modal full-width di mobile */
+    .modal-box{
+        padding:24px 18px;
+        margin:12px;
+        border-radius:16px;
+    }
+    .modal-title{font-size:18px;}
+
+    .ulasan-section{
+        padding:0 16px;
+        margin:24px auto 40px;
+    }
+    .ulasan-section h3{font-size:17px;}
+    .ulasan-card{padding:14px;}
+}
+
+/* Small mobile (≤ 480px) */
+@media(max-width:480px){
+    .container-detail{
+        padding:0 12px;
+        margin:12px auto;
+        gap:16px;
+    }
+
+    .foto-utama{border-radius:12px;}
+
+    .produk-nama{font-size:19px;}
+    .produk-harga{font-size:20px;}
+    .harga-asli{font-size:13px;margin-bottom:12px;}
+
+    .produk-meta{gap:6px;}
+    .meta-tag{font-size:11px;padding:4px 10px;}
+
+    .btn-beli{
+        padding:13px 8px;
+        font-size:13px;
+        border-radius:10px;
+    }
+    .btn-nego, .btn-chat{
+        padding:11px 8px;
+        font-size:13px;
+        border-radius:10px;
+    }
+
+    .modal-box{
+        padding:20px 14px;
+        margin:8px;
+    }
+    .modal-actions{flex-direction:column;gap:8px;}
+    .modal-btn-batal,.modal-btn-kirim{flex:unset;width:100%;}
+
+    .ulasan-section{
+        padding:0 12px;
+        margin:16px auto 32px;
+    }
+    .ulasan-card{padding:12px;}
+    .ulasan-avatar{width:30px;height:30px;font-size:11px;}
+    .ulasan-nama{font-size:12px;}
 }
 </style>
 

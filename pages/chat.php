@@ -82,7 +82,7 @@ include '../includes/header.php';
 body { font-family:'DM Sans',sans-serif; color:var(--dark); background:var(--cream); }
 a { text-decoration:none; color:inherit; }
 
-/* ── LAYOUT ── */
+/* ── LAYOUT DESKTOP ── */
 .chat-page { max-width:1000px; margin:0 auto; padding:24px 20px 40px; }
 .chat-wrap {
     display:grid; grid-template-columns:280px 1fr;
@@ -146,7 +146,6 @@ a { text-decoration:none; color:inherit; }
     box-shadow:0 2px 12px rgba(214,51,132,.08);
 }
 
-/* HEADER */
 .chat-header {
     padding:14px 18px; border-bottom:1.5px solid var(--border);
     background:var(--pink-blush);
@@ -170,39 +169,27 @@ a { text-decoration:none; color:inherit; }
 }
 .chat-header-link:hover { text-decoration:underline !important; }
 
-/* MESSAGES */
 .chat-messages {
     flex:1; overflow-y:auto; padding:16px;
     display:flex; flex-direction:column; gap:12px;
     background:var(--cream);
+    overscroll-behavior:contain;
 }
 .chat-messages::-webkit-scrollbar { width:4px; }
 .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
 
-/* DATE SEPARATOR */
 .date-sep {
     text-align:center; font-size:11px; color:var(--muted);
     display:flex; align-items:center; gap:8px; margin:4px 0;
 }
 .date-sep::before, .date-sep::after { content:''; flex:1; height:1px; background:var(--border); }
 
-/* BUBBLE */
 .bubble-wrap {
     display:flex; gap:8px; align-items:flex-end;
     max-width:80%;
 }
-.bubble-wrap.saya {
-    flex-direction:row-reverse;
-    margin-left:auto;
-}
+.bubble-wrap.saya { flex-direction:row-reverse; margin-left:auto; }
 .bubble-wrap.admin { margin-right:auto; }
-
-.bubble-avatar {
-    width:30px; height:30px; border-radius:50%;
-    background:linear-gradient(135deg,var(--pink-deep),var(--pink-mid));
-    display:flex; align-items:center; justify-content:center;
-    font-size:11px; font-weight:700; color:#fff; flex-shrink:0;
-}
 
 .bubble-content { display:flex; flex-direction:column; max-width:100%; }
 
@@ -227,7 +214,6 @@ a { text-decoration:none; color:inherit; }
 .bubble-wrap.saya .bubble-time { text-align:right; }
 .bubble-wrap.admin .bubble-time { text-align:left; }
 
-/* INPUT */
 .chat-input-area {
     padding:12px 16px; border-top:1.5px solid var(--border);
     background:var(--white);
@@ -251,7 +237,6 @@ a { text-decoration:none; color:inherit; }
 }
 .btn-kirim:hover { opacity:.88; transform:scale(1.06); }
 
-/* PLACEHOLDER */
 .chat-placeholder {
     flex:1; display:flex; flex-direction:column;
     align-items:center; justify-content:center;
@@ -260,16 +245,61 @@ a { text-decoration:none; color:inherit; }
 .chat-placeholder i { font-size:3rem; margin-bottom:12px; opacity:.25; display:block; }
 .chat-placeholder p { font-size:13px; line-height:1.7; }
 
-/* RESPONSIVE */
-@media(max-width:680px) {
-    .chat-wrap { grid-template-columns:1fr; height:auto; }
-    .chat-list { max-height:180px; }
-    .chat-area { height:65vh; }
-    .bubble-wrap { max-width:90%; }
+/* ── RESPONSIVE MOBILE ── */
+@media(max-width:768px) {
+    /* Sembunyikan header/footer bawaan halaman agar full screen */
+    body > header, body > footer,
+    .navbar, .site-header, .site-footer,
+    nav.navbar { display:none !important; }
+
+    .chat-page {
+        padding: 0;
+        max-width: 100%;
+        /* Pakai height dari JS agar pas dengan visual viewport */
+        height: var(--vh-total, 100vh);
+    }
+    .chat-wrap {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: 100%;
+        gap: 0;
+    }
+    .chat-list {
+        border-radius: 0;
+        border-left: none; border-right: none; border-top: none;
+        max-height: 130px;
+        flex-shrink: 0;
+    }
+    .chat-area {
+        border-radius: 0;
+        border-left: none; border-right: none; border-bottom: none;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .chat-messages {
+        flex: 1;
+        min-height: 0;
+        padding: 12px 10px;
+    }
+    .chat-header { padding: 10px 14px; }
+    .chat-input-area { padding: 8px 12px; }
+    .bubble-wrap { max-width: 88%; }
+}
+
+@media(max-width:400px) {
+    .chat-list { max-height: 110px; }
+    .chat-item { padding: 8px 10px; }
+    .chat-item-img { width: 36px; height: 36px; }
+    .chat-header-img { width: 34px; height: 34px; }
+    .bubble { font-size: 12px; padding: 8px 12px; }
+    .btn-kirim { width: 36px; height: 36px; font-size: 14px; }
 }
 </style>
 
-<div class="chat-page">
+<div class="chat-page" id="chatPage">
 <div class="chat-wrap">
 
     <!-- LIST SIDEBAR -->
@@ -349,14 +379,11 @@ a { text-decoration:none; color:inherit; }
                 $isSaya  = $p['pengirim'] === 'pembeli';
                 $waktu   = date('H:i', strtotime($p['created_at']));
                 $tgl     = date('d M Y', strtotime($p['created_at']));
-
-                // Date separator
                 if ($tgl !== $prev_date):
                     $prev_date = $tgl;
             ?>
             <div class="date-sep"><?= $tgl === date('d M Y') ? 'Hari ini' : $tgl ?></div>
             <?php endif; ?>
-
             <div class="bubble-wrap <?= $isSaya ? 'saya' : 'admin' ?>">
                 <div class="bubble-content">
                     <div class="bubble"><?= nl2br(escape($p['pesan'])) ?></div>
@@ -366,10 +393,11 @@ a { text-decoration:none; color:inherit; }
             <?php endforeach; ?>
         </div>
 
-        <form method="POST" class="chat-input-area">
-            <textarea name="pesan" class="chat-input" placeholder="Tulis pesan..." rows="1"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.form.submit();}"></textarea>
-            <button type="submit" class="btn-kirim"><i class="bi bi-send-fill"></i></button>
+        <form method="POST" class="chat-input-area" id="formChat">
+            <textarea name="pesan" id="pesanInput" class="chat-input" placeholder="Tulis pesan..." rows="1"
+                autocomplete="off"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();kirimPesan();}"></textarea>
+            <button type="button" class="btn-kirim" onclick="kirimPesan()"><i class="bi bi-send-fill"></i></button>
         </form>
 
         <?php else: ?>
@@ -384,15 +412,63 @@ a { text-decoration:none; color:inherit; }
 </div>
 
 <script>
+// ── Fix tinggi layar mobile (hilangkan jeda putih bawah) ──
+function setVh() {
+    // Pakai visualViewport jika tersedia (lebih akurat saat keyboard muncul)
+    const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.getElementById('chatPage').style.height = h + 'px';
+}
+setVh();
+window.addEventListener('resize', setVh);
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function() {
+        setVh();
+        // Scroll ke bawah saat keyboard muncul
+        setTimeout(() => {
+            const msgs = document.getElementById('chatMessages');
+            if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        }, 100);
+    });
+}
+
+// ── Scroll ke pesan terbaru ──
 const msgs = document.getElementById('chatMessages');
 if (msgs) msgs.scrollTop = msgs.scrollHeight;
 
-const ta = document.querySelector('.chat-input');
+// ── Auto resize textarea ──
+const ta = document.getElementById('pesanInput');
 if (ta) {
     ta.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 100) + 'px';
     });
-    ta.focus();
+    // TIDAK ada ta.focus() — keyboard tidak muncul otomatis
 }
+
+// ── Kirim pesan via AJAX ──
+async function kirimPesan() {
+    const input = document.getElementById('pesanInput');
+    if (!input) return;
+
+    const pesan = input.value.trim();
+    if (!pesan) return;
+
+    // Clear & tutup keyboard SEBELUM kirim
+    input.blur();
+    input.value = '';
+    input.style.height = 'auto';
+
+    const fd = new FormData();
+    fd.append('pesan', pesan);
+    await fetch(window.location.href, { method: 'POST', body: fd });
+
+    // Reload tanpa tambah history stack
+    window.location.replace(window.location.href);
+}
+
+// ── Cegah browser restore textarea saat back ──
+window.addEventListener('pageshow', function() {
+    const input = document.getElementById('pesanInput');
+    if (input) { input.value = ''; input.style.height = 'auto'; }
+});
 </script>

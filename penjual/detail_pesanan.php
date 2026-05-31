@@ -385,63 +385,50 @@ hr{border:none;border-top:1.5px solid var(--border);margin:16px 0;}
 .wilayah-loading i{animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 /* RESPONSIVE MOBILE */
-.btn-toggle-sidebar { display:none; background:var(--surface2,#FFF0F5); border:1.5px solid var(--border,#FFD6E7); border-radius:10px; width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--text,#2d2d2d); }
-.sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:98; }
+.btn-toggle-sidebar { display:none; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--text); flex-shrink:0; }
+.sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:9998; }
 .sidebar-overlay.active { display:block; }
+
+/* Desktop: sidebar selalu tampil */
+@media (min-width:901px) {
+    .sidebar { transform:none !important; }
+}
+
 @media (max-width:900px) {
-    .sidebar { position:fixed; left:0; top:0; height:100vh; width:280px; border-radius:0; transform:translateX(-100%); transition:transform 0.3s ease; z-index:99; }
-    .sidebar.active { transform:translateX(0); }
+    .sidebar { transform:translateX(-100%); transition:transform 0.3s ease; }
+    .sidebar.active { transform:translateX(0) !important; }
     .main { margin-left:0 !important; }
     .btn-toggle-sidebar { display:flex !important; }
-    .topbar { padding:0 16px !important; }
-    .content { padding:16px 14px !important; }
-    table { font-size:12px; }
-    td, th { padding:8px 10px; }
-}
-@media (max-width:480px) {
-    .topbar-date { display:none; }
-}
-
-@media (max-width:900px) {
-    .grid-2, [style*="grid-template-columns:1fr 1fr"], [style*="grid-template-columns: 1fr 1fr"] {
-        grid-template-columns: 1fr !important;
-    }
-    .stats-grid { grid-template-columns: repeat(2,1fr) !important; }
-    .card { padding: 14px !important; }
-    .card-header { flex-wrap: wrap; gap: 8px; }
-    .modal-box, .modal-content { max-width: 95vw !important; margin: 10px !important; }
-    .form-grid { grid-template-columns: 1fr !important; }
-    .topbar { height: auto !important; min-height: 56px; flex-wrap: wrap; gap: 8px; padding: 10px 16px !important; }
-    .chat-layout, [style*="display:flex"][style*="height"] { flex-direction: column !important; height: auto !important; }
-    .chat-list { width: 100% !important; max-height: 250px; border-right: none !important; border-bottom: 1.5px solid var(--border,#FFD6E7); }
-    .chat-main { width: 100% !important; }
-    .nego-table, .pesanan-table { overflow-x: auto; display: block; }
-    .filter-bar, .search-bar { flex-wrap: wrap; gap: 8px; }
-    .filter-bar select, .filter-bar input { width: 100% !important; }
+    .topbar { padding:0 14px !important; height:auto !important; min-height:56px; }
+    .content { padding:14px 12px !important; }
+    .detail-grid { grid-template-columns:1fr !important; }
+    .info-row { flex-wrap:wrap; gap:4px; }
+    .info-val { text-align:left !important; word-break:break-word; }
+    .badge { white-space:normal !important; }
+    .btn-group { flex-direction:column; }
+    .btn-group .btn, .btn-group form { width:100%; }
+    .btn-group form button { width:100%; justify-content:center; }
+    .modal-box { max-width:95vw !important; padding:20px !important; }
+    .card-body { padding:14px !important; }
 }
 
 @media (max-width:480px) {
-    .stats-grid { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
-    .content { padding: 12px 10px !important; }
-    table { font-size: 11px !important; }
-    td, th { padding: 6px 8px !important; }
-    .badge { font-size: 10px !important; padding: 2px 7px !important; }
-    .btn-tambah, .btn-primary { font-size: 12px !important; padding: 8px 12px !important; }
-    h2, h3 { font-size: 14px !important; }
-    .topbar-title { font-size: 15px !important; }
-    img.produk-thumb { width: 32px !important; height: 32px !important; }
+    .content { padding:10px 8px !important; }
+    .topbar-title { font-size:15px !important; }
+    .btn { font-size:12px !important; }
 }
 
 </style>
 </head>
 <body>
-<?php include '../includes/sidebar.php'; ?>
+<?php include __DIR__ . '/sidebar.php'; ?>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="main">
     <div class="topbar">
         <div class="topbar-left">
+            <button class="btn-toggle-sidebar" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
             <a href="pesanan.php" class="btn-back"><i class="bi bi-arrow-left"></i> Kembali</a>
-            <div style="display:flex;align-items:center;gap:12px;"><button class="btn-toggle-sidebar" onclick="toggleSidebar()"><i class="bi bi-list"></i></button><div class="topbar-title">Detail Pesanan</div></div>
+            <div class="topbar-title">Detail Pesanan</div>
         </div>
         <span class="badge badge-<?= $status ?>" style="font-size:12px;"><?= $status_label ?></span>
     </div>
@@ -1173,20 +1160,27 @@ document.getElementById('modalTolak').addEventListener('click', function(e){
 
 <script>
 function toggleSidebar() {
-    document.querySelector('.sidebar').classList.toggle('active');
-    document.getElementById('sidebarOverlay').classList.toggle('active');
+    var sidebar = document.querySelector('.sidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (!sidebar || !overlay) return;
+    if (sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    } else {
+        sidebar.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 }
 function closeSidebar() {
-    document.querySelector('.sidebar').classList.remove('active');
-    document.getElementById('sidebarOverlay').classList.remove('active');
+    var sidebar = document.querySelector('.sidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (!sidebar || !overlay) return;
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
 }
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function(link) {
-        link.addEventListener('click', function() {
-            if (window.innerWidth <= 900) closeSidebar();
-        });
-    });
-});
 </script>
 </body>
 </html>
