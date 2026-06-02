@@ -16,14 +16,58 @@ tandaiDibacaPembeli($conn, $user_id);
 // Ambil semua notifikasi
 $list = getNotifikasiPembeli($conn, $user_id);
 
-// Ikon per tipe
+// Pisah per tipe
+$list_pesanan   = array_filter($list, fn($n) => $n['tipe'] !== 'nego');
+$list_negosiasi = array_filter($list, fn($n) => $n['tipe'] === 'nego');
+
+// Ikon & warna per tipe
 $ikon = [
-    'pesanan'    => ['icon' => 'bi-bag-check',      'color' => '#C43860'],
-    'transfer'   => ['icon' => 'bi-credit-card',    'color' => '#7C3AED'],
-    'pengiriman' => ['icon' => 'bi-truck',           'color' => '#0891B2'],
-    'chat'       => ['icon' => 'bi-chat-dots',       'color' => '#059669'],
-    'sistem'     => ['icon' => 'bi-info-circle',     'color' => '#6B7280'],
+    'pesanan'    => ['icon' => 'bi-bag-check',       'color' => '#C43860'],
+    'transfer'   => ['icon' => 'bi-credit-card',     'color' => '#7C3AED'],
+    'pengiriman' => ['icon' => 'bi-truck',            'color' => '#0891B2'],
+    'chat'       => ['icon' => 'bi-chat-dots',        'color' => '#059669'],
+    'sistem'     => ['icon' => 'bi-info-circle',      'color' => '#6B7280'],
+    // Tipe nego — dibedakan berdasarkan kata kunci di judul
+    'nego'       => ['icon' => 'bi-tag',              'color' => '#C43860'],
 ];
+
+// Helper: tentukan ikon & warna khusus notifikasi nego berdasarkan judul
+function getMetaNego($judul) {
+    $j = mb_strtolower($judul);
+    if (str_contains($j, 'disetujui'))       return ['icon' => 'bi-check-circle-fill', 'color' => '#059669'];
+    if (str_contains($j, 'ditolak'))         return ['icon' => 'bi-x-circle-fill',     'color' => '#DC2626'];
+    if (str_contains($j, 'penawaran balik')) return ['icon' => 'bi-arrow-left-right',  'color' => '#D97706'];
+    return ['icon' => 'bi-tag', 'color' => '#C43860'];
+}
+
+// Helper: badge label & warna berdasarkan judul notifikasi nego
+function getBadgeNego($judul) {
+    $j = mb_strtolower($judul);
+    if (str_contains($j, 'disetujui'))       return ['label' => 'Nego disetujui',  'bg' => '#D1FAE5', 'color' => '#065F46'];
+    if (str_contains($j, 'ditolak'))         return ['label' => 'Nego ditolak',    'bg' => '#FEE2E2', 'color' => '#991B1B'];
+    if (str_contains($j, 'penawaran balik')) return ['label' => 'Ditawar balik',   'bg' => '#FEF3C7', 'color' => '#92400E'];
+    return ['label' => 'Negosiasi',          'bg' => '#FCE7F3', 'color' => '#9D174D'];
+}
+
+// Helper: badge label untuk pesanan berdasarkan tipe & isi pesan
+function getBadgePesanan($tipe, $judul) {
+    $j = mb_strtolower($judul);
+    if (str_contains($j, 'dalam pengiriman') || str_contains($j, 'dikirim'))
+        return ['label' => 'Dalam pengiriman', 'bg' => '#DBEAFE', 'color' => '#1E40AF'];
+    if (str_contains($j, 'dikemas'))
+        return ['label' => 'Dikemas',          'bg' => '#EDE9FE', 'color' => '#5B21B6'];
+    if (str_contains($j, 'diproses'))
+        return ['label' => 'Diproses',         'bg' => '#D1FAE5', 'color' => '#065F46'];
+    if (str_contains($j, 'menunggu'))
+        return ['label' => 'Menunggu',         'bg' => '#FEF3C7', 'color' => '#92400E'];
+    if (str_contains($j, 'tiba') || str_contains($j, 'selesai'))
+        return ['label' => 'Tiba di tujuan',   'bg' => '#D1FAE5', 'color' => '#065F46'];
+    if (str_contains($j, 'dibatalkan'))
+        return ['label' => 'Dibatalkan',       'bg' => '#FEE2E2', 'color' => '#991B1B'];
+    if ($tipe === 'transfer')
+        return ['label' => 'Transfer',         'bg' => '#EDE9FE', 'color' => '#5B21B6'];
+    return ['label' => 'Pesanan',              'bg' => '#FCE7F3', 'color' => '#9D174D'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -36,52 +80,106 @@ $ikon = [
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background: #fdf4f7; color: #2D1520; min-height: 100vh; }
 
-        .page-wrap { max-width: 680px; margin: 0 auto; padding: 24px 16px 60px; }
+        .page-wrap { max-width: 680px; margin: 0 auto; padding: 0 0 60px; }
 
-        .page-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+        /* ── Header ── */
+        .page-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 24px 16px 0;
+            margin-bottom: 0;
+        }
         .page-header h1 { font-size: 20px; font-weight: 700; color: #2D1520; }
-        .page-header .count-badge {
+        .count-badge {
             background: #C43860; color: #fff;
             font-size: 12px; font-weight: 700;
             padding: 2px 8px; border-radius: 20px;
         }
 
-        .empty-state { text-align: center; padding: 60px 20px; color: #9CA3AF; }
-        .empty-state i { font-size: 48px; margin-bottom: 12px; display: block; }
-        .empty-state p { font-size: 15px; }
+        /* ── Tab ── */
+        .tabs {
+            display: flex;
+            border-bottom: 1.5px solid #f0d6e0;
+            margin: 16px 0 0;
+            padding: 0 16px;
+            background: #fdf4f7;
+        }
+        .tab {
+            flex: 1; text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            color: #9CA3AF;
+            cursor: pointer;
+            border-bottom: 2.5px solid transparent;
+            margin-bottom: -1.5px;
+            transition: all .15s;
+            user-select: none;
+        }
+        .tab.active { color: #C43860; font-weight: 600; border-bottom-color: #C43860; }
+        .tab:hover:not(.active) { color: #2D1520; }
 
+        /* ── Tab Content ── */
+        .tab-content { display: none; padding: 12px 0; }
+        .tab-content.active { display: block; }
+
+        /* ── Section label ── */
+        .section-label {
+            font-size: 11px; font-weight: 600;
+            color: #9CA3AF;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            padding: 10px 16px 4px;
+        }
+
+        /* ── Notif Card ── */
         .notif-card {
             background: #fff;
             border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 10px;
+            padding: 14px 14px 14px 16px;
+            margin: 0 12px 8px;
             display: flex;
-            gap: 14px;
+            gap: 12px;
             align-items: flex-start;
             box-shadow: 0 1px 4px rgba(196,56,96,.07);
             border-left: 4px solid transparent;
             transition: box-shadow .2s;
             text-decoration: none;
             color: inherit;
+            position: relative;
         }
         .notif-card:hover { box-shadow: 0 4px 14px rgba(196,56,96,.13); }
         .notif-card.unread { border-left-color: #C43860; background: #fff8fb; }
 
+        /* ── Icon ── */
         .notif-icon {
-            width: 42px; height: 42px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 18px; flex-shrink: 0;
+            font-size: 17px; flex-shrink: 0;
         }
 
+        /* ── Body ── */
         .notif-body { flex: 1; min-width: 0; }
-        .notif-judul { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
-        .notif-pesan { font-size: 13px; color: #555; line-height: 1.5; }
+        .notif-judul { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .notif-pesan { font-size: 12px; color: #555; line-height: 1.5; margin-bottom: 6px; }
         .notif-time  { font-size: 11px; color: #9CA3AF; margin-top: 5px; }
 
+        /* ── Badge ── */
+        .badge {
+            display: inline-block;
+            font-size: 11px; font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        /* ── Unread dot ── */
         .unread-dot {
             width: 8px; height: 8px; border-radius: 50%;
-            background: #C43860; flex-shrink: 0; margin-top: 6px;
+            background: #C43860; flex-shrink: 0; margin-top: 5px;
         }
+
+        /* ── Empty state ── */
+        .empty-state { text-align: center; padding: 50px 20px; color: #9CA3AF; }
+        .empty-state i { font-size: 44px; margin-bottom: 12px; display: block; }
+        .empty-state p { font-size: 14px; }
     </style>
 </head>
 <body>
@@ -97,43 +195,153 @@ $ikon = [
         <?php endif; ?>
     </div>
 
-    <?php if (empty($list)): ?>
-    <div class="empty-state">
-        <i class="bi bi-bell-slash"></i>
-        <p>Belum ada notifikasi untuk kamu.</p>
+    <!-- Tab Navigation -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('semua', this)">
+            Semua <?= count($list) > 0 ? '(' . count($list) . ')' : '' ?>
+        </div>
+        <div class="tab" onclick="switchTab('pesanan', this)">
+            Pesanan <?= count($list_pesanan) > 0 ? '(' . count($list_pesanan) . ')' : '' ?>
+        </div>
+        <div class="tab" onclick="switchTab('negosiasi', this)">
+            Negosiasi <?= count($list_negosiasi) > 0 ? '(' . count($list_negosiasi) . ')' : '' ?>
+        </div>
     </div>
-    <?php else: ?>
 
-    <?php foreach ($list as $n):
-        $tipe  = $n['tipe'] ?? 'sistem';
+    <!-- ── TAB: SEMUA ── -->
+    <div id="tab-semua" class="tab-content active">
+        <?php if (empty($list)): ?>
+        <div class="empty-state">
+            <i class="bi bi-bell-slash"></i>
+            <p>Belum ada notifikasi untuk kamu.</p>
+        </div>
+        <?php else: ?>
+
+        <?php
+        // Kelompokkan: Terbaru (≤ 1 hari) vs Sebelumnya
+        $terbaru    = [];
+        $sebelumnya = [];
+        foreach ($list as $n) {
+            $diff = time() - strtotime($n['created_at']);
+            if ($diff <= 86400) $terbaru[] = $n;
+            else $sebelumnya[] = $n;
+        }
+        ?>
+
+        <?php if (!empty($terbaru)): ?>
+        <div class="section-label">Terbaru</div>
+        <?php foreach ($terbaru as $n): ?>
+            <?php echo renderNotifCard($n, $ikon); ?>
+        <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if (!empty($sebelumnya)): ?>
+        <div class="section-label">Sebelumnya</div>
+        <?php foreach ($sebelumnya as $n): ?>
+            <?php echo renderNotifCard($n, $ikon); ?>
+        <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php endif; ?>
+    </div>
+
+    <!-- ── TAB: PESANAN ── -->
+    <div id="tab-pesanan" class="tab-content">
+        <?php if (empty($list_pesanan)): ?>
+        <div class="empty-state">
+            <i class="bi bi-bag-x"></i>
+            <p>Belum ada notifikasi pesanan.</p>
+        </div>
+        <?php else: ?>
+        <?php foreach ($list_pesanan as $n): ?>
+            <?php echo renderNotifCard($n, $ikon); ?>
+        <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+
+    <!-- ── TAB: NEGOSIASI ── -->
+    <div id="tab-negosiasi" class="tab-content">
+        <?php if (empty($list_negosiasi)): ?>
+        <div class="empty-state">
+            <i class="bi bi-tag"></i>
+            <p>Belum ada notifikasi negosiasi.</p>
+        </div>
+        <?php else: ?>
+        <?php foreach ($list_negosiasi as $n): ?>
+            <?php echo renderNotifCard($n, $ikon); ?>
+        <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php
+// ── Render satu kartu notifikasi ──────────────────────────────────────────
+function renderNotifCard($n, $ikon) {
+    $tipe   = $n['tipe'] ?? 'sistem';
+    $unread = !$n['is_read'];
+    $waktu  = formatWaktu($n['created_at']);
+
+    // Link tujuan
+    $link = match($tipe) {
+        'pesanan', 'transfer', 'pengiriman' => '../pages/pesanan.php',
+        'nego'   => '../pages/nego.php',
+        'chat'   => '../pages/chat.php',
+        default  => '#'
+    };
+
+    if ($tipe === 'nego') {
+        $meta  = getMetaNego($n['judul']);
+        $badge = getBadgeNego($n['judul']);
+    } else {
         $meta  = $ikon[$tipe] ?? $ikon['sistem'];
-        $waktu = date('d M Y, H:i', strtotime($n['created_at']));
-        $unread = !$n['is_read'];
+        $badge = getBadgePesanan($tipe, $n['judul']);
+    }
 
-        // Link ke halaman terkait berdasarkan tipe
-        $link = match($tipe) {
-            'pesanan', 'transfer', 'pengiriman' => '../pages/pesanan.php',
-            'chat'    => '../pages/chat.php',
-            default   => '#'
-        };
+    $unread_class = $unread ? 'unread' : '';
+    $icon_bg      = $meta['color'] . '1a';
+
+    ob_start();
     ?>
-    <a href="<?= $link ?>" class="notif-card <?= $unread ? 'unread' : '' ?>">
-        <div class="notif-icon" style="background: <?= $meta['color'] ?>1a; color: <?= $meta['color'] ?>;">
+    <a href="<?= $link ?>" class="notif-card <?= $unread_class ?>">
+        <div class="notif-icon" style="background:<?= $icon_bg ?>; color:<?= $meta['color'] ?>;">
             <i class="bi <?= $meta['icon'] ?>"></i>
         </div>
         <div class="notif-body">
             <div class="notif-judul"><?= htmlspecialchars($n['judul']) ?></div>
             <div class="notif-pesan"><?= htmlspecialchars($n['pesan']) ?></div>
+            <span class="badge" style="background:<?= $badge['bg'] ?>; color:<?= $badge['color'] ?>;">
+                <?= $badge['label'] ?>
+            </span>
             <div class="notif-time"><i class="bi bi-clock"></i> <?= $waktu ?></div>
         </div>
         <?php if ($unread): ?>
         <div class="unread-dot"></div>
         <?php endif; ?>
     </a>
-    <?php endforeach; ?>
+    <?php
+    return ob_get_clean();
+}
 
-    <?php endif; ?>
-</div>
+// ── Format waktu relatif ──────────────────────────────────────────────────
+function formatWaktu($created_at) {
+    $diff = time() - strtotime($created_at);
+    if ($diff < 60)         return 'Baru saja';
+    if ($diff < 3600)       return (int)($diff / 60) . ' menit lalu';
+    if ($diff < 86400)      return (int)($diff / 3600) . ' jam lalu';
+    if ($diff < 172800)     return 'Kemarin';
+    if ($diff < 604800)     return (int)($diff / 86400) . ' hari lalu';
+    return date('d M Y', strtotime($created_at));
+}
+?>
+
+<script>
+function switchTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+}
+</script>
 
 </body>
 </html>

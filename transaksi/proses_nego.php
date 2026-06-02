@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 0);
+error_reporting(0);
+
 $aksi = $_POST['aksi'] ?? '';
 
 // Aksi dari PEMBELI
@@ -32,6 +35,8 @@ if (in_array($aksi, $aksi_pembeli)) {
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../pages/home.php"); exit;
 }
+
+require_once '../includes/notifikasi.php';
 
 // ══════════════════════════════════════════
 // AKSI 1: AJUKAN NEGO BARU (PEMBELI)
@@ -141,10 +146,32 @@ if ($aksi === 'setuju') {
     $harga_deal = (float)($_POST['harga_deal'] ?? 0);
     $pesan      = trim($_POST['pesan_admin'] ?? '');
 
+    // Ambil data nego + nama_barang produk + pembeli_id untuk notifikasi
+    $stmt = $conn->prepare("SELECT n.*, p.nama_barang AS nama_produk FROM nego_harga n JOIN produk p ON p.id = n.produk_id WHERE n.id = ? LIMIT 1");
+    $stmt->bind_param("i", $nego_id);
+    $stmt->execute();
+    $nego = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$nego_id || !$nego) {
+        header("Location: ../penjual/nego.php?msg=error"); exit;
+    }
+
     $upd = $conn->prepare("UPDATE nego_harga SET status='disetujui', harga_deal=?, pesan_admin=?, updated_at=NOW() WHERE id=?");
     $upd->bind_param("dsi", $harga_deal, $pesan, $nego_id);
     $upd->execute();
     $upd->close();
+
+    // ── Notifikasi ke pembeli ──
+    kirimNotifikasiNegoDisetujui(
+        $conn,
+        $nego['pembeli_id'],
+        $nego_id,
+        $nego['nama_produk'],
+        $nego['harga_asli'],
+        $harga_deal
+    );
+
     header("Location: ../penjual/nego.php?msg=setuju"); exit;
 }
 
@@ -156,10 +183,38 @@ if ($aksi === 'counter') {
     $harga_counter = (float)($_POST['harga_counter'] ?? 0);
     $pesan         = trim($_POST['pesan_admin'] ?? '');
 
+    // Ambil data nego + nama_barang produk + pembeli_id untuk notifikasi
+    $stmt = $conn->prepare("SELECT n.*, p.nama_barang AS nama_produk FROM nego_harga n JOIN produk p ON p.id = n.produk_id WHERE n.id = ? LIMIT 1");
+    $stmt->bind_param("i", $nego_id);
+    $stmt->execute();
+    $nego = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$nego_id || !$nego) {
+        header("Location: ../penjual/nego.php?msg=error"); exit;
+    }
+
+    if ($harga_counter <= 0) {
+        header("Location: ../penjual/nego.php?msg=error_counter"); exit;
+    }
+
     $upd = $conn->prepare("UPDATE nego_harga SET status='counter', harga_counter=?, pesan_admin=?, updated_at=NOW() WHERE id=?");
     $upd->bind_param("dsi", $harga_counter, $pesan, $nego_id);
     $upd->execute();
     $upd->close();
+
+    // ── Notifikasi ke pembeli ──
+    kirimNotifikasiNegoCounter(
+        $conn,
+        $nego['pembeli_id'],
+        $nego_id,
+        $nego['nama_produk'],
+        $nego['harga_asli'],
+        $nego['harga_tawar'],
+        $harga_counter,
+        $pesan
+    );
+
     header("Location: ../penjual/nego.php?msg=counter"); exit;
 }
 
@@ -170,10 +225,32 @@ if ($aksi === 'tolak') {
     $nego_id = (int)($_POST['nego_id'] ?? 0);
     $pesan   = trim($_POST['pesan_admin'] ?? '');
 
+    // Ambil data nego + nama_barang produk + pembeli_id untuk notifikasi
+    $stmt = $conn->prepare("SELECT n.*, p.nama_barang AS nama_produk FROM nego_harga n JOIN produk p ON p.id = n.produk_id WHERE n.id = ? LIMIT 1");
+    $stmt->bind_param("i", $nego_id);
+    $stmt->execute();
+    $nego = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$nego_id || !$nego) {
+        header("Location: ../penjual/nego.php?msg=error"); exit;
+    }
+
     $upd = $conn->prepare("UPDATE nego_harga SET status='ditolak', pesan_admin=?, updated_at=NOW() WHERE id=?");
     $upd->bind_param("si", $pesan, $nego_id);
     $upd->execute();
     $upd->close();
+
+    // ── Notifikasi ke pembeli ──
+    kirimNotifikasiNegoDitolak(
+        $conn,
+        $nego['pembeli_id'],
+        $nego_id,
+        $nego['nama_produk'],
+        $nego['harga_tawar'],
+        $pesan
+    );
+
     header("Location: ../penjual/nego.php?msg=tolak"); exit;
 }
 

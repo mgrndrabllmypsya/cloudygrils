@@ -535,9 +535,9 @@ header::after {
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
 .section-title {
     font-family: var(--font-heading);
-    font-size: 24px; font-weight: 700; color: var(--text);
+    font-size: 24px; font-weight: 700; color: #1db899b1;
 }
-.section-title span { color: var(--accent); }
+.section-title span { color: #ff009db1; }
 
 /* PRODUCT GRID */
 .product-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 20px; }
@@ -822,7 +822,7 @@ footer { background: var(--bg); border-top: 1.5px solid var(--border); position:
             <div class="hero-actions">
                 <a href="auth/login.php" class="hero-cta"><i class="bi bi-bag-heart"></i> Mulai Belanja</a>
                 <a href="#produk" class="hero-cta-outline" id="lihatKoleksi">
-                    Lihat Koleksi <i class="bi bi-arrow-down"></i>
+                    Lihat Koleksi 
                 </a>
             </div>
         </div>
