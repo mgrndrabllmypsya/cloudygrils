@@ -1,12 +1,13 @@
 <?php
-/**
- * sidebar.php — Sidebar terpusat untuk semua halaman penjual
- */
 
 $total_unread     = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM chat WHERE pengirim='pembeli' AND sudah_dibaca=0"))[0] ?? 0;
 $nego_menunggu    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='menunggu'"))[0] ?? 0;
 $pesanan_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status='menunggu'"))[0] ?? 0;
 $ulasan_baru      = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM ulasan WHERE DATE(created_at) = CURDATE()"))[0] ?? 0;
+
+// Notifikasi admin yang belum dibaca
+require_once __DIR__ . '/notifikasi.php';
+$notif_admin_unread = countUnreadAdmin($conn);
 
 $current_page = basename($_SERVER['PHP_SELF']);
 
@@ -40,23 +41,31 @@ function sidebar_active($page, $current) {
 }
 
 @media (max-width:900px) {
+    /* Tampilkan tombol hamburger di mobile */
+    .btn-toggle-sidebar {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
     .sidebar {
         position:fixed !important;
         left:0 !important;
         top:0 !important;
         height:100vh !important;
-        width:220px !important;
-        max-width:65vw !important;
+        width:260px !important;
+        max-width:80vw !important;
         border-radius:0 24px 24px 0 !important;
         overflow:hidden !important;
         display:flex !important;
-        flex-direction:column !important; /* ← sama seperti desktop */
+        flex-direction:column !important;
         transform:translateX(-100%) !important;
         transition:transform 0.3s ease !important;
-        z-index:99 !important;
+        z-index:200 !important;
     }
     .sidebar.active {
         transform:translateX(0) !important;
+        box-shadow: 4px 0 24px rgba(0,0,0,0.18) !important;
     }
     .sidebar-nav {
         flex: 1 !important;
@@ -69,6 +78,19 @@ function sidebar_active($page, $current) {
     .sidebar-footer {
         flex-shrink: 0 !important;
     }
+}
+
+/* Overlay gelap di belakang sidebar */
+#sidebarOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 199;
+    transition: opacity 0.3s ease;
+}
+#sidebarOverlay.active {
+    display: block;
 }
 </style>
 
@@ -138,14 +160,50 @@ function sidebar_active($page, $current) {
 </aside>
 
 <script>
-document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function(link) {
-    link.addEventListener('click', function() {
-        if (window.innerWidth <= 900) {
-            document.querySelector('.sidebar').classList.remove('active');
-            var overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+(function() {
+    // Buat overlay jika belum ada
+    if (!document.getElementById('sidebarOverlay')) {
+        var ov = document.createElement('div');
+        ov.id = 'sidebarOverlay';
+        document.body.appendChild(ov);
+    }
+
+    function closeSidebar() {
+        var sidebar = document.querySelector('.sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function openSidebar() {
+        var sidebar = document.querySelector('.sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Klik overlay → tutup sidebar
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'sidebarOverlay') closeSidebar();
     });
-});
+
+    // Klik nav item / logout → tutup sidebar
+    document.querySelectorAll('.sidebar .nav-item, .sidebar .btn-logout').forEach(function(link) {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 900) closeSidebar();
+        });
+    });
+
+    // Expose untuk dipakai tombol hamburger di luar
+    window.toggleSidebarMenu = function() {
+        var sidebar = document.querySelector('.sidebar');
+        if (sidebar && sidebar.classList.contains('active')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    };
+})();
 </script>

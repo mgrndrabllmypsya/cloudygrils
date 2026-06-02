@@ -127,6 +127,36 @@ if ($conn->query($sql)) {
     // Tandai produk sebagai terjual
     $conn->query("UPDATE produk SET status = 'terjual' WHERE id = $produk_id");
 
+    // ── NOTIFIKASI ──────────────────────────────────────────────────
+    require_once '../includes/notifikasi.php';
+    $pesanan_id = $conn->insert_id;
+
+    // Notifikasi ke pembeli
+    if ($metode === 'transfer') {
+        kirimNotifikasiPembeli(
+            $conn, $pembeli_id,
+            "Pesanan Berhasil Dibuat",
+            "Pesanan #{$kode_pesanan} berhasil dibuat. Silakan tunggu konfirmasi pembayaran dari admin.",
+            'pesanan', $pesanan_id
+        );
+    } else {
+        kirimNotifikasiPembeli(
+            $conn, $pembeli_id,
+            "Pesanan COD Berhasil Dibuat",
+            "Pesanan #{$kode_pesanan} dengan metode COD berhasil dibuat. Seller akan segera memproses pesananmu.",
+            'pesanan', $pesanan_id
+        );
+    }
+
+    // Notifikasi ke admin
+    kirimNotifikasiAdmin(
+        $conn,
+        "Pesanan Baru Masuk",
+        "Ada pesanan baru #{$kode_pesanan} dengan metode " . strtoupper($metode) . ". Segera cek dan proses.",
+        'pesanan', $pesanan_id
+    );
+    // ────────────────────────────────────────────────────────────────
+
     header("Location: ../transaksi/sukses.php?kode={$kode_pesanan}");
     exit;
 } else {

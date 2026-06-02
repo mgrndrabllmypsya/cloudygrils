@@ -28,16 +28,9 @@ $q_list = mysqli_query($conn, "
 if ($produk_id) {
     $pr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM produk WHERE id=$produk_id LIMIT 1"));
     if (!$pr) { header("Location: home.php"); exit; }
-} else {
-    $first = mysqli_fetch_assoc($q_list);
-    if ($first) {
-        $produk_id = $first['produk_id'];
-        mysqli_data_seek($q_list, 0);
-    }
-    if ($produk_id) {
-        $pr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM produk WHERE id=$produk_id LIMIT 1"));
-    }
 }
+// Tidak ada auto-select — biarkan area chat menampilkan placeholder
+// sampai user klik salah satu percakapan di list
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $produk_id) {
     $pesan = trim($_POST['pesan'] ?? '');
@@ -100,7 +93,17 @@ a { text-decoration:none; color:inherit; }
     padding:14px 16px; border-bottom:1px solid var(--border);
     background:var(--pink-blush);
     font-weight:700; font-size:14px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
 }
+.btn-keluar {
+    display:flex; align-items:center; gap:5px;
+    font-size:12px; font-weight:600; color:var(--pink-deep);
+    background:var(--pink-pale); border:1.5px solid var(--border);
+    border-radius:8px; padding:5px 10px; cursor:pointer;
+    text-decoration:none; transition:background .15s, opacity .15s;
+    white-space:nowrap;
+}
+.btn-keluar:hover { background:var(--pink-soft); opacity:.85; }
 .chat-list-body { flex:1; overflow-y:auto; }
 .chat-list-body::-webkit-scrollbar { width:3px; }
 .chat-list-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
@@ -247,51 +250,119 @@ a { text-decoration:none; color:inherit; }
 
 /* ── RESPONSIVE MOBILE ── */
 @media(max-width:768px) {
-    /* Sembunyikan header/footer bawaan halaman agar full screen */
     body > header, body > footer,
     .navbar, .site-header, .site-footer,
     nav.navbar { display:none !important; }
 
+    body { overflow: hidden; }
+
     .chat-page {
         padding: 0;
         max-width: 100%;
-        /* Pakai height dari JS agar pas dengan visual viewport */
-        height: var(--vh-total, 100vh);
+        width: 100%;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
     .chat-wrap {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        height: 100%;
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: unset;
+        grid-template-rows: unset;
+        flex: 1;
+        min-height: 0;
         gap: 0;
+        overflow: hidden;
     }
-    .chat-list {
+
+    /* ── STATE: Belum pilih chat → tampilkan list penuh ── */
+    .mobile-show-list .chat-list {
         border-radius: 0;
         border-left: none; border-right: none; border-top: none;
-        max-height: 130px;
+        height: 100%;
+        min-height: 0;
+        max-height: 100%;
+        flex: 1;
+        overflow: hidden;
+    }
+    .mobile-show-list .chat-list-body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .mobile-show-list .chat-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        padding: 12px 14px;
+        gap: 10px;
+        border-bottom: 1px solid var(--border);
+        border-right: none;
+        border-top: none;
+        text-align: left;
         flex-shrink: 0;
     }
-    .chat-area {
+    .mobile-show-list .chat-item.active { border-top: none; border-left: 3px solid var(--pink-deep); }
+    .mobile-show-list .chat-item-img { width: 44px; height: 44px; border-radius: 10px; }
+    .mobile-show-list .chat-item-info { width: auto; flex: 1; min-width: 0; }
+    .mobile-show-list .chat-item-nama { font-size: 13px; white-space: nowrap; }
+    .mobile-show-list .chat-item-preview { display: block; }
+    .mobile-show-list .chat-area { display: none !important; }
+
+    /* ── STATE: Sudah pilih chat → sembunyikan list, tampilkan chat penuh ── */
+    .mobile-show-chat .chat-list { display: none !important; }
+    .mobile-show-chat .chat-area {
         border-radius: 0;
-        border-left: none; border-right: none; border-bottom: none;
+        border: none;
         flex: 1;
         min-height: 0;
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
+
+    /* Header chat: tambah tombol Back di mobile */
+    .btn-back-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px; height: 34px;
+        border-radius: 8px;
+        background: var(--pink-pale);
+        border: 1.5px solid var(--border);
+        color: var(--pink-deep);
+        font-size: 16px;
+        cursor: pointer;
+        flex-shrink: 0;
+        text-decoration: none;
+    }
+
     .chat-messages {
         flex: 1;
         min-height: 0;
         padding: 12px 10px;
+        overflow-y: auto;
     }
-    .chat-header { padding: 10px 14px; }
-    .chat-input-area { padding: 8px 12px; }
+    .chat-header { padding: 10px 14px; flex-shrink: 0; }
+    .chat-input-area {
+        padding: 8px 12px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 10;
+    }
     .bubble-wrap { max-width: 88%; }
 }
 
+/* Tombol back hanya muncul di mobile */
+.btn-back-mobile { display: none; }
+@media(max-width:768px) {
+    .btn-back-mobile { display: flex; }
+}
+
 @media(max-width:400px) {
-    .chat-list { max-height: 110px; }
-    .chat-item { padding: 8px 10px; }
     .chat-item-img { width: 36px; height: 36px; }
     .chat-header-img { width: 34px; height: 34px; }
     .bubble { font-size: 12px; padding: 8px 12px; }
@@ -304,7 +375,10 @@ a { text-decoration:none; color:inherit; }
 
     <!-- LIST SIDEBAR -->
     <div class="chat-list">
-        <div class="chat-list-head">💬 Pesan</div>
+        <div class="chat-list-head">
+            <span>💬 Pesan</span>
+            <a href="home.php" class="btn-keluar"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        </div>
         <div class="chat-list-body">
             <?php
             $has_list = false;
@@ -356,6 +430,7 @@ a { text-decoration:none; color:inherit; }
 
         <div class="chat-header">
             <?php $fotoSrc = !empty($pr['foto_utama']) ? '../uploads/produk/' . escape($pr['foto_utama']) : 'https://placehold.co/42x42/FDE8F2/D63384?text=CG'; ?>
+            <a href="chat.php" class="btn-back-mobile"><i class="bi bi-arrow-left"></i></a>
             <img src="<?= $fotoSrc ?>" class="chat-header-img" alt="produk">
             <div class="chat-header-info">
                 <div class="nama"><?= escape($pr['nama_barang']) ?></div>
@@ -412,28 +487,42 @@ a { text-decoration:none; color:inherit; }
 </div>
 
 <script>
-// ── Fix tinggi layar mobile (hilangkan jeda putih bawah) ──
-function setVh() {
-    // Pakai visualViewport jika tersedia (lebih akurat saat keyboard muncul)
-    const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    document.getElementById('chatPage').style.height = h + 'px';
-}
-setVh();
-window.addEventListener('resize', setVh);
-if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', function() {
-        setVh();
-        // Scroll ke bawah saat keyboard muncul
-        setTimeout(() => {
-            const msgs = document.getElementById('chatMessages');
-            if (msgs) msgs.scrollTop = msgs.scrollHeight;
-        }, 100);
+// ── Set mobile state (list vs chat) ──
+(function() {
+    const wrap = document.querySelector('.chat-wrap');
+    if (!wrap) return;
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) return;
+    // Cek apakah ada produk_id di URL
+    const params = new URLSearchParams(window.location.search);
+    const hasProduk = params.has('produk_id') && params.get('produk_id') !== '';
+    if (hasProduk) {
+        wrap.classList.add('mobile-show-chat');
+    } else {
+        wrap.classList.add('mobile-show-list');
+    }
+    // Resize handler jika orientasi berubah
+    window.addEventListener('resize', function() {
+        const m = window.innerWidth <= 768;
+        if (!m) {
+            wrap.classList.remove('mobile-show-list', 'mobile-show-chat');
+        }
     });
-}
+})();
 
 // ── Scroll ke pesan terbaru ──
 const msgs = document.getElementById('chatMessages');
 if (msgs) msgs.scrollTop = msgs.scrollHeight;
+
+// ── Saat keyboard muncul (visualViewport resize), scroll ke bawah ──
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function() {
+        setTimeout(() => {
+            const m = document.getElementById('chatMessages');
+            if (m) m.scrollTop = m.scrollHeight;
+        }, 150);
+    });
+}
 
 // ── Auto resize textarea ──
 const ta = document.getElementById('pesanInput');

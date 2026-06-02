@@ -19,10 +19,14 @@ if (!$nego_id) {
 }
 
 // Ambil data nego
-$row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM nego_harga WHERE id=$nego_id LIMIT 1"));
+$row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT nh.*, pr.nama_barang FROM nego_harga nh JOIN produk pr ON nh.produk_id = pr.id WHERE nh.id=$nego_id LIMIT 1"));
 if (!$row) {
     header("Location: nego.php"); exit;
 }
+
+require_once '../includes/notifikasi.php';
+$pembeli_id  = (int)$row['pembeli_id'];
+$nama_produk = $row['nama_barang'];
 
 if ($aksi === 'setuju') {
     $harga_deal = (float)($_POST['harga_deal'] ?? $row['harga_tawar']);
@@ -34,6 +38,14 @@ if ($aksi === 'setuju') {
             updated_at = NOW()
         WHERE id = $nego_id
     ");
+
+    kirimNotifikasiPembeli(
+        $conn, $pembeli_id,
+        "Nego Harga Disetujui ✅",
+        "Nego harga untuk produk \"$nama_produk\" disetujui dengan harga Rp " . number_format($harga_deal, 0, ',', '.') . ". Segera lakukan checkout!",
+        'pesanan', $nego_id
+    );
+
     header("Location: nego.php?msg=setuju"); exit;
 
 } elseif ($aksi === 'counter') {
@@ -49,6 +61,14 @@ if ($aksi === 'setuju') {
             updated_at = NOW()
         WHERE id = $nego_id
     ");
+
+    kirimNotifikasiPembeli(
+        $conn, $pembeli_id,
+        "Ada Penawaran Balik dari Seller 🔄",
+        "Seller memberikan harga counter Rp " . number_format($harga_counter, 0, ',', '.') . " untuk produk \"$nama_produk\". Cek dan pertimbangkan penawarannya!",
+        'pesanan', $nego_id
+    );
+
     header("Location: nego.php?msg=counter"); exit;
 
 } elseif ($aksi === 'tolak') {
@@ -59,6 +79,14 @@ if ($aksi === 'setuju') {
             updated_at = NOW()
         WHERE id = $nego_id
     ");
+
+    kirimNotifikasiPembeli(
+        $conn, $pembeli_id,
+        "Nego Harga Ditolak ❌",
+        "Maaf, nego harga untuk produk \"$nama_produk\" tidak dapat disetujui." . ($pesan_admin ? " Pesan seller: $pesan_admin" : ''),
+        'pesanan', $nego_id
+    );
+
     header("Location: nego.php?msg=tolak"); exit;
 
 } else {

@@ -1,4 +1,5 @@
 <?php
+session_name('session_pembeli');
 session_start();
 date_default_timezone_set('Asia/Jakarta');
 require_once '../config/koneksi.php';
@@ -122,7 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1 class="page-title">Cek Email Kamu!</h1>
         <p class="subtitle">Kami sudah kirim kode OTP 6 digit ke:</p>
         <div class="email-badge"><?= htmlspecialchars($email) ?></div>
-
         <?php if ($error): ?>
         <div class="alert alert-error"><span>⚠️</span><span><?= htmlspecialchars($error) ?></span></div>
         <?php endif; ?>
