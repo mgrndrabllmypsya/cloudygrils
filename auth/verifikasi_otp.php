@@ -39,13 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi OTP — Cloudy Girls</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Syne:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --bg:#FFF0F4; --border:#FFB3C6; --accent:#D94F6E; --muted:#C48899; --text:#2D1520; --text2:#6B3A4A; }
         body {
             min-height:100vh; display:flex; align-items:center; justify-content:center;
-            font-family:'DM Sans',sans-serif; background:#f9cfcf; padding:24px; position:relative;
+            font-family:'Lato',sans-serif; background:#f9cfcf; padding:24px; position:relative;
         }
         body::before {
             content:''; position:fixed; inset:0;
@@ -65,19 +65,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .logo-img { width:90px; height:auto; object-fit:contain; }
         .brand-title-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:16px; }
         .gembok-icon { font-size:24px; line-height:1; }
-        .logo-text { font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:#1db899b1; line-height:1; }
+        .logo-text { font-family:'Poppins',sans-serif; font-size:24px; font-weight:800; color:#1db899b1; line-height:1; }
         .logo-text .pink-text { color:#ff009db1; }
-        .page-title { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; color:var(--text); text-align:center; margin-bottom:6px; }
-        .subtitle { font-size:0.88rem; color:var(--muted); line-height:1.6; margin-bottom:1.5rem; text-align:center; }
+        .page-title { font-family:'Poppins',sans-serif; font-size:1.4rem; font-weight:700; color:var(--text); text-align:center; margin-bottom:6px; }
+        .subtitle { font-size:0.88rem; color:var(--muted); line-height:1.6; margin-bottom:1.5rem; text-align:center; font-family:'Lato',sans-serif; }
         .email-badge {
             background:#FFF0F4; border:1px solid var(--border); border-radius:10px;
             padding:8px 14px; font-size:13px; font-weight:600; color:var(--accent);
-            text-align:center; margin-bottom:1.5rem;
+            text-align:center; margin-bottom:1.5rem; font-family:'Lato',sans-serif;
         }
-        .alert { padding:12px 14px; border-radius:12px; font-size:0.875rem; margin-bottom:1.25rem; display:flex; align-items:flex-start; gap:8px; line-height:1.5; }
+        .alert { padding:12px 14px; border-radius:12px; font-size:0.875rem; margin-bottom:1.25rem; display:flex; align-items:flex-start; gap:8px; line-height:1.5; font-family:'Lato',sans-serif; }
         .alert-error { background:#fff0f0; color:#c0392b; border:1px solid #fecaca; }
         .form-group { margin-bottom:1.25rem; }
-        label { display:block; font-size:0.875rem; font-weight:500; color:var(--text); margin-bottom:6px; text-align:center; }
+        label { display:block; font-size:0.875rem; font-weight:600; color:var(--text); margin-bottom:6px; text-align:center; font-family:'Poppins',sans-serif; }
 
         /* OTP Input Style */
         .otp-input {
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size:2rem; font-weight:900; letter-spacing:16px;
             border:2px solid var(--border); border-radius:16px;
             color:var(--accent); background:#FFF5F8;
-            font-family:'DM Sans',sans-serif; outline:none;
+            font-family:'Poppins',sans-serif; outline:none;
             transition:border-color .2s, box-shadow .2s;
         }
         .otp-input:focus { border-color:#FF6FA3; box-shadow:0 0 0 4px rgba(255,111,163,.15); background:#fff; }
@@ -93,20 +93,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .btn {
             width:100%; padding:13px; background:#FF6FA3; color:white; border:none;
-            border-radius:12px; font-size:0.95rem; font-weight:600;
-            font-family:'DM Sans',sans-serif; cursor:pointer;
+            border-radius:12px; font-size:0.95rem; font-weight:700;
+            font-family:'Poppins',sans-serif; cursor:pointer;
             transition:transform .15s, box-shadow .2s, background .2s;
             box-shadow:0 4px 14px rgba(255,111,163,.40);
         }
         .btn:hover { transform:translateY(-1px); background:#FF4F90; }
         .btn:active { transform:translateY(0); }
-        .timer { text-align:center; font-size:13px; color:var(--muted); margin-top:12px; }
-        .timer span { font-weight:700; color:var(--accent); }
-        .resend-link { color:var(--accent); font-weight:600; cursor:pointer; text-decoration:underline; display:none; }
+        .timer { text-align:center; font-size:13px; color:var(--muted); margin-top:12px; font-family:'Lato',sans-serif; }
+        .timer span { font-weight:700; color:var(--accent); font-family:'Poppins',sans-serif; }
+        .resend-link { color:var(--accent); font-weight:600; cursor:pointer; text-decoration:underline; display:none; font-family:'Poppins',sans-serif; }
         .back-link {
             display:flex; align-items:center; justify-content:center; gap:6px;
             margin-top:1.25rem; font-size:0.875rem; color:var(--text2);
-            text-decoration:none; transition:color .2s; font-weight:500;
+            text-decoration:none; transition:color .2s; font-weight:600; font-family:'Poppins',sans-serif;
         }
         .back-link:hover { color:var(--accent); }
     </style>

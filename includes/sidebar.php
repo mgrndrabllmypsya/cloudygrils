@@ -4,6 +4,13 @@ $total_unread     = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM c
 $nego_menunggu    = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego_harga WHERE status='menunggu'"))[0] ?? 0;
 $pesanan_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM pesanan WHERE status='menunggu'"))[0] ?? 0;
 $ulasan_baru      = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM ulasan WHERE DATE(created_at) = CURDATE()"))[0] ?? 0;
+$logo_toko_file = mysqli_fetch_assoc(
+    mysqli_query($conn, "SELECT logo FROM pengaturan_toko WHERE id=1 LIMIT 1")
+)['logo'] ?? '';
+
+$logo_toko_src = !empty($logo_toko_file)
+    ? '../uploads/toko/' . htmlspecialchars($logo_toko_file) . '?v=' . time()
+    : 'https://placehold.co/32x32/FFE4EE/FF4081?text=CG';
 
 // Notifikasi admin yang belum dibaca
 require_once __DIR__ . '/notifikasi.php';
@@ -97,8 +104,9 @@ function sidebar_active($page, $current) {
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div style="display:flex; align-items:center; gap:12px;">
-            <img src="../uploads/toko/logo.png" class="logo-img"
-                 onerror="this.src='https://placehold.co/32x32/FFE4EE/FF4081?text=CG'">
+            <img src="<?= $logo_toko_src ?>" class="logo-img"
+     onerror="this.src='https://placehold.co/32x32/FFE4EE/FF4081?text=CG'">
+
             <div class="logo" style="line-height:1; margin:0;">Cloudy <span>Girls</span></div>
         </div>
         <small>Seller Dashboard</small>

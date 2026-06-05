@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password — Cloudy Girls</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body {
             min-height: 100vh;
             display: flex; align-items: center; justify-content: center;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Lato', sans-serif;
             background: #f9cfcf;
             padding: 24px;
             position: relative;
@@ -117,9 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 4px;
         }
         .logo-text {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 24px;
-            font-weight: 700;
+            font-weight: 800;
             color: #1db899b1;
             text-align: center;
             line-height: 1.2;
@@ -133,13 +133,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 16px;
         }
         .card-top h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 22px;
             font-weight: 700;
             color: var(--text);
             margin-bottom: 4px;
         }
-        .card-top p { font-size: 12px; color: var(--muted); }
+        .card-top p { font-size: 12px; color: var(--muted); font-family: 'Lato', sans-serif; }
 
         /* Alert */
         .alert-err {
@@ -149,6 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 10px 14px; border-radius: 10px;
             font-size: 12px; margin-bottom: 18px;
             display: flex; align-items: center; gap: 8px;
+            font-family: 'Lato', sans-serif;
         }
 
         /* Fields */
@@ -157,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: block; font-size: 11px; font-weight: 600;
             letter-spacing: .8px; text-transform: uppercase;
             color: var(--text2); margin-bottom: 6px;
+            font-family: 'Poppins', sans-serif;
         }
         .field-wrap { position: relative; }
         .field-wrap .icon {
@@ -167,14 +169,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .field-wrap input {
             width: 100%; padding: 11px 42px 11px 40px;
             border: 2px solid #F48FB1; border-radius: 10px;
-            font-family: 'DM Sans', sans-serif; font-size: 13px;
+            font-family: 'Lato', sans-serif; font-size: 13px;
             color: var(--text); background: #fffef4;
             outline: none; transition: border-color .2s, box-shadow .2s, background .2s;
         }
         .field-wrap input:focus {
-            border-color: #47cbd0;
+            border-color: #FF6FA3;
             box-shadow: 0 0 0 4px rgba(255,111,163,.15);
-            background: #1db899b1;
+            background: #fff;
         }
         .field-wrap input::placeholder { color: #D4809A; }
 
@@ -189,9 +191,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /* Submit */
         .btn-submit {
             width: 100%; padding: 13px;
-            background: #59B292;
+            background: #FF6FA3;
             color: #fff; border: none; border-radius: 12px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 13px; font-weight: 700;
             letter-spacing: 1px; text-transform: uppercase;
             cursor: pointer;
@@ -210,17 +212,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .success-wrap { text-align: center; padding: 16px 0; }
         .success-wrap .check { font-size: 3rem; display: block; margin-bottom: 12px; }
         .success-wrap h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 20px; font-weight: 700;
             color: var(--text); margin-bottom: 8px;
         }
-        .success-wrap p { color: var(--muted); font-size: 13px; margin-bottom: 24px; line-height: 1.6; }
+        .success-wrap p { color: var(--muted); font-size: 13px; margin-bottom: 24px; line-height: 1.6; font-family: 'Lato', sans-serif; }
         .btn-login {
             display: inline-block; padding: 13px 32px;
-            background: #59B292; color: #fff;
+            background: #FF6FA3; color: #fff;
             border-radius: 12px; font-weight: 700; font-size: 13px;
             letter-spacing: 1px; text-transform: uppercase;
             text-decoration: none;
+            font-family: 'Poppins', sans-serif;
             box-shadow: 0 6px 22px rgba(255,111,163,.45);
             transition: background .2s, transform .15s;
         }
@@ -228,8 +231,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .back-home {
             display: flex; align-items: center; justify-content: center; gap: 5px;
-            margin-top: 18px; font-size: 11px; color: #59B292;
+            margin-top: 18px; font-size: 11px; color: #FF6FA3;
             text-decoration: none; transition: color .2s;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
         }
         .back-home:hover { color: var(--accent); }
     </style>

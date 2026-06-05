@@ -13,19 +13,12 @@ function renderStars($rating) {
     return $html;
 }
 
-/* ── DATA TOKO ── */
 $q_toko = mysqli_query($conn, "SELECT * FROM pengaturan_toko LIMIT 1");
 $toko   = $q_toko ? mysqli_fetch_assoc($q_toko) : [];
-
-/* ── FILTER KATEGORI ── */
 $filter_kategori = isset($_GET['kategori']) ? mysqli_real_escape_string($conn, $_GET['kategori']) : '';
 $where = "status='aktif'";
 if ($filter_kategori && $filter_kategori !== 'all') $where .= " AND kategori='$filter_kategori'";
-
-/* ── PRODUK UTAMA ── */
 $q_produk = mysqli_query($conn, "SELECT * FROM produk WHERE $where ORDER BY created_at DESC LIMIT 10");
-
-/* ── HERO CARDS ── */
 $q_hero   = mysqli_query($conn, "SELECT foto_utama, nama_barang FROM produk WHERE status='aktif' ORDER BY created_at DESC LIMIT 3");
 $hero_imgs = $q_hero ? mysqli_fetch_all($q_hero, MYSQLI_ASSOC) : [];
 
@@ -36,7 +29,6 @@ function heroImg($arr, $idx, $fallback) {
     return $fallback;
 }
 
-/* ── FOTO ABOUT: 1 foto per kategori ── */
 $about_imgs = [];
 $r = mysqli_query($conn, "SELECT foto_utama, nama_barang, kategori FROM produk WHERE status='aktif' AND foto_utama != '' ORDER BY created_at DESC LIMIT 1");
 $about_imgs[0] = $r ? mysqli_fetch_assoc($r) : [];
@@ -45,7 +37,6 @@ $about_imgs[1] = $r ? mysqli_fetch_assoc($r) : [];
 $r = mysqli_query($conn, "SELECT foto_utama, nama_barang, kategori FROM produk WHERE status='aktif' AND foto_utama != '' AND kategori='Dress/Gamis' ORDER BY created_at DESC LIMIT 1");
 $about_imgs[2] = $r ? mysqli_fetch_assoc($r) : [];
 
-/* ── ULASAN ── */
 $q_ulasan = mysqli_query($conn, "
     SELECT ul.rating, ul.komentar, p.nama AS nama_pembeli
     FROM ulasan ul
@@ -54,10 +45,13 @@ $q_ulasan = mysqli_query($conn, "
     ORDER BY ul.created_at DESC LIMIT 3
 ");
 $ulasan_list = $q_ulasan ? mysqli_fetch_all($q_ulasan, MYSQLI_ASSOC) : [];
-
 $kategori_list = ['Atasan','Bawahan','Dress/Gamis','Outer','Hijab & Aksesoris'];
 
-/* ── AJAX REQUEST: kembalikan hanya HTML produk ── */
+// ── LOGO DARI DB ──
+$logo_index_src = !empty($toko['logo'])
+    ? 'uploads/toko/' . htmlspecialchars($toko['logo']) . '?v=' . time()
+    : 'https://placehold.co/40x40/FFE4EE/FF4081?text=CG';
+
 if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     ob_start();
     if ($q_produk && mysqli_num_rows($q_produk) > 0):
@@ -105,25 +99,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cloudy Girls — Thrift Fashion Wanita</title>
 
-<!-- ═══════════════════════════════════════════════════
-     FONT: Poppins (heading/display) + Lato (body text)
-     Keduanya dari Google Fonts, gratis & cepat dimuat
-     ═══════════════════════════════════════════════════ -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
-
-<!-- Bootstrap 5 (CDN resmi) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-<!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
-<!-- AOS Animate on Scroll -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
 
 <style>
-/* ═══════════════════════════════════════
-   CSS VARIABLES — warna tidak diubah
-   ═══════════════════════════════════════ */
 :root {
     --bg:      #FFF0F4;
     --surface: #FFFFFF;
@@ -138,16 +119,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     --text2:   #5C3244;
     --yellow:  #E8956D;
     --green:   #5BAF9E;
-
-    /* ── FONT VARIABLES (baru) ── */
-    --font-heading: 'Poppins', sans-serif;   /* heading, logo, judul besar */
-    --font-body:    'Lato', sans-serif;      /* paragraf, deskripsi, caption */
-    --font-ui:      'Poppins', sans-serif;   /* tombol, label, nav, badge */
+    --font-heading: 'Poppins', sans-serif;  
+    --font-body:    'Lato', sans-serif;      
+    --font-ui:      'Poppins', sans-serif;   
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ── BASE TYPOGRAPHY ── */
 body {
     font-family: var(--font-body);
     color: var(--text);
@@ -167,14 +145,12 @@ body::before {
 }
 a { text-decoration: none !important; color: inherit; }
 
-/* Semua heading pakai Poppins */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     font-family: var(--font-heading);
     font-weight: 700;
 }
 
-/* Tombol, nav, badge, label → Poppins */
 button, .btn,
 .cat-link, .hero-badge, .hero-cta,
 .hero-cta-outline, .btn-masuk, .btn-daftar,
@@ -183,56 +159,44 @@ label, input, select, textarea {
     font-family: var(--font-ui);
 }
 
-/* ====== HEADER KEYFRAMES ====== */
-
-/* Header turun dari atas */
 @keyframes headerSlideDown {
     from { transform: translateY(-100%); opacity: 0; }
     to   { transform: translateY(0);     opacity: 1; }
 }
-/* Logo masuk dari kiri */
 @keyframes logoSlideIn {
     from { transform: translateX(-32px); opacity: 0; }
     to   { transform: translateX(0);     opacity: 1; }
 }
-/* Logo image putar + muncul */
 @keyframes logoImgSpin {
     from { transform: rotate(-15deg) scale(0.6); opacity: 0; }
     to   { transform: rotate(0deg)   scale(1);   opacity: 1; }
 }
-/* Teks logo huruf demi huruf (clip reveal) */
 @keyframes logoTextReveal {
     from { clip-path: inset(0 100% 0 0); opacity: 0; }
     to   { clip-path: inset(0 0% 0 0);   opacity: 1; }
 }
-/* Tombol masuk dari kanan */
 @keyframes btnSlideIn {
     from { transform: translateX(28px); opacity: 0; }
     to   { transform: translateX(0);    opacity: 1; }
 }
-/* Shimmer ping pada tombol Daftar setelah masuk */
 @keyframes btnPing {
     0%   { box-shadow: 0 4px 14px rgba(217,79,110,.30); }
     50%  { box-shadow: 0 4px 28px rgba(217,79,110,.65), 0 0 0 6px rgba(217,79,110,.10); }
     100% { box-shadow: 0 4px 14px rgba(217,79,110,.30); }
 }
-/* Garis bawah header sweep dari kiri ke kanan */
 @keyframes borderSweep {
     from { background-position: -100% 0; }
     to   { background-position: 0% 0; }
 }
 
-/* ====== HEADER ====== */
 header {
     background: rgba(255,255,255,.97);
     backdrop-filter: blur(12px);
     border-bottom: 1.5px solid var(--border);
     position: sticky; top: 0; z-index: 100;
     box-shadow: 0 2px 16px rgba(217,79,110,.08);
-    /* animasi 1: header turun dari atas */
     animation: headerSlideDown .55s cubic-bezier(.22,.68,0,1.2) both;
 }
-/* Garis bawah header — sweep pink setelah header muncul */
 header::after {
     content: '';
     position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
@@ -245,16 +209,13 @@ header::after {
     height: 68px; display: flex; align-items: center; justify-content: space-between;
 }
 
-/* ── Logo wrapper: slide dari kiri ── */
 .logo-wrapper {
     display: flex; align-items: center; gap: 12px;
     text-decoration: none !important;
     animation: logoSlideIn .6s cubic-bezier(.22,.68,0,1.2) .2s both;
 }
-/* Hover: logo wrapper naik sedikit */
 .logo-wrapper:hover { transform: translateY(-1px); transition: transform .2s ease; }
 
-/* Logo image: spin masuk + hover spin */
 .logo-img {
     width: 40px; height: 40px; border-radius: 50%;
     object-fit: cover; border: 1px solid var(--border);
@@ -267,7 +228,6 @@ header::after {
     box-shadow: 0 0 0 3px rgba(217,79,110,.15);
 }
 
-/* Logo text: clip reveal dari kiri */
 .logo-text {
     font-family: var(--font-heading);
     font-size: 22px; font-weight: 900;
@@ -276,7 +236,7 @@ header::after {
     display: inline-block;
 }
 .logo-text span { color: #ff009db1; }
-/* Hover: gradient shimmer pada teks */
+
 .logo-wrapper:hover .logo-text {
     background: linear-gradient(90deg, #1db899, #ff009d, #1db899);
     background-size: 200%;
@@ -289,7 +249,6 @@ header::after {
     100% { background-position: -200% center; }
 }
 
-/* ── Auth buttons: slide dari kanan, stagger ── */
 .auth-btns { display: flex; gap: 8px; align-items: center; }
 
 .btn-masuk {
@@ -298,11 +257,9 @@ header::after {
     padding: 8px 18px; border-radius: 20px;
     border: 1.5px solid var(--border);
     transition: all .25s cubic-bezier(.34,1.56,.64,1);
-    /* stagger: tombol pertama */
     animation: btnSlideIn .55s cubic-bezier(.22,.68,0,1.2) .35s both;
     position: relative; overflow: hidden;
 }
-/* Ripple fill saat hover */
 .btn-masuk::before {
     content: '';
     position: absolute; inset: 0; border-radius: 20px;
@@ -325,12 +282,10 @@ header::after {
     background: linear-gradient(135deg, var(--pink), var(--accent2));
     box-shadow: 0 4px 14px rgba(217,79,110,.30);
     transition: all .25s cubic-bezier(.34,1.56,.64,1);
-    /* stagger: tombol kedua, delay lebih lama */
     animation: btnSlideIn .55s cubic-bezier(.22,.68,0,1.2) .48s both,
                btnPing 2s ease 1.2s 2;
     position: relative; overflow: hidden;
 }
-/* Shine sweep saat hover */
 .btn-daftar::before {
     content: '';
     position: absolute; top: 0; left: -75%;
@@ -347,7 +302,6 @@ header::after {
 }
 .btn-daftar:active { transform: translateY(0) scale(.97); }
 
-/* ====== HERO ====== */
 .hero {
     min-height: calc(100vh - 68px);
     display: flex; align-items: center;
@@ -384,7 +338,6 @@ header::after {
 }
 .hero-badge i { font-size: 14px; }
 
-/* Hero title: Poppins Black italic — tetap kuat tapi beda karakter */
 .hero-title {
     font-family: var(--font-heading);
     font-size: clamp(36px, 4.5vw, 56px);
@@ -395,7 +348,6 @@ header::after {
     letter-spacing: -1px;
     text-shadow: 0 2px 12px rgba(255,255,255,.4);
 }
-/* em di dalam hero-title → italic Poppins */
 .hero-title em {
     font-style: italic;
     font-weight: 800;
@@ -442,7 +394,6 @@ header::after {
 }
 .hero-stat-divider { width: 1px; background: rgba(217,79,110,.25); align-self: stretch; }
 
-/* Hero kanan */
 .hero-right { position: relative; height: 460px; animation: heroInRight 1s ease both; }
 @keyframes heroInRight { from { opacity:0; transform:translateX(30px) } to { opacity:1; transform:translateX(0) } }
 .hero-img-main {
@@ -488,8 +439,6 @@ header::after {
 .hero-float-tag.tag-2 { top: 50%; left: -10px; transform: translateY(-50%); animation-delay: 1s; }
 .hero-float-tag .tag-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 .hero-float-tag .tag-dot.green { background: var(--green); }
-
-/* Waves */
 .waves-container { position: absolute; bottom: -1px; left: 0; width: 100%; overflow: hidden; line-height: 0; z-index: 3; }
 .waves { position: relative; width: 100%; height: 12vh; min-height: 70px; max-height: 120px; }
 .parallax > use { animation: move-forever 20s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -499,7 +448,6 @@ header::after {
 .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 16s; }
 @keyframes move-forever { 0%{transform:translate3d(-90px,0,0)} 100%{transform:translate3d(85px,0,0)} }
 
-/* ====== CATEGORY BAR ====== */
 .cat-bar {
     background: #fff; border-bottom: 1.5px solid var(--border);
     position: sticky; top: 67px; z-index: 99;
@@ -524,7 +472,6 @@ header::after {
     box-shadow: 0 3px 10px rgba(217,79,110,.25);
 }
 
-/* ====== SECTION PRODUK ====== */
 .section {
     max-width: 100%;
     background: #fff;
@@ -539,7 +486,6 @@ header::after {
 }
 .section-title span { color: #ff009db1; }
 
-/* PRODUCT GRID */
 .product-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 20px; }
 
 @keyframes cardIn { from { opacity:0; transform:translateY(18px) } to { opacity:1; transform:translateY(0) } }
@@ -583,7 +529,6 @@ header::after {
     font-size: 11px; color: var(--muted); margin-top: 4px;
 }
 
-/* Loading skeleton */
 .grid-loading {
     grid-column: 1/-1;
     display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 20px;
@@ -595,74 +540,6 @@ header::after {
 .skeleton-line.short { width: 60%; }
 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-/* ====== TENTANG KAMI ====== */
-.about-section {
-    background: #fff;
-    padding: 80px max(40px, calc((100% - 1280px) / 2 + 40px));
-    position: relative; z-index: 1;
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-}
-.about-section::before {
-    content: ''; position: absolute; top: -120px; right: -120px;
-    width: 400px; height: 400px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,179,198,.25), transparent 70%);
-    pointer-events: none;
-}
-.about-section::after {
-    content: ''; position: absolute; bottom: -80px; left: -80px;
-    width: 300px; height: 300px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(217,79,110,.10), transparent 70%);
-    pointer-events: none;
-}
-.about-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; position: relative; z-index: 1; }
-.about-label {
-    font-family: var(--font-ui);
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-    color: var(--accent); text-transform: uppercase; margin-bottom: 12px;
-    display: flex; align-items: center; gap: 8px;
-}
-.about-label::before { content:''; display:block; width:28px; height:2px; background:var(--accent); border-radius:2px; }
-.about-title {
-    font-family: var(--font-heading);
-    font-size: clamp(26px, 3vw, 38px);
-    font-weight: 800; line-height: 1.2; color: var(--text); margin-bottom: 14px;
-    letter-spacing: -0.5px;
-}
-.about-title em { font-style: italic; color: var(--accent); font-weight: 800; }
-.about-desc {
-    font-family: var(--font-body);
-    font-size: 14px; color: var(--text2); line-height: 1.85; margin-bottom: 32px;
-}
-.about-features { display: flex; flex-direction: column; gap: 14px; }
-.about-feat-item {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 16px 18px; background: var(--bg); border: 1.5px solid var(--border);
-    border-radius: 14px; transition: transform .22s, box-shadow .22s, border-color .22s;
-}
-.about-feat-item:hover { transform: translateX(6px); box-shadow: 0 8px 24px rgba(217,79,110,.13); border-color: var(--accent); }
-.feat-icon { width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0; background: linear-gradient(135deg, var(--pink2), var(--accent)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.feat-title {
-    font-family: var(--font-ui);
-    font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px;
-}
-.feat-desc {
-    font-family: var(--font-body);
-    font-size: 12px; color: var(--muted); line-height: 1.5;
-}
-.about-img-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 200px 200px; gap: 12px; }
-.about-img-cell { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(217,79,110,.14); border: 2px solid rgba(255,255,255,.90); position: relative; }
-.about-img-cell:first-child { grid-row: 1 / 3; border-radius: 20px; }
-.about-img-cell img { width:100%; height:100%; object-fit:cover; transition: transform .5s; }
-.about-img-cell:hover img { transform: scale(1.06); }
-.about-img-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(45,21,32,.45)); border-radius: inherit; }
-.about-img-caption {
-    position: absolute; bottom: 12px; left: 12px;
-    font-family: var(--font-ui);
-    font-size: 11px; font-weight: 700; color: #fff; letter-spacing: .5px; text-transform: uppercase;
-}
-
-/* ====== TESTIMONIAL ====== */
 .testi-section { background: linear-gradient(135deg, #FF8FAB 0%, #FFB3C6 50%, #FFD6E0 100%); padding: 72px 40px; position: relative; overflow: hidden; z-index: 1; }
 .testi-section::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,.22) 1px, transparent 1px); background-size: 24px 24px; pointer-events: none; }
 .testi-section-header { text-align: center; margin-bottom: 48px; position: relative; z-index: 2; }
@@ -677,7 +554,6 @@ header::after {
 .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
 .testi-card { background: rgba(255,255,255,.92); border: 1.5px solid rgba(255,255,255,.65); border-radius: 20px; padding: 28px; position: relative; box-shadow: 0 8px 32px rgba(217,79,110,.10); transition: transform .25s, box-shadow .25s; }
 .testi-card:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(217,79,110,.18); }
-/* Tanda kutip dekoratif pakai Poppins italic */
 .testi-quote {
     font-family: var(--font-heading);
     font-size: 56px; line-height: 1; color: var(--accent); opacity: .12;
@@ -695,7 +571,6 @@ header::after {
 }
 .testi-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--accent)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; font-family: var(--font-ui); }
 
-/* ====== CTA BANNER ====== */
 .cta-section { background: linear-gradient(135deg, var(--accent2) 0%, var(--accent) 50%, var(--pink) 100%); padding: 64px 40px; text-align: center; position: relative; overflow: hidden; z-index: 1; }
 .cta-section::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,.15) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
 .cta-inner { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; width: 100%; }
@@ -724,7 +599,6 @@ header::after {
 }
 .cta-btn-outline:hover { background: rgba(255,255,255,.30); color: #fff; }
 
-/* ====== FOOTER ====== */
 footer { background: var(--bg); border-top: 1.5px solid var(--border); position: relative; z-index: 1; }
 .footer-inner { max-width: 1280px; margin: 0 auto; padding: 48px 40px 24px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
 .footer-logo {
@@ -745,16 +619,13 @@ footer { background: var(--bg); border-top: 1.5px solid var(--border); position:
 .footer-socials a { width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--muted); transition: all .2s; }
 .footer-socials a:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-/* ====== EMPTY STATE ====== */
 .empty-state { grid-column: 1/-1; text-align: center; padding: 80px 20px; }
 .empty-state i { font-size: 3rem; color: var(--border); display: block; margin-bottom: 12px; }
 .empty-state p { color: var(--muted); font-family: var(--font-body); font-size: 14px; }
 
-/* ====== SCROLL FLASH ====== */
 .scroll-flash { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(180deg, #FF8FAB, #FFD6E0); opacity: 0; pointer-events: none; transition: opacity .18s ease; }
 .scroll-flash.show { opacity: .18; }
 
-/* ====== RESPONSIVE ====== */
 @media (max-width: 1280px) { .product-grid { grid-template-columns: repeat(4,1fr); } .grid-loading { grid-template-columns: repeat(4,1fr); } }
 @media (max-width: 1024px) {
     .hero-inner { grid-template-columns: 1fr; text-align: center; padding: 60px 40px 100px; }
@@ -762,15 +633,11 @@ footer { background: var(--bg); border-top: 1.5px solid var(--border); position:
     .hero-actions { justify-content: center; }
     .hero-stats { justify-content: center; }
     .hero-right { display: none; }
-    .about-inner { grid-template-columns: 1fr; gap: 40px; }
-    .about-img-grid { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 160px; }
-    .about-img-grid .about-img-cell:first-child { grid-row: 1; }
 }
 @media (max-width: 768px) {
     .header-inner { padding-left: 16px; padding-right: 16px; }
     .hero-inner { padding: 48px 20px 80px; }
     .hero-stats { gap: 16px; }
-    .about-section { padding: 48px 16px; }
     .section { padding: 24px 16px 40px; }
     .product-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
     .grid-loading { grid-template-columns: repeat(2,1fr); }
@@ -799,7 +666,9 @@ footer { background: var(--bg); border-top: 1.5px solid var(--border); position:
 <header>
     <div class="header-inner">
         <a href="index.php" class="logo-wrapper">
-            <img src="uploads/toko/logo.png" class="logo-img" alt="Cloudy Girls" onerror="this.style.display='none'">
+            <!-- ✅ Logo dari DB, bukan hardcoded -->
+            <img src="<?= $logo_index_src ?>" class="logo-img" alt="Cloudy Girls"
+                 onerror="this.src='https://placehold.co/40x40/FFE4EE/FF4081?text=CG'">
             <span class="logo-text">Cloudy <span>Girls</span></span>
         </a>
         <div class="auth-btns">
@@ -821,9 +690,7 @@ footer { background: var(--bg); border-top: 1.5px solid var(--border); position:
             <p class="hero-sub">Koleksi pakaian wanita berkualitas pilihan — atasan, bawahan, dress, outer, hingga hijab. Temukan outfit favoritmu dengan harga terjangkau.</p>
             <div class="hero-actions">
                 <a href="auth/login.php" class="hero-cta"><i class="bi bi-bag-heart"></i> Mulai Belanja</a>
-                <a href="#produk" class="hero-cta-outline" id="lihatKoleksi">
-                    Lihat Koleksi 
-                </a>
+                <a href="#produk" class="hero-cta-outline" id="lihatKoleksi">Lihat Koleksi</a>
             </div>
         </div>
         <div class="hero-right">
@@ -960,25 +827,24 @@ footer { background: var(--bg); border-top: 1.5px solid var(--border); position:
             </p>
             <?php endif; ?>
             <div style="border-radius:20px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.25);
-            margin:0 auto 20px;border:3px solid rgba(255,255,255,.30);
-            width:100%;max-width:700px;position:relative;">
-    <iframe
-        src="<?= escape($toko['maps_url']) ?>"
-        width="100%" height="320"
-        style="border:0;display:block;width:100%;transform:none;"
-        allowfullscreen=""
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
-</div>
+                margin:0 auto 20px;border:3px solid rgba(255,255,255,.30);
+                width:100%;max-width:700px;position:relative;">
+                <iframe
+                    src="<?= escape($toko['maps_url']) ?>"
+                    width="100%" height="320"
+                    style="border:0;display:block;width:100%;transform:none;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
             <?php
-// Ambil koordinat dari embed URL, buat link Google Maps biasa
-$maps_direct = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($toko['alamat'] ?? 'Cloudy Girls');
-if (!empty($toko['maps_link'])) $maps_direct = $toko['maps_link'];
-?>
-<a href="https://maps.app.goo.gl/zo5cvjjenoCqa7mk6" target="_blank" class="cta-btn-primary">
-    <i class="bi bi-geo-alt-fill"></i> Buka di Google Maps
-</a>
+            $maps_direct = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($toko['alamat'] ?? 'Cloudy Girls');
+            if (!empty($toko['maps_link'])) $maps_direct = $toko['maps_link'];
+            ?>
+            <a href="https://maps.app.goo.gl/zo5cvjjenoCqa7mk6" target="_blank" class="cta-btn-primary">
+                <i class="bi bi-geo-alt-fill"></i> Buka di Google Maps
+            </a>
         <?php else: ?>
             <h2>Siap Tampil Cantik<br>Hari Ini?</h2>
             <p>Daftar sekarang dan dapatkan akses ke ratusan koleksi thrift pilihan. Harga hemat, kualitas oke!</p>
@@ -992,10 +858,7 @@ if (!empty($toko['maps_link'])) $maps_direct = $toko['maps_link'];
 
 <?php include 'includes/footer.php'; ?>
 
-<!-- Bootstrap 5 JS Bundle (Popper included) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- AOS -->
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
 AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 60 });

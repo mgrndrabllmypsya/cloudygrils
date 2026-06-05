@@ -64,14 +64,13 @@ include '../includes/header.php';
     --red:        #ef4444;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'DM Sans',sans-serif; color:var(--dark); background:var(--cream); }
+body { font-family:'Lato',sans-serif; color:var(--dark); background:var(--cream); }
 a { text-decoration:none; }
 
 .page-wrap { max-width:900px; margin:0 auto; padding:32px 20px 80px; }
 
 .page-header { margin-bottom:28px; }
-.page-header h1 {
-    font-family:'Playfair Display',serif;
+.page-header h1 {font-family:'Poppins',sans-serif; font-weight:800; letter-spacing:-0.5px;
     font-size:26px; font-weight:700; color:var(--dark);
 }
 .page-header p { font-size:13px; color:var(--muted); margin-top:4px; }
@@ -124,7 +123,7 @@ a { text-decoration:none; }
 }
 .card-head .kode {
     font-weight:700; font-size:13px; color:var(--pink-deep);
-    font-family:'DM Mono',monospace;
+    font-family:'Poppins',sans-serif;
 }
 .card-head .tgl { font-size:12px; color:var(--muted); }
 
@@ -184,8 +183,7 @@ a { text-decoration:none; }
     background:linear-gradient(135deg,#10b981,#059669);
     color:#fff; border:none; border-radius:20px;
     font-size:12px; font-weight:700; cursor:pointer;
-    transition:opacity .2s; font-family:'DM Sans',sans-serif;
-}
+    transition:opacity .2s; font-family:'Poppins',sans-serif;
 .btn-diterima:hover { opacity:.88; }
 
 /* ── NOTIF DIKIRIM ── */
@@ -229,7 +227,7 @@ a { text-decoration:none; }
     border:1.5px solid var(--border);
 }
 .empty-state .icon { font-size:3rem; margin-bottom:16px; display:block; }
-.empty-state h3 { font-family:'Playfair Display',serif; font-size:18px; margin-bottom:8px; }
+.empty-state h3 { font-family:'Poppins',sans-serif; font-weight:700;
 .empty-state p { font-size:13px; color:var(--muted); margin-bottom:20px; }
 
 @media(max-width:600px) {

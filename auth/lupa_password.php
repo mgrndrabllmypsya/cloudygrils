@@ -32,21 +32,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Kirim pakai mail() PHP biasa
             $from    = 'noreply@claudygirls.mif.myhost.id';
             $subject = 'Kode OTP Reset Password - Cloudy Girls';
+            
+            // Format OTP dengan spasi di antara digit agar lebih rapi di email
+            $otp_formatted = implode(' ', str_split($otp));
+            
             $body    = "
-                <div style='font-family:Arial,sans-serif;background:#FFF0F4;padding:32px;'>
-                    <div style='max-width:480px;margin:0 auto;background:#fff;border-radius:16px;padding:32px;border:1px solid #FFB3C6;'>
-                        <h2 style='color:#D94F6E;'>🔐 Kode OTP Kamu</h2>
-                        <p>Halo <strong>{$pembeli['nama']}</strong>,</p>
-                        <p>Gunakan kode OTP berikut untuk mereset password:</p>
-                        <div style='text-align:center;margin:24px 0;'>
-                            <span style='font-size:40px;font-weight:900;letter-spacing:12px;color:#D94F6E;background:#FFF0F4;padding:16px 24px;border-radius:12px;border:2px dashed #FFB3C6;'>
-                                {$otp}
-                            </span>
-                        </div>
-                        <p style='color:#C48899;font-size:13px;text-align:center;'>Kode berlaku <strong>10 menit</strong>. Jangan berikan ke siapapun.</p>
-                        <p style='color:#aaa;font-size:12px;margin-top:16px;'>Jika tidak merasa meminta reset password, abaikan email ini.</p>
-                    </div>
-                </div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+</head>
+<body style='font-family:Arial,sans-serif;margin:0;padding:0;background:#FFF0F4;'>
+    <div style='width:100%;padding:32px 0;background:#FFF0F4;'>
+        <div style='max-width:480px;margin:0 auto;background:#fff;border-radius:16px;padding:32px;border:1px solid #FFB3C6;box-shadow:0 4px 12px rgba(255,179,198,0.2);'>
+            
+            <!-- Header -->
+            <div style='text-align:center;margin-bottom:28px;'>
+                <h2 style='color:#D94F6E;font-size:24px;margin:0 0 8px 0;'>🔐 Kode OTP Kamu</h2>
+            </div>
+            
+            <!-- Greeting -->
+            <p style='color:#2D1520;font-size:14px;margin:0 0 16px 0;line-height:1.6;'>
+                Halo <strong>{$pembeli['nama']}</strong>,
+            </p>
+            
+            <!-- Message -->
+            <p style='color:#2D1520;font-size:14px;margin:0 0 24px 0;line-height:1.6;'>
+                Gunakan kode OTP berikut untuk mereset password:
+            </p>
+            
+            <!-- OTP Code Box -->
+            <div style='text-align:center;margin:32px 0;'>
+                <table style='width:100%;border-collapse:collapse;margin:0 auto;'>
+                    <tr>
+                        <td style='text-align:center;'>
+                            <div style='background:#FFF5F8;border:2px solid #FFB3C6;border-radius:12px;padding:20px;display:inline-block;'>
+                                <span style='font-size:48px;font-weight:900;color:#D94F6E;font-family:Courier New,monospace;letter-spacing:8px;line-height:1;'>
+                                    {$otp_formatted}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Info -->
+            <p style='color:#C48899;font-size:13px;text-align:center;margin:24px 0 0 0;line-height:1.5;'>
+                Kode berlaku <strong style='color:#D94F6E;'>10 menit</strong>.<br>
+                Jangan berikan kode ini ke siapapun.
+            </p>
+            
+            <!-- Footer -->
+            <p style='color:#999;font-size:12px;margin:24px 0 0 0;padding-top:16px;border-top:1px solid #FFB3C6;line-height:1.6;'>
+                Jika Anda tidak merasa meminta reset password, abaikan email ini. Akun Anda tetap aman.
+            </p>
+            
+        </div>
+    </div>
+</body>
+</html>
             ";
             $headers  = "MIME-Version: 1.0\r\n";
             $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
@@ -75,36 +120,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lupa Password — Cloudy Girls</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Syne:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --bg:#FFF0F4; --border:#FFB3C6; --accent:#D94F6E; --muted:#C48899; --text:#2D1520; --text2:#6B3A4A; }
-        body { min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:'DM Sans',sans-serif; background:#f9cfcf; padding:24px; position:relative; }
+        body { min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:'Lato',sans-serif; background:#f9cfcf; padding:24px; position:relative; }
         body::before { content:''; position:fixed; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,.18) 1px,transparent 1px); background-size:24px 24px; pointer-events:none; }
         .card { width:100%; max-width:380px; background:rgba(249,242,242,0.95); backdrop-filter:blur(16px); border:1.5px solid rgba(255,179,198,.6); border-radius:24px; padding:40px 36px; animation:fadeUp .45s ease both; position:relative; z-index:1; box-shadow:0 24px 64px rgba(255,143,171,.25); }
         @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
         .logo-top-container { display:flex; justify-content:center; margin-bottom:8px; }
         .logo-img { width:90px; height:auto; object-fit:contain; }
         .brand-title-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:16px; }
-        .logo-text { font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:#1db899b1; line-height:1; }
+        .logo-text { font-family:'Poppins',sans-serif; font-size:24px; font-weight:800; color:#1db899b1; line-height:1; }
         .logo-text .pink-text { color:#ff009db1; }
-        .page-title { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; color:var(--text); text-align:center; margin-bottom:6px; }
-        .subtitle { font-size:0.88rem; color:var(--muted); line-height:1.6; margin-bottom:1.5rem; text-align:center; }
-        .alert { padding:12px 14px; border-radius:12px; font-size:0.875rem; margin-bottom:1.25rem; display:flex; align-items:flex-start; gap:8px; line-height:1.5; }
+        .page-title { font-family:'Poppins',sans-serif; font-size:1.4rem; font-weight:700; color:var(--text); text-align:center; margin-bottom:6px; }
+        .subtitle { font-size:0.88rem; color:var(--muted); line-height:1.6; margin-bottom:1.5rem; text-align:center; font-family:'Lato',sans-serif; }
+        .alert { padding:12px 14px; border-radius:12px; font-size:0.875rem; margin-bottom:1.25rem; display:flex; align-items:flex-start; gap:8px; line-height:1.5; font-family:'Lato',sans-serif; }
         .alert-error { background:#fff0f0; color:#c0392b; border:1px solid #fecaca; }
         .form-group { margin-bottom:1.25rem; }
-        label { display:block; font-size:0.875rem; font-weight:500; color:var(--text); margin-bottom:6px; }
+        label { display:block; font-size:0.875rem; font-weight:600; color:var(--text); margin-bottom:6px; font-family:'Poppins',sans-serif; }
         .input-wrap { position:relative; }
         .input-wrap svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
-        input[type="email"] { width:100%; padding:12px 14px 12px 42px; border:1.5px solid var(--border); border-radius:12px; font-size:0.9rem; font-family:'DM Sans',sans-serif; color:var(--text); background:#fafafa; transition:border-color .2s, box-shadow .2s; outline:none; }
+        input[type="email"] { width:100%; padding:12px 14px 12px 42px; border:1.5px solid var(--border); border-radius:12px; font-size:0.9rem; font-family:'Lato',sans-serif; color:var(--text); background:#fafafa; transition:border-color .2s, box-shadow .2s; outline:none; }
         input[type="email"]:focus { border-color:#FF6FA3; box-shadow:0 0 0 4px rgba(255,111,163,.15); background:#fff; }
         input[type="email"]::placeholder { color:#D4809A; }
-        .btn { width:100%; padding:13px; background:#FF6FA3; color:white; border:none; border-radius:12px; font-size:0.95rem; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; transition:transform .15s, box-shadow .2s, background .2s; box-shadow:0 4px 14px rgba(255,111,163,.40); }
+        .btn { width:100%; padding:13px; background:#FF6FA3; color:white; border:none; border-radius:12px; font-size:0.95rem; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer; transition:transform .15s, box-shadow .2s, background .2s; box-shadow:0 4px 14px rgba(255,111,163,.40); }
         .btn:hover { transform:translateY(-1px); background:#FF4F90; }
-        .back-link { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:1.25rem; font-size:0.875rem; color:var(--text2); text-decoration:none; transition:color .2s; font-weight:500; }
+        .back-link { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:1.25rem; font-size:0.875rem; color:var(--text2); text-decoration:none; transition:color .2s; font-weight:600; font-family:'Poppins',sans-serif; }
         .back-link:hover { color:var(--accent); }
         .divider { height:1px; background:var(--border); margin:1.5rem 0; }
-        .info-box { background:#FFF5F8; border-radius:12px; padding:12px 14px; font-size:0.8rem; color:var(--text2); line-height:1.6; border:1px solid var(--border); }
+        .info-box { background:#FFF5F8; border-radius:12px; padding:12px 14px; font-size:0.8rem; color:var(--text2); line-height:1.6; border:1px solid var(--border); font-family:'Lato',sans-serif; }
+        .info-box strong { font-family:'Poppins',sans-serif; font-weight:600; }
     </style>
 </head>
 <body>

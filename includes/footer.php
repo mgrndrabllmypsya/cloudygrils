@@ -2,6 +2,8 @@
 /**
  * footer.php — Footer reusable untuk Cloudy Girls
  * Dipanggil di: home.php, index.php, dan halaman lain
+ * 
+ * UPDATE: Perbaikan link Instagram agar redirect ke akun penjual dengan benar
  */
 
 if (!isset($toko)) {
@@ -14,6 +16,9 @@ if (!isset($kategori_list)) {
 if (!function_exists('escape')) {
     function escape($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
 }
+
+// Deteksi otomatis: link kategori sesuai halaman yang memanggil footer
+$base = strpos($_SERVER['PHP_SELF'], '/pages/') !== false ? 'home.php' : 'index.php';
 ?>
 
 <!-- ══════════════════════════════════════
@@ -35,13 +40,6 @@ if (!function_exists('escape')) {
                     <i class="bi bi-whatsapp"></i> Hubungi Kami
                 </a>
                 <?php endif; ?>
-                <?php if (!empty($toko['instagram'])): ?>
-                <a href="https://instagram.com/<?= ltrim(escape($toko['instagram']), '@') ?>"
-                   target="_blank"
-                   style="display:inline-flex;align-items:center;gap:6px;font-size:28px;color:#E1306C;">
-                    <i class="bi bi-instagram"></i>
-                </a>
-                <?php endif; ?>
             </div>
         </div>
 
@@ -50,7 +48,7 @@ if (!function_exists('escape')) {
             <h4 style="font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:14px;color:var(--text);">Kategori</h4>
             <div class="footer-links">
                 <?php foreach ($kategori_list as $kat): ?>
-                <a href="home.php?kategori=<?= urlencode($kat) ?>"><?= escape($kat) ?></a>
+                <a href="<?= $base ?>?kategori=<?= urlencode($kat) ?>"><?= escape($kat) ?></a>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -110,7 +108,7 @@ if (!function_exists('escape')) {
     border-radius: 20px 20px 0 0;
 }
 .cg-modal-head h3 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 17px; font-weight: 700; color: #2D1520;
 }
 .cg-modal-head h3 span { color: #D94F6E; }
@@ -133,11 +131,16 @@ if (!function_exists('escape')) {
     font-size: 12px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; margin-top: 1px;
+    font-family: 'Poppins', sans-serif;
 }
-.cg-rule-text { font-size: 13.5px; color: #3D2028; line-height: 1.7; }
+.cg-rule-text {
+    font-family: 'Lato', sans-serif;
+    font-size: 13.5px; color: #3D2028; line-height: 1.7;
+}
 .cg-rule-text strong { color: #D94F6E; }
 .cg-rule-divider { border: none; border-top: 1px dashed #FFB3C6; margin: 18px 0; }
 .cg-note {
+    font-family: 'Lato', sans-serif;
     background: #FFF0F4; border-left: 3px solid #FF6FA3;
     border-radius: 0 10px 10px 0;
     padding: 12px 14px; font-size: 13px;

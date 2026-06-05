@@ -76,228 +76,268 @@ include '../includes/header.php';
 <!-- PASTIKAN tag berikut ada di dalam header.php agar responsive bekerja:
      <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
 <style>
-/* ── PINK SOFT GRADIENT PALETTE ──
-   Top:    #FF8FAB  (pink medium)
-   Mid:    #FFB3C6  (pink soft)
-   Bottom: #FFD6E0  (pink pastel lembut)
-   Accent: #E8607A  (pink deep untuk teks/aksi)
-   Dark:   #3D1A24  (gelap hangat)
-*/
-
-.container-detail{max-width:1100px;margin:40px auto;padding:0 40px;display:grid;grid-template-columns:1fr 1fr;gap:48px;}
-
-/* Foto */
-.foto-utama{border-radius:20px;overflow:hidden;background:#f9cfcf;border:1.5px solid #FFB3C6;}
-.foto-utama img{width:100%;height:auto;display:block;object-fit:cover;}
-
-/* Info produk */
-.produk-info{}
-.produk-kategori{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#E8607A;margin-bottom:8px;}
-.produk-nama{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;line-height:1.2;margin-bottom:12px !important;color:#3D1A24;}
-.produk-harga{font-size:28px;font-weight:700;color:#E8607A;margin-bottom:4px;}
-.harga-asli{font-size:16px;color:#C48899;text-decoration:line-through;margin-bottom:16px;}
-
-.produk-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
-.meta-tag{font-size:12px;padding:5px 14px;border-radius:20px;background:#FFF0F4;border:1.5px solid #FFB3C6;color:#C48899;}
-
-.produk-desc{font-size:14px;line-height:1.7;color:#C48899;margin-bottom:0;}
-.divider{height:1px;background:#FFB3C6;margin:20px 0;}
-
-/* Tombol Beli */
-.btn-beli{
-    width:100%;padding:14px;
-    background:#59B292;
-    color:#fff;border:none;border-radius:12px;
-    font-size:15px;font-weight:700;cursor:pointer;
-    transition:background .2s, transform .1s;
-    margin-bottom:10px;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    letter-spacing:.3px;
+:root {
+    --font-heading: 'Poppins', sans-serif;
+    --font-body:    'Lato', sans-serif;
+    --font-ui:      'Poppins', sans-serif;
 }
-.btn-beli:hover{background:#FF4F90;transform:translateY(-1px);}
-.btn-beli:disabled{background:#F9C8D4;cursor:not-allowed;transform:none;}
 
-/* Tombol Nego */
-.btn-nego{
-    width:100%;padding:13px;
-    background:#FFF0F4;
-    color:#E8607A;
-    border:1.5px solid #FF8FAB;
-    border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;
-    transition:all .2s;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    margin-bottom:10px;
+.container-detail {
+    max-width: 1100px; margin: 40px auto;
+    padding: 0 40px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
 }
-.btn-nego:hover{background:#FFD6E0;border-color:#E8607A;}
 
-/* Tombol Chat */
-.btn-chat{
-    width:100%;padding:13px;
-    background:#fff;
-    color:#3D1A24;
-    border:1.5px solid #FFB3C6;
-    border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;
-    transition:border-color .2s, background .2s;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    text-decoration:none;
+/* ── FOTO ── */
+.foto-utama {
+    border-radius: 20px; overflow: hidden;
+    background: #f9cfcf; border: 1.5px solid #FFB3C6;
 }
-.btn-chat:hover{border-color:#FF8FAB;background:#59B292;}
+.foto-utama img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+/* ── INFO PRODUK ── */
+.produk-kategori {
+    font-family: var(--font-ui);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: #E8607A; margin-bottom: 8px;
+}
+.produk-nama {
+    font-family: var(--font-heading);
+    font-size: 28px; font-weight: 800;
+    line-height: 1.2; margin-bottom: 12px !important;
+    color: #3D1A24; letter-spacing: -0.5px;
+}
+.produk-harga {
+    font-family: var(--font-heading);
+    font-size: 28px; font-weight: 700;
+    color: #E8607A; margin-bottom: 4px;
+}
+.harga-asli {
+    font-family: var(--font-body);
+    font-size: 16px; color: #C48899;
+    text-decoration: line-through; margin-bottom: 16px;
+}
+
+.produk-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.meta-tag {
+    font-family: var(--font-ui);
+    font-size: 12px; padding: 5px 14px;
+    border-radius: 20px; background: #FFF0F4;
+    border: 1.5px solid #FFB3C6; color: #C48899;
+}
+
+.produk-desc {
+    font-family: var(--font-body);
+    font-size: 14px; line-height: 1.7; color: #C48899; margin-bottom: 0;
+}
+.divider { height: 1px; background: #FFB3C6; margin: 20px 0; }
+
+/* ── TOMBOL BELI ── */
+.btn-beli {
+    font-family: var(--font-ui);
+    width: 100%; padding: 14px;
+    background: #59B292; color: #fff;
+    border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: background .2s, transform .1s;
+    margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: .3px;
+}
+.btn-beli:hover { background: #FF4F90; transform: translateY(-1px); }
+.btn-beli:disabled { background: #F9C8D4; cursor: not-allowed; transform: none; }
+
+/* ── TOMBOL NEGO ── */
+.btn-nego {
+    font-family: var(--font-ui);
+    width: 100%; padding: 13px;
+    background: #FFF0F4; color: #E8607A;
+    border: 1.5px solid #FF8FAB;
+    border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 10px;
+}
+.btn-nego:hover { background: #FFD6E0; border-color: #E8607A; }
+
+/* ── TOMBOL CHAT ── */
+.btn-chat {
+    font-family: var(--font-ui);
+    width: 100%; padding: 13px;
+    background: #fff; color: #3D1A24;
+    border: 1.5px solid #FFB3C6;
+    border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: border-color .2s, background .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none;
+}
+.btn-chat:hover { border-color: #FF8FAB; background: #59B292; color: #fff; }
 
 /* ── STATUS NEGO ── */
-.nego-status{border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:13px;}
-.nego-menunggu{background:rgba(255,179,198,.15);border:1.5px solid #FFB3C6;color:#A0465A;}
-.nego-disetujui{background:rgba(232,96,122,.08);border:1.5px solid #FF8FAB;color:#7A2036;}
-.nego-ditolak{background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.3);color:#991b1b;}
-.nego-counter{background:rgba(255,143,171,.1);border:1.5px solid #FF8FAB;color:#9B2C42;}
-.nego-status-title{font-weight:700;margin-bottom:4px;}
-.nego-status-harga{font-size:18px;font-weight:700;margin:6px 0;color:#E8607A;}
+.nego-status {
+    font-family: var(--font-body);
+    border-radius: 12px; padding: 14px 16px;
+    margin-bottom: 12px; font-size: 13px;
+}
+.nego-menunggu  { background: rgba(255,179,198,.15); border: 1.5px solid #FFB3C6; color: #A0465A; }
+.nego-disetujui { background: rgba(232,96,122,.08);  border: 1.5px solid #FF8FAB;  color: #7A2036; }
+.nego-ditolak   { background: rgba(239,68,68,.07);   border: 1.5px solid rgba(239,68,68,.3); color: #991b1b; }
+.nego-counter   { background: rgba(255,143,171,.1);  border: 1.5px solid #FF8FAB;  color: #9B2C42; }
+.nego-status-title {
+    font-family: var(--font-ui);
+    font-weight: 700; margin-bottom: 4px;
+}
+.nego-status-harga {
+    font-family: var(--font-heading);
+    font-size: 18px; font-weight: 700; margin: 6px 0; color: #E8607A;
+}
 
 /* ── MODAL NEGO ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(61,26,36,0.45);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .25s;}
-.modal-overlay.open{opacity:1;visibility:visible;}
-.modal-box{
-    background:#fff;
-    border-radius:20px;padding:32px;
-    width:100%;max-width:420px;margin:20px;
-    transform:translateY(16px);transition:transform .25s;
-    border:1.5px solid #FFB3C6;
+.modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(61,26,36,0.45);
+    z-index: 999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: all .25s;
 }
-.modal-overlay.open .modal-box{transform:translateY(0);}
-.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;color:#3D1A24;}
-.modal-sub{font-size:13px;color:#C48899;margin-bottom:24px;}
-.modal-field{margin-bottom:16px;}
-.modal-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#3D1A24;margin-bottom:6px;}
-.modal-field input,.modal-field textarea{
-    width:100%;padding:10px 14px;
-    border:1.5px solid #FFB3C6;
-    border-radius:10px;
-    font-family:'DM Sans',sans-serif;font-size:14px;outline:none;
-    transition:border-color .2s;color:#3D1A24;
-    background:#FFF8FA;
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal-box {
+    background: #fff; border-radius: 20px; padding: 32px;
+    width: 100%; max-width: 420px; margin: 20px;
+    transform: translateY(16px); transition: transform .25s;
+    border: 1.5px solid #FFB3C6;
 }
-.modal-field input:focus,.modal-field textarea:focus{border-color:#FF8FAB;background:#fff;}
-.modal-field textarea{resize:vertical;min-height:80px;}
-.modal-actions{display:flex;gap:10px;margin-top:20px;}
-.modal-btn-batal{flex:1;padding:12px;background:#FFF0F4;border:1.5px solid #FFB3C6;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;color:#C48899;}
-.modal-btn-batal:hover{background:#FFD6E0;}
-.modal-btn-kirim{flex:2;padding:12px;background:#FF6FA3;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
-.modal-btn-kirim:hover{background:#59B292;}
-.harga-ref{font-size:12px;color:#C48899;margin-bottom:4px;}
+.modal-overlay.open .modal-box { transform: translateY(0); }
+.modal-title {
+    font-family: var(--font-heading);
+    font-size: 20px; font-weight: 800;
+    margin-bottom: 6px; color: #3D1A24; letter-spacing: -0.3px;
+}
+.modal-sub {
+    font-family: var(--font-body);
+    font-size: 13px; color: #C48899; margin-bottom: 24px;
+}
+.modal-field { margin-bottom: 16px; }
+.modal-field label {
+    font-family: var(--font-ui);
+    display: block; font-size: 11px; font-weight: 600;
+    letter-spacing: .8px; text-transform: uppercase;
+    color: #3D1A24; margin-bottom: 6px;
+}
+.modal-field input,
+.modal-field textarea {
+    font-family: var(--font-body);
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid #FFB3C6; border-radius: 10px;
+    font-size: 14px; outline: none;
+    transition: border-color .2s; color: #3D1A24;
+    background: #FFF8FA;
+}
+.modal-field input:focus,
+.modal-field textarea:focus { border-color: #FF8FAB; background: #fff; }
+.modal-field textarea { resize: vertical; min-height: 80px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-btn-batal {
+    font-family: var(--font-ui);
+    flex: 1; padding: 12px;
+    background: #FFF0F4; border: 1.5px solid #FFB3C6;
+    border-radius: 10px; font-size: 14px; font-weight: 600;
+    cursor: pointer; color: #C48899;
+}
+.modal-btn-batal:hover { background: #FFD6E0; }
+.modal-btn-kirim {
+    font-family: var(--font-ui);
+    flex: 2; padding: 12px;
+    background: #FF6FA3; color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background .2s;
+}
+.modal-btn-kirim:hover { background: #59B292; }
+.harga-ref {
+    font-family: var(--font-body);
+    font-size: 12px; color: #C48899; margin-bottom: 4px;
+}
 
 /* ── ULASAN ── */
-.ulasan-section{max-width:1100px;margin:40px auto 60px;padding:0 40px;}
-.ulasan-section h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px !important;color:#3D1A24;}
-.ulasan-card{
-    background:#fff;
-    border:1.5px solid #FFB3C6;
-    border-radius:14px;padding:18px;margin-bottom:14px;
+.ulasan-section { max-width: 1100px; margin: 40px auto 60px; padding: 0 40px; }
+.ulasan-section h3 {
+    font-family: var(--font-heading);
+    font-size: 20px; font-weight: 700;
+    margin-bottom: 20px !important; color: #3D1A24;
+}
+.ulasan-card {
+    background: #fff; border: 1.5px solid #FFB3C6;
+    border-radius: 14px; padding: 18px; margin-bottom: 14px;
+}
+.ulasan-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.ulasan-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #FF8FAB, #FFD6E0);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-ui);
+    font-size: 13px; font-weight: 700; overflow: hidden;
+}
+.ulasan-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.ulasan-nama {
+    font-family: var(--font-ui);
+    font-size: 13px; font-weight: 600; color: #3D1A24;
+}
+.ulasan-tgl {
+    font-family: var(--font-body);
+    font-size: 11px; color: #C48899; margin-top: 2px;
+}
+.ulasan-text {
+    font-family: var(--font-body);
+    font-size: 13px; color: #C48899; line-height: 1.6; margin-top: 8px;
 }
 
-.ulasan-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.ulasan-avatar{
-    width:36px;height:36px;border-radius:50%;
-    background:linear-gradient(135deg,#FF8FAB,#FFD6E0);
-    color:#fff;display:flex;align-items:center;justify-content:center;
-    font-size:13px;font-weight:700;overflow:hidden;
-}
-.ulasan-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.ulasan-nama{font-size:13px;font-weight:600;color:#3D1A24;}
-.ulasan-tgl{font-size:11px;color:#C48899;margin-top:2px;}
-.ulasan-text{font-size:13px;color:#C48899;line-height:1.6;margin-top:8px;}
-
-/* ── RESPONSIVE ── */
-
-/* Tablet (≤ 1024px) */
-@media(max-width:1024px){
-    .container-detail{
-        max-width:100%;
-        padding:0 24px;
-        gap:32px;
-    }
-    .ulasan-section{padding:0 24px;}
-    .produk-nama{font-size:24px;}
-    .produk-harga{font-size:24px;}
+/* ── RESPONSIVE: TABLET (≤ 1024px) ── */
+@media (max-width: 1024px) {
+    .container-detail { max-width: 100%; padding: 0 24px; gap: 32px; }
+    .ulasan-section { padding: 0 24px; }
+    .produk-nama  { font-size: 24px; }
+    .produk-harga { font-size: 24px; }
 }
 
-/* Mobile & small tablet (≤ 768px) */
-@media(max-width:768px){
-    .container-detail{
-        grid-template-columns:1fr;
-        gap:20px;
-        padding:0 16px;
-        margin:16px auto;
+/* ── RESPONSIVE: MOBILE (≤ 768px) ── */
+@media (max-width: 768px) {
+    .container-detail {
+        grid-template-columns: 1fr; gap: 20px;
+        padding: 0 16px; margin: 16px auto;
     }
-
-    .foto-utama{border-radius:14px;}
-
-    .produk-kategori{font-size:10px;}
-    .produk-nama{font-size:22px;}
-    .produk-harga{font-size:22px;}
-    .harga-asli{font-size:14px;}
-
-    .btn-beli, .btn-nego, .btn-chat{
-        padding:13px 10px;
-        font-size:14px;
-    }
-
-    /* Modal full-width di mobile */
-    .modal-box{
-        padding:24px 18px;
-        margin:12px;
-        border-radius:16px;
-    }
-    .modal-title{font-size:18px;}
-
-    .ulasan-section{
-        padding:0 16px;
-        margin:24px auto 40px;
-    }
-    .ulasan-section h3{font-size:17px;}
-    .ulasan-card{padding:14px;}
+    .foto-utama { border-radius: 14px; }
+    .produk-kategori { font-size: 10px; }
+    .produk-nama  { font-size: 22px; }
+    .produk-harga { font-size: 22px; }
+    .harga-asli   { font-size: 14px; }
+    .btn-beli, .btn-nego, .btn-chat { padding: 13px 10px; font-size: 14px; }
+    .modal-box { padding: 24px 18px; margin: 12px; border-radius: 16px; }
+    .modal-title { font-size: 18px; }
+    .ulasan-section { padding: 0 16px; margin: 24px auto 40px; }
+    .ulasan-section h3 { font-size: 17px; }
+    .ulasan-card { padding: 14px; }
 }
 
-/* Small mobile (≤ 480px) */
-@media(max-width:480px){
-    .container-detail{
-        padding:0 12px;
-        margin:12px auto;
-        gap:16px;
-    }
-
-    .foto-utama{border-radius:12px;}
-
-    .produk-nama{font-size:19px;}
-    .produk-harga{font-size:20px;}
-    .harga-asli{font-size:13px;margin-bottom:12px;}
-
-    .produk-meta{gap:6px;}
-    .meta-tag{font-size:11px;padding:4px 10px;}
-
-    .btn-beli{
-        padding:13px 8px;
-        font-size:13px;
-        border-radius:10px;
-    }
-    .btn-nego, .btn-chat{
-        padding:11px 8px;
-        font-size:13px;
-        border-radius:10px;
-    }
-
-    .modal-box{
-        padding:20px 14px;
-        margin:8px;
-    }
-    .modal-actions{flex-direction:column;gap:8px;}
-    .modal-btn-batal,.modal-btn-kirim{flex:unset;width:100%;}
-
-    .ulasan-section{
-        padding:0 12px;
-        margin:16px auto 32px;
-    }
-    .ulasan-card{padding:12px;}
-    .ulasan-avatar{width:30px;height:30px;font-size:11px;}
-    .ulasan-nama{font-size:12px;}
+/* ── RESPONSIVE: SMALL MOBILE (≤ 480px) ── */
+@media (max-width: 480px) {
+    .container-detail { padding: 0 12px; margin: 12px auto; gap: 16px; }
+    .foto-utama { border-radius: 12px; }
+    .produk-nama  { font-size: 19px; }
+    .produk-harga { font-size: 20px; }
+    .harga-asli   { font-size: 13px; margin-bottom: 12px; }
+    .produk-meta  { gap: 6px; }
+    .meta-tag     { font-size: 11px; padding: 4px 10px; }
+    .btn-beli     { padding: 13px 8px; font-size: 13px; border-radius: 10px; }
+    .btn-nego, .btn-chat { padding: 11px 8px; font-size: 13px; border-radius: 10px; }
+    .modal-box    { padding: 20px 14px; margin: 8px; }
+    .modal-actions { flex-direction: column; gap: 8px; }
+    .modal-btn-batal, .modal-btn-kirim { flex: unset; width: 100%; }
+    .ulasan-section { padding: 0 12px; margin: 16px auto 32px; }
+    .ulasan-card  { padding: 12px; }
+    .ulasan-avatar { width: 30px; height: 30px; font-size: 11px; }
+    .ulasan-nama  { font-size: 12px; }
 }
 </style>
 

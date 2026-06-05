@@ -99,14 +99,30 @@ function kirimNotifikasiNegoCounter($conn, $pembeli_id, $nego_id, $nama_produk, 
 
 // ── Helper: kirim notifikasi update status pesanan ke pembeli ────────────────
 
-function kirimNotifikasiStatusPesanan($conn, $pembeli_id, $pesanan_id, $kode_pesanan, $status_baru) {
+function kirimNotifikasiStatusPesanan($conn, $pembeli_id, $pesanan_id, $kode_pesanan, $status_baru, $is_cod = false, $cod_jenis = null, $nama_produk = '') {
+
+    $np = $nama_produk ? "\"{$nama_produk}\"" : 'pesananmu';
+
+    if ($is_cod) {
+        if ($cod_jenis === 'ambil') {
+            $dikirim_judul = "Pesanan Siap Diambil";
+            $dikirim_pesan = "Produk {$np} siap diambil. Silakan datang ke toko penjual dan siapkan pembayaran.";
+        } else {
+            $dikirim_judul = "Penjual Sedang Mengantar";
+            $dikirim_pesan = "Produk {$np} sedang diantar oleh penjual. Harap siapkan pembayaran COD.";
+        }
+    } else {
+        $dikirim_judul = "Pesanan Dalam Pengiriman";
+        $dikirim_pesan = "Produk {$np} sudah dikirim. Pantau resi pengirimanmu.";
+    }
+
     $pesan_map = [
-        'diproses'        => ["Pesanan Sedang Diproses",      "Pesanan #{$kode_pesanan} sedang diproses oleh penjual."],
-        'dikemas'         => ["Pesanan Sedang Dikemas",        "Pesanan #{$kode_pesanan} sedang dikemas dan siap dikirim."],
-        'dikirim'         => ["Pesanan Dalam Pengiriman",      "Pesanan #{$kode_pesanan} sudah dikirim. Pantau resi pengirimanmu."],
-        'tiba'            => ["Pesanan Telah Tiba!",           "Pesanan #{$kode_pesanan} sudah tiba di tujuan. Jangan lupa konfirmasi penerimaan."],
-        'selesai'         => ["Pesanan Selesai",               "Pesanan #{$kode_pesanan} telah selesai. Terima kasih sudah berbelanja!"],
-        'dibatalkan'      => ["Pesanan Dibatalkan",            "Pesanan #{$kode_pesanan} telah dibatalkan."],
+        'diproses'   => ["Pesanan Sedang Diproses", "Produk {$np} sedang diproses oleh penjual."],
+        'dikemas'    => ["Pesanan Sedang Dikemas",   "Produk {$np} sedang dikemas dan siap dikirim."],
+        'dikirim'    => [$dikirim_judul,             $dikirim_pesan],
+        'tiba'       => ["Pesanan Telah Tiba!",      "Produk {$np} sudah tiba di tujuan. Jangan lupa konfirmasi penerimaan."],
+        'selesai'    => ["Pesanan Selesai",           "Produk {$np} telah selesai. Terima kasih sudah berbelanja!"],
+        'dibatalkan' => ["Pesanan Dibatalkan",        "Pesanan untuk produk {$np} telah dibatalkan."],
     ];
 
     if (!isset($pesan_map[$status_baru])) return;

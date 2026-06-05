@@ -102,7 +102,7 @@ $nego_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pengaturan — Cloudy Girls</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
 :root {
@@ -121,10 +121,14 @@ $nego_menunggu = mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM nego
     --text2:    #444444;
     --muted:    #BBA0B0;
     --white:    #FFFFFF;
+
+    --font-heading: 'Poppins', sans-serif;
+    --font-body:    'Lato', sans-serif;
+    --font-ui:      'Poppins', sans-serif;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-body);
     background: var(--bg);
     color: var(--text);
     display: flex;
@@ -163,28 +167,53 @@ a { text-decoration: none; color: inherit; }
     border: 1.5px solid rgba(255,255,255,.4);
 }
 .sidebar-logo .logo {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-heading);
     font-size: 24px; font-weight: 900;
     color: #1db899b1 !important;
     letter-spacing: -.3px; margin: 0; line-height: 1;
 }
 .sidebar-logo .logo span { color: #ff009db1; }
 .sidebar-logo small {
-    display: block; font-size: 10px; letter-spacing: 2px;
+    display: block;
+    font-family: var(--font-body);
+    font-size: 10px; letter-spacing: 2px;
     text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 8px;
 }
 .sidebar-nav { flex: 1; padding: 20px 18px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
-.nav-section { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.55); padding: 18px 16px 8px; font-weight: 600; }
-.nav-item { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-radius: 12px; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.85); transition: all .2s; letter-spacing: 0.01em; }
+.nav-section {
+    font-family: var(--font-ui);
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: rgba(255,255,255,.55); padding: 18px 16px 8px; font-weight: 600;
+}
+.nav-item {
+    font-family: var(--font-ui);
+    display: flex; align-items: center; gap: 14px; padding: 13px 18px;
+    border-radius: 12px; font-size: 14px; font-weight: 500;
+    color: rgba(255,255,255,.85); transition: all .2s; letter-spacing: 0.01em;
+}
 .nav-item:hover { background: rgba(255,255,255,.2); color: #fff; transform: translateX(3px); }
 .nav-item.active { background: rgba(255,255,255,.28); color: #fff; font-weight: 600; border-left: 3px solid #fff; padding-left: 15px; }
 .nav-item i { font-size: 17px; width: 22px; flex-shrink: 0; }
-.badge-notif { background: #fff; color: var(--accent); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: auto; }
-.nav-item-toko { margin-top: 0; background: transparent; border: none; color: rgba(255,255,255,.85) !important; font-weight: 500 !important; justify-content: flex-start; border-radius: 12px; box-shadow: none; letter-spacing: 0.01em; }
+.badge-notif {
+    font-family: var(--font-ui);
+    background: #fff; color: var(--accent); font-size: 10px;
+    font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: auto;
+}
+.nav-item-toko {
+    font-family: var(--font-ui);
+    margin-top: 0; background: transparent; border: none;
+    color: rgba(255,255,255,.85) !important; font-weight: 500 !important;
+    justify-content: flex-start; border-radius: 12px; box-shadow: none; letter-spacing: 0.01em;
+}
 .nav-item-toko:hover { background: rgba(255,255,255,.2) !important; border-color: transparent !important; box-shadow: none; transform: translateX(3px) !important; color: #fff !important; }
 .nav-ext-icon { font-size: 11px !important; width: auto !important; margin-left: auto; opacity: .6; }
 .sidebar-footer { padding: 16px 18px 20px; border-top: 1.5px solid rgba(255,255,255,.2); background: rgba(0,0,0,.1); }
-.btn-logout { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.85); transition: background .2s; width: 100%; letter-spacing: 0.01em; }
+.btn-logout {
+    font-family: var(--font-ui);
+    display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+    border-radius: 10px; font-size: 13px; font-weight: 500;
+    color: rgba(255,255,255,.85); transition: background .2s; width: 100%; letter-spacing: 0.01em;
+}
 .btn-logout i { font-size: 16px; }
 .btn-logout:hover { background: rgba(255,255,255,.2); color: #fff; }
 
@@ -202,9 +231,15 @@ a { text-decoration: none; color: inherit; }
     box-shadow: 0 2px 12px rgba(212,84,127,.07);
 }
 .topbar-left { display: flex; align-items: center; gap: 12px; }
-.topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.topbar-title {
+    font-family: var(--font-heading);
+    font-size: 18px; font-weight: 700; color: var(--text);
+}
 .topbar-right { display: flex; align-items: center; gap: 10px; }
-.topbar-date { font-size: 12px; color: var(--muted); }
+.topbar-date {
+    font-family: var(--font-body);
+    font-size: 12px; color: var(--muted);
+}
 
 /* ── CONTENT ── */
 .content { padding: 28px 32px; flex: 1; }
@@ -213,14 +248,25 @@ a { text-decoration: none; color: inherit; }
 /* ── CARD ── */
 .card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 16px rgba(212,84,127,.06); }
 .card-header { padding: 16px 20px; border-bottom: 1.5px solid var(--border); background: var(--surface2); }
-.card-header h3 { font-size: 14px; font-weight: 600; color: var(--text); }
-.card-header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.card-header h3 {
+    font-family: var(--font-heading);
+    font-size: 14px; font-weight: 600; color: var(--text);
+}
+.card-header p {
+    font-family: var(--font-body);
+    font-size: 12px; color: var(--muted); margin-top: 2px;
+}
 .card-body { padding: 20px; }
 
 /* ── FORM ── */
 .form-group { margin-bottom: 16px; }
-.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: .3px; }
+.form-label {
+    font-family: var(--font-ui);
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text2); margin-bottom: 6px; letter-spacing: .3px;
+}
 .form-input, .form-textarea {
+    font-family: var(--font-body);
     width: 100%;
     background: var(--surface2);
     border: 1.5px solid var(--border);
@@ -229,7 +275,6 @@ a { text-decoration: none; color: inherit; }
     font-size: 13px;
     padding: 10px 12px;
     outline: none;
-    font-family: 'DM Sans', sans-serif;
     transition: border-color .2s, box-shadow .2s;
 }
 .form-input:focus, .form-textarea:focus {
@@ -250,6 +295,7 @@ a { text-decoration: none; color: inherit; }
 /* ── REKENING SECTION ── */
 .rek-divider { margin: 20px 0 16px; padding-top: 18px; border-top: 1.5px dashed var(--border); }
 .rek-divider-title {
+    font-family: var(--font-ui);
     font-size: 12px; font-weight: 700; color: var(--accent);
     display: flex; align-items: center; gap: 6px;
     margin-bottom: 14px;
@@ -262,9 +308,18 @@ a { text-decoration: none; color: inherit; }
     display: flex; align-items: center; gap: 10px;
 }
 .rek-preview .rek-icon { font-size: 22px; flex-shrink: 0; }
-.rek-preview .rek-detail .rek-bank  { font-size: 12px; font-weight: 700; color: var(--text); }
-.rek-preview .rek-detail .rek-nomor { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: .5px; margin-top: 1px; }
-.rek-preview .rek-detail .rek-atas  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.rek-preview .rek-detail .rek-bank  {
+    font-family: var(--font-ui);
+    font-size: 12px; font-weight: 700; color: var(--text);
+}
+.rek-preview .rek-detail .rek-nomor {
+    font-family: var(--font-heading);
+    font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: .5px; margin-top: 1px;
+}
+.rek-preview .rek-detail .rek-atas  {
+    font-family: var(--font-body);
+    font-size: 11px; color: var(--muted); margin-top: 1px;
+}
 
 /* ── LOGO UPLOAD ── */
 .logo-upload-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
@@ -277,13 +332,17 @@ a { text-decoration: none; color: inherit; }
 .logo-preview:hover { border-color: var(--accent); }
 .logo-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 .logo-placeholder { font-size: 28px; color: var(--muted); }
-.logo-upload-info p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.logo-upload-info p {
+    font-family: var(--font-body);
+    font-size: 12px; color: var(--muted); line-height: 1.5;
+}
 .btn-upload-logo {
+    font-family: var(--font-ui);
     display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
     padding: 7px 14px; border-radius: 7px;
     background: var(--surface2); border: 1.5px solid var(--border);
     font-size: 12px; color: var(--accent); cursor: pointer;
-    font-family: 'DM Sans', sans-serif; transition: border-color .2s, background .2s;
+    transition: border-color .2s, background .2s;
 }
 .btn-upload-logo:hover { border-color: var(--accent); background: rgba(212,84,127,.06); }
 #inputLogo { display: none; }
@@ -293,16 +352,23 @@ a { text-decoration: none; color: inherit; }
     background: rgba(212,84,127,.05); border: 1px solid rgba(212,84,127,.2);
     border-radius: 8px; padding: 10px 12px; margin-top: 6px;
 }
-.maps-info-title { font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
-.maps-info ol { font-size: 11px; color: var(--muted); padding-left: 14px; line-height: 1.9; margin: 0; }
+.maps-info-title {
+    font-family: var(--font-ui);
+    font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 4px;
+}
+.maps-info ol {
+    font-family: var(--font-body);
+    font-size: 11px; color: var(--muted); padding-left: 14px; line-height: 1.9; margin: 0;
+}
 
 /* ── BUTTONS ── */
 .btn-save {
+    font-family: var(--font-ui);
     display: inline-flex; align-items: center; gap: 8px;
     padding: 10px 22px; border-radius: 8px;
     background: linear-gradient(135deg, #F4A7C3, #E8719A);
     color: #fff; font-size: 13px; font-weight: 600;
-    border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    border: none; cursor: pointer;
     box-shadow: 0 4px 14px rgba(212,84,127,.35);
     transition: opacity .2s, transform .15s;
 }
@@ -310,6 +376,7 @@ a { text-decoration: none; color: inherit; }
 
 /* ── ALERTS ── */
 .alert {
+    font-family: var(--font-body);
     padding: 12px 16px; border-radius: 10px; font-size: 13px;
     margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
 }
@@ -426,18 +493,8 @@ a { text-decoration: none; color: inherit; }
                             <textarea name="deskripsi" class="form-textarea" placeholder="Deskripsi singkat toko Anda..."><?= escape($settings['deskripsi'] ?? '') ?></textarea>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Nomor WhatsApp / HP</label>
-                            <input type="text" name="no_hp" class="form-input" placeholder="08xxxxxxxxxx"
-                                value="<?= escape($settings['no_hp'] ?? '') ?>">
-                        </div>
-                        <div class="form-group">
                             <label class="form-label">Alamat Toko</label>
                             <textarea name="alamat" class="form-textarea" placeholder="Alamat lengkap toko..."><?= escape($settings['alamat'] ?? '') ?></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Instagram</label>
-                            <input type="text" name="instagram" class="form-input" placeholder="@cloudygirls"
-                                value="<?= escape($settings['instagram'] ?? '') ?>">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Link Google Maps Toko</label>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Daftar — Cloudy Girls</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -441,6 +441,211 @@ body {
     .form-box { max-width: 100%; }
     .field-row { grid-template-columns: 1fr; }
 }
+
+/* LOGO SAMA SEPERTI LOGIN */
+.login-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-decoration: none !important;
+    cursor: pointer;
+    margin-bottom: 14px;
+    transition: transform .25s ease;
+}
+
+.login-logo:hover {
+    transform: translateY(-2px);
+}
+
+.login-logo:active {
+    transform: scale(.97);
+}
+
+.login-logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #FFB3C6;
+    transition: transform .4s cubic-bezier(.34,1.56,.64,1),
+                border-color .25s ease,
+                box-shadow .25s ease;
+}
+
+.login-logo:hover .login-logo-img {
+    transform: rotate(10deg) scale(1.08);
+    border-color: #D94F6E;
+    box-shadow: 0 0 0 3px rgba(217,79,110,.15);
+}
+
+.login-logo-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: #1db899b1 !important;
+    letter-spacing: -0.5px;
+}
+
+.login-logo-text span {
+    color: #ff009db1 !important;
+}
+
+.login-logo:hover .login-logo-text {
+    background: linear-gradient(90deg, #1db899, #ff009d, #1db899);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: logoShimmer 1.2s linear infinite;
+}
+
+.login-logo:hover .login-logo-text span {
+    -webkit-text-fill-color: transparent;
+}
+
+/* JUDUL REGISTER SAMA STYLE LOGIN */
+.auth-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: .95;
+    overflow: visible;
+}
+
+.auth-title .halo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 9vw, 72px);
+    font-weight: 900;
+    color: #2D1520;
+    display: inline-block;
+    animation: haloFloat 3s ease-in-out infinite;
+}
+
+.auth-title .welcome {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(56px, 10vw, 78px);
+    font-style: italic;
+    font-weight: 900;
+    line-height: 1.05;
+    padding-bottom: 10px;
+
+    background: linear-gradient(90deg, #ff7ab6, #ff4fa0, #ff9bd1, #ff4fa0);
+    background-size: 300% auto;
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation: welcomeGradient 4s linear infinite,
+               welcomeGlow 2s ease-in-out infinite;
+}
+
+/* MOBILE HEADER PUTIH TENGAH */
+@media (max-width: 800px) {
+    html,
+    body {
+        width: 100%;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+
+    .panel-left {
+        display: flex !important;
+        height: 72px;
+        min-height: 72px;
+        padding: 0 16px;
+        background: #fff !important;
+        justify-content: center;
+        align-items: center;
+        border-bottom: 1.5px solid #FFB3C6;
+        overflow: visible !important;
+    }
+
+    .panel-left::before,
+    .panel-left::after,
+    .deco-circle,
+    .brand-tagline,
+    .steps {
+        display: none !important;
+    }
+
+    .left-content {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-logo {
+        margin: 0;
+    }
+
+    .login-logo-img {
+        width: clamp(34px, 9vw, 42px);
+        height: clamp(34px, 9vw, 42px);
+    }
+
+    .login-logo-text {
+        font-size: clamp(20px, 6vw, 24px);
+        white-space: nowrap;
+    }
+
+    .panel-right {
+        min-height: calc(100vh - 72px);
+        padding: 34px 28px 100px;
+        align-items: flex-start;
+    }
+
+    .form-box {
+        width: 100%;
+        max-width: 430px;
+        margin: 0 auto;
+    }
+
+    .field-row {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-title .halo {
+        font-size: 48px;
+    }
+
+    .auth-title .welcome {
+        font-size: 54px;
+        line-height: 1.08;
+        padding-bottom: 14px;
+    }
+}
+
+@keyframes logoShimmer {
+    0% { background-position: 200% center; }
+    100% { background-position: -200% center; }
+}
+
+@keyframes haloFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@keyframes welcomeGradient {
+    0% { background-position: 0% center; }
+    100% { background-position: 300% center; }
+}
+
+@keyframes welcomeGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 0px rgba(255,79,160,.3));
+    }
+    50% {
+        filter: drop-shadow(0 0 12px rgba(255,79,160,.55));
+    }
+}
 </style>
 </head>
 <body>
@@ -452,11 +657,11 @@ body {
     <div class="deco-circle deco-3"></div>
 
     <div class="left-content">
-        <a href="../index.php" class="brand-icon">
-            <img src="../uploads/toko/logo.png" alt="Cloudy Girls Logo">
-        </a>
+        <a href="../index.php" class="login-logo">
+    <img src="../uploads/toko/logo.png" class="login-logo-img" alt="Cloudy Girls">
+    <span class="login-logo-text">Cloudy <span>Girls</span></span>
+</a>
 
-        <h2 class="brand-name">Cloudy<br><em>Girls</em></h2>
         <p class="brand-tagline">Bergabunglah dan temukan ribuan pilihan fashion terbaik untukmu.</p>
 
         <div class="steps">
@@ -505,8 +710,10 @@ body {
         </a>
 
         <div class="form-heading">
-            <h1>Buat Akun<br><em>Barumu</em></h1>
-            <p>Daftar gratis dan mulai belanja sekarang</p>
+           <h1 class="auth-title">
+    <span class="halo">Buat Akun</span>
+    <span class="welcome">Barumu</span>
+</h1>
         </div>
 
         <div class="tabs">

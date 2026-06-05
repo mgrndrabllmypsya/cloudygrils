@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 session_name('session_pembeli');
 session_start();
 include '../config/koneksi.php';
@@ -20,8 +22,8 @@ $produk_id    = (int)$_POST['produk_id'];
 $nego_id      = !empty($_POST['nego_id']) ? (int)$_POST['nego_id'] : null;
 $metode       = $_POST['metode'];
 $harga_produk = (float)$_POST['harga_produk'];
-$catatan = $metode === 'cod' 
-    ? trim($_POST['catatan_cod'] ?? '') 
+$catatan = $metode === 'cod'
+    ? trim($_POST['catatan_cod'] ?? '')
     : trim($_POST['catatan'] ?? '');
 
 $ongkir  = $metode === 'transfer' ? (float)($_POST['ongkir'] ?? 0) : 0;
@@ -47,15 +49,23 @@ $kode_pos       = trim($_POST['kode_pos'] ?? '');
 $lokasi_cod = trim($_POST['lokasi_cod'] ?? '');
 $cod_jenis  = trim($_POST['cod_jenis'] ?? '');
 
+// Siapkan kolom jenis_cod & alamat_cod secara terpisah
+$jenis_cod_val  = null;
+$alamat_cod_val = null;
+
 // Ambil kurir
 $kurir = trim($_POST['ekspedisi'] ?? '');
 if ($metode === 'cod') {
     $kurir = 'cod';
 }
 
+// Ambil nama produk
+$res_produk  = $conn->query("SELECT nama_barang FROM produk WHERE id = $produk_id LIMIT 1");
+$nama_produk = $res_produk ? ($res_produk->fetch_assoc()['nama_barang'] ?? 'produk') : 'produk';
+
 if ($metode === 'cod') {
-    $detail_alamat = $lokasi_cod;
-    $catatan = ($cod_jenis ? "Jenis COD: {$cod_jenis}. " : '') . $catatan;
+    $jenis_cod_val  = $cod_jenis ?: null;   // 'antar' atau 'ambil'
+    $alamat_cod_val = $lokasi_cod ?: null;  // alamat pembeli / lokasi toko
 }
 
 $metode_transfer = null;
@@ -82,19 +92,22 @@ if ($metode === 'transfer') {
 }
 
 // Helper escape
-function e($conn, $val) {
-    return $val === null ? 'NULL' : "'" . $conn->real_escape_string($val) . "'";
+if (!function_exists('e')) {
+    function e($conn, $val) {
+        return $val === null ? 'NULL' : "'" . $conn->real_escape_string($val) . "'";
+    }
 }
 
 $nego_sql = $nego_id ? $nego_id : 'NULL';
 
+// INSERT pesanan
 $sql = "INSERT INTO pesanan
     (kode_pesanan, produk_id, pembeli_id, nego_id, metode,
      harga_produk, diskon, ongkir, total_bayar, catatan, status,
      nama_penerima, no_hp_penerima, provinsi, kota_tujuan,
      kecamatan, kecamatan_id, detail_alamat, kode_pos,
      metode_transfer, jumlah_transfer, bukti_transfer, status_transfer,
-     kurir, created_at, updated_at)
+     kurir, jenis_cod, alamat_cod, created_at, updated_at)
 VALUES (
     " . e($conn, $kode_pesanan) . ",
     $produk_id,
@@ -120,30 +133,48 @@ VALUES (
     " . e($conn, $bukti_transfer) . ",
     " . e($conn, $status_transfer) . ",
     " . e($conn, $kurir) . ",
+    " . e($conn, $jenis_cod_val) . ",
+    " . e($conn, $alamat_cod_val) . ",
     NOW(), NOW()
 )";
 
 if ($conn->query($sql)) {
+    $pesanan_id = $conn->insert_id;
+
     // Tandai produk sebagai terjual
     $conn->query("UPDATE produk SET status = 'terjual' WHERE id = $produk_id");
 
+    // INSERT ke tabel cod (khusus metode COD)
+    if ($metode === 'cod' && $jenis_cod_val) {
+        $sql_cod = "INSERT INTO cod
+            (pesanan_id, jenis, lokasi, catatan_pembeli, status, created_at, updated_at)
+        VALUES (
+            $pesanan_id,
+            " . e($conn, $jenis_cod_val) . ",
+            " . e($conn, $alamat_cod_val) . ",
+            " . e($conn, $catatan) . ",
+            'menunggu',
+            NOW(), NOW()
+        )";
+        $conn->query($sql_cod);
+    }
+
     // ── NOTIFIKASI ──────────────────────────────────────────────────
     require_once '../includes/notifikasi.php';
-    $pesanan_id = $conn->insert_id;
 
     // Notifikasi ke pembeli
     if ($metode === 'transfer') {
         kirimNotifikasiPembeli(
             $conn, $pembeli_id,
             "Pesanan Berhasil Dibuat",
-            "Pesanan #{$kode_pesanan} berhasil dibuat. Silakan tunggu konfirmasi pembayaran dari admin.",
+            "Pesanan #{$kode_pesanan} ({$nama_produk}) berhasil dibuat. Silakan tunggu konfirmasi pembayaran dari admin.",
             'pesanan', $pesanan_id
         );
     } else {
         kirimNotifikasiPembeli(
             $conn, $pembeli_id,
             "Pesanan COD Berhasil Dibuat",
-            "Pesanan #{$kode_pesanan} dengan metode COD berhasil dibuat. Seller akan segera memproses pesananmu.",
+            "Pesanan #{$kode_pesanan} ({$nama_produk}) dengan metode COD berhasil dibuat. Seller akan segera memproses pesananmu.",
             'pesanan', $pesanan_id
         );
     }
@@ -152,7 +183,7 @@ if ($conn->query($sql)) {
     kirimNotifikasiAdmin(
         $conn,
         "Pesanan Baru Masuk",
-        "Ada pesanan baru #{$kode_pesanan} dengan metode " . strtoupper($metode) . ". Segera cek dan proses.",
+        "Ada pesanan baru #{$kode_pesanan} ({$nama_produk}) dengan metode " . strtoupper($metode) . ". Segera cek dan proses.",
         'pesanan', $pesanan_id
     );
     // ────────────────────────────────────────────────────────────────
