@@ -396,7 +396,7 @@ textarea { resize: vertical; min-height: 80px; }
           <div class="desc">Bayar saat terima<br>Khusus Banyuwangi Kota</div>
         </div>
         <div class="metode-tab" id="tabTransfer" onclick="pilihMetode('transfer')">
-          <span class="icon">💳</span>
+          <span class="icon">💸</span>
           <div class="label">Transfer</div>
           <div class="desc">BCA atau DANA<br>Kirim via JNT/JNE</div>
         </div>
@@ -412,7 +412,7 @@ textarea { resize: vertical; min-height: 80px; }
   <div class="cj-desc">Penjual antar ke alamatmu<br>(area Banyuwangi Kota)</div>
 </div>
 <div class="cod-jenis-card" onclick="pilihCODJenis('ambil')">
-  <div class="cj-icon">🏪</div>
+  <div class="cj-icon">🏠</div>
   <div class="cj-label">Beli ke Rumah Penjual</div>
   <div class="cj-desc">Datang langsung ke tempat kami</div>
 </div>
@@ -532,11 +532,18 @@ textarea { resize: vertical; min-height: 80px; }
       ?>
       <div class="rekening-grid">
         <div class="rek-card" onclick="pilihRek('bca')">
-          <div class="rek-name">🏦 BCA</div>
+          <div class="rek-name">
+            <svg width="20" height="20" viewBox="0 0 40 40" style="vertical-align:middle;margin-right:5px;" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="40" rx="6" fill="#005BAA"/>
+              <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">BCA</text>
+            </svg> BCA
+          </div>
           <div class="rek-no"><?= $no_bca ?><br>a/n <?= $nm_bca ?></div>
         </div>
         <div class="rek-card" onclick="pilihRek('dana')">
-          <div class="rek-name">💜 DANA</div>
+          <div class="rek-name">
+            <img src="../uploads/icons/dana.png" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;margin-right:5px;"> DANA
+          </div>
           <div class="rek-no"><?= $no_dana ?><br>a/n <?= $nm_dana ?></div>
         </div>
       </div>
