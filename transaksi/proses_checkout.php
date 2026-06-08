@@ -30,12 +30,19 @@ $ongkir  = $metode === 'transfer' ? (float)($_POST['ongkir'] ?? 0) : 0;
 $diskon  = ($metode === 'transfer' && $harga_produk > 50000) ? 10000 : 0;
 $total   = $harga_produk - $diskon + $ongkir;
 
-// Generate kode pesanan
-$tahun_bulan  = date('ym');
-$stmt_kode    = $conn->query("SELECT COUNT(*) AS c FROM pesanan WHERE kode_pesanan LIKE 'CG-{$tahun_bulan}%'");
-$row_kode     = $stmt_kode->fetch_assoc();
-$urut         = str_pad($row_kode['c'] + 1, 4, '0', STR_PAD_LEFT);
-$kode_pesanan = "CG-{$tahun_bulan}{$urut}";
+// Generate kode pesanan (format: CG-YYYYMMDD + 4 digit urut)
+$tgl_kode  = date('Ymd');
+$stmt_kode = $conn->query("SELECT COUNT(*) AS c FROM pesanan WHERE kode_pesanan LIKE 'CG-{$tgl_kode}%'");
+$row_kode  = $stmt_kode->fetch_assoc();
+$urut      = str_pad($row_kode['c'] + 1, 4, '0', STR_PAD_LEFT);
+$kode_pesanan = "CG-{$tgl_kode}{$urut}";
+// Pastikan tidak duplikat
+$cek = $conn->query("SELECT id FROM pesanan WHERE kode_pesanan = '$kode_pesanan' LIMIT 1");
+while ($cek && $cek->num_rows > 0) {
+    $urut = str_pad((int)$urut + 1, 4, '0', STR_PAD_LEFT);
+    $kode_pesanan = "CG-{$tgl_kode}{$urut}";
+    $cek = $conn->query("SELECT id FROM pesanan WHERE kode_pesanan = '$kode_pesanan' LIMIT 1");
+}
 
 $nama_penerima  = trim($_POST['nama_penerima'] ?? '');
 $no_hp_penerima = trim($_POST['no_hp_penerima'] ?? '');
@@ -141,8 +148,8 @@ VALUES (
 if ($conn->query($sql)) {
     $pesanan_id = $conn->insert_id;
 
-    // Tandai produk sebagai terjual
-    $conn->query("UPDATE produk SET status = 'terjual' WHERE id = $produk_id");
+    // Tandai produk sebagai ditahan (bukan terjual dulu, tunggu konfirmasi selesai)
+    $conn->query("UPDATE produk SET status = 'ditahan' WHERE id = $produk_id");
 
     // INSERT ke tabel cod (khusus metode COD)
     if ($metode === 'cod' && $jenis_cod_val) {

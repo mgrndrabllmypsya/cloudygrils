@@ -74,14 +74,23 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'konfirmasi_transfer') {
 }
 if (isset($_POST['aksi']) && $_POST['aksi'] === 'tolak_transfer') {
     $catatan = mysqli_real_escape_string($conn, $_POST['catatan_tolak'] ?? '');
-    mysqli_query($conn, "UPDATE pesanan SET status_transfer='ditolak', catatan_transfer='$catatan', status='menunggu' WHERE id=$id");
-    mysqli_query($conn, "UPDATE produk SET status='aktif' WHERE id = (SELECT produk_id FROM pesanan WHERE id=$id)");
+
+    // ✅ FIX 1: Ambil produk_id SEBELUM update, lalu aktifkan kembali produk
+    $res_pid = mysqli_query($conn, "SELECT produk_id FROM pesanan WHERE id=$id");
+    if ($res_pid && $row_pid = mysqli_fetch_assoc($res_pid)) {
+        $produk_id_tolak = (int)$row_pid['produk_id'];
+        mysqli_query($conn, "UPDATE produk SET status='aktif' WHERE id=$produk_id_tolak");
+    }
+
+    // ✅ FIX 2: Status pesanan jadi 'dibatalkan', bukan 'menunggu'
+    mysqli_query($conn, "UPDATE pesanan SET status_transfer='ditolak', catatan_transfer='$catatan', status='dibatalkan' WHERE id=$id");
+
     // Notifikasi ke pembeli
     $p = getPesananForNotif($conn, $id);
     $info_catatan = $catatan ? " Alasan: {$catatan}." : '';
     kirimNotifikasiPembeli($conn, $p['pembeli_id'],
         "Transfer Ditolak",
-        "Bukti transfer untuk pesanan #{$p['kode_pesanan']} ditolak.{$info_catatan} Silakan upload ulang bukti transfer.",
+        "Bukti transfer untuk pesanan #{$p['kode_pesanan']} ditolak.{$info_catatan} Pesanan telah dibatalkan dan produk kembali tersedia.",
         'pesanan', $id
     );
     header("Location: detail_pesanan.php?id=$id&msg=tolak"); exit;
@@ -101,6 +110,16 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'simpan_resi') {
 }
 if (isset($_POST['aksi']) && $_POST['aksi'] === 'update_status') {
     $status_baru = mysqli_real_escape_string($conn, $_POST['status'] ?? '');
+
+    // Jika penjual membatalkan pesanan, kembalikan status produk ke 'aktif'
+    if ($status_baru === 'dibatalkan') {
+        $res_pid = mysqli_query($conn, "SELECT produk_id FROM pesanan WHERE id=$id");
+        if ($res_pid && $row_pid = mysqli_fetch_assoc($res_pid)) {
+            $produk_id_batal = (int)$row_pid['produk_id'];
+            mysqli_query($conn, "UPDATE produk SET status='aktif' WHERE id=$produk_id_batal");
+        }
+    }
+
     mysqli_query($conn, "UPDATE pesanan SET status='$status_baru' WHERE id=$id");
     // Notifikasi ke pembeli
     $p = getPesananForNotif($conn, $id);

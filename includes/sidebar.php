@@ -24,7 +24,6 @@ function sidebar_active($page, $current) {
 ?>
 <style>
 
-/* Pastikan footer selalu nempel di bawah di semua ukuran layar */
 .sidebar {
     height: 100vh;
     display: flex;

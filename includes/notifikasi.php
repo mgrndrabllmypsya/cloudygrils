@@ -54,8 +54,6 @@ function tandaiDibacaAdmin($conn) {
     mysqli_query($conn, "UPDATE notifikasi SET is_read = 1 WHERE penerima = 'admin'");
 }
 
-// ── Helper: kirim notifikasi hasil nego dari penjual ke pembeli ──────────────
-
 function kirimNotifikasiNegoDisetujui($conn, $pembeli_id, $nego_id, $nama_produk, $harga_asli, $harga_deal) {
     $harga_asli_fmt = 'Rp' . number_format($harga_asli, 0, ',', '.');
     $harga_deal_fmt = 'Rp' . number_format($harga_deal, 0, ',', '.');
@@ -96,8 +94,6 @@ function kirimNotifikasiNegoCounter($conn, $pembeli_id, $nego_id, $nama_produk, 
         $nego_id
     );
 }
-
-// ── Helper: kirim notifikasi update status pesanan ke pembeli ────────────────
 
 function kirimNotifikasiStatusPesanan($conn, $pembeli_id, $pesanan_id, $kode_pesanan, $status_baru, $is_cod = false, $cod_jenis = null, $nama_produk = '') {
 

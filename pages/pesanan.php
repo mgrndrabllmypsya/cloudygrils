@@ -34,10 +34,12 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'pesanan_diterima') {
 // Ambil semua pesanan milik pembeli ini
 $q = mysqli_query($conn, "
     SELECT p.*, pr.nama_barang, pr.foto_utama,
-           u.id AS ulasan_id
+           u.id AS ulasan_id,
+           c.jenis AS cod_jenis
     FROM pesanan p
-    JOIN produk pr ON pr.id = p.produk_id
+    LEFT JOIN produk pr ON pr.id = p.produk_id
     LEFT JOIN ulasan u ON u.pesanan_id = p.id AND u.pembeli_id = $user_id
+    LEFT JOIN cod c ON c.pesanan_id = p.id
     WHERE p.pembeli_id = $user_id
     ORDER BY p.created_at DESC
 ");
@@ -278,15 +280,40 @@ a { text-decoration:none; }
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                     <span class="badge badge-<?= escape($p['status']) ?>">
                         <?php
-                        $statusLabel = [
-                            'menunggu'    => '⏳ Menunggu',
-                            'dikonfirmasi'=> '✅ Dikonfirmasi',
-                            'diproses'    => '📦 Diproses',
-                            'dikirim'     => '🚚 Dikirim',
-                            'selesai'     => '✅ Selesai',
-                            'dibatalkan'  => '❌ Dibatalkan',
-                        ];
-                        echo $statusLabel[$p['status']] ?? $p['status'];
+                        $cod_jenis = $p['cod_jenis'] ?? '';
+                        $metode    = $p['metode'] ?? '';
+                        $status    = $p['status'] ?? '';
+
+                        if ($metode === 'cod' && $cod_jenis === 'antar') {
+                            // COD Antar ke Rumah
+                            $statusLabel = [
+                                'menunggu'   => '⏳ Menunggu',
+                                'diproses'   => '📦 Diproses',
+                                'dikirim'    => '🛵 Dalam Pengantaran',
+                                'selesai'    => '✅ Selesai',
+                                'dibatalkan' => '❌ Dibatalkan',
+                            ];
+                        } elseif ($metode === 'cod' && $cod_jenis === 'ambil') {
+                            // COD Pembeli ke Rumah Penjual
+                            $statusLabel = [
+                                'menunggu'   => '⏳ Menunggu',
+                                'diproses'   => '📦 Diproses',
+                                'dikirim'    => '🏪 Menunggu Pembeli',
+                                'selesai'    => '✅ Selesai',
+                                'dibatalkan' => '❌ Dibatalkan',
+                            ];
+                        } else {
+                            // Transfer
+                            $statusLabel = [
+                                'menunggu'     => '⏳ Menunggu',
+                                'dikonfirmasi' => '✅ Dikonfirmasi',
+                                'diproses'     => '📦 Diproses',
+                                'dikirim'      => '🚚 Dikirim',
+                                'selesai'      => '✅ Selesai',
+                                'dibatalkan'   => '❌ Dibatalkan',
+                            ];
+                        }
+                        echo $statusLabel[$status] ?? $status;
                         ?>
                     </span>
                     <span class="badge" style="background:<?= $p['metode']==='cod' ? '#fef3c7' : '#e0e7ff' ?>;color:<?= $p['metode']==='cod' ? '#92400e' : '#3730a3' ?>">
@@ -345,18 +372,35 @@ a { text-decoration:none; }
 
                     <!-- ── TOMBOL PESANAN DITERIMA (muncul saat status = dikirim) ── -->
                     <?php if ($p['status'] === 'dikirim'): ?>
+                    <?php
+                        $cod_jenis_btn = $p['cod_jenis'] ?? '';
+                        $metode_btn    = $p['metode'] ?? '';
+                        if ($metode_btn === 'cod' && $cod_jenis_btn === 'ambil') {
+                            $notif_judul  = '🏪 Barang siap diambil di toko!';
+                            $notif_pesan  = 'Klik tombol di bawah setelah kamu mengambil barang dan membayar di toko. Pesanan akan otomatis ditandai selesai.';
+                            $notif_tombol = 'Sudah Diambil';
+                        } elseif ($metode_btn === 'cod' && $cod_jenis_btn === 'antar') {
+                            $notif_judul  = '🛵 Barang sedang dalam pengantaran!';
+                            $notif_pesan  = 'Klik tombol di bawah setelah barang sampai dan kamu sudah membayar ke kurir. Pesanan akan otomatis ditandai selesai.';
+                            $notif_tombol = 'Pesanan Diterima';
+                        } else {
+                            $notif_judul  = '📬 Sudah menerima barangnya?';
+                            $notif_pesan  = 'Klik tombol di bawah jika barang sudah sampai di tanganmu. Pesanan akan otomatis ditandai selesai.';
+                            $notif_tombol = 'Pesanan Diterima';
+                        }
+                    ?>
                     <div style="margin-top:12px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:12px 14px;">
                         <div style="font-size:12px;color:#065f46;margin-bottom:10px;font-weight:600;">
-                            📬 Sudah menerima barangnya?
+                            <?= $notif_judul ?>
                         </div>
                         <div style="font-size:11px;color:#6b7280;margin-bottom:10px;line-height:1.5;">
-                            Klik tombol di bawah jika barang sudah sampai di tanganmu. Pesanan akan otomatis ditandai selesai.
+                            <?= $notif_pesan ?>
                         </div>
                         <form method="POST" onsubmit="return confirm('Konfirmasi bahwa pesanan sudah kamu terima?');">
                             <input type="hidden" name="aksi" value="pesanan_diterima">
                             <input type="hidden" name="pesanan_id" value="<?= $p['id'] ?>">
                             <button type="submit" class="btn-diterima">
-                                <i class="bi bi-check-circle-fill"></i> Pesanan Diterima
+                                <i class="bi bi-check-circle-fill"></i> <?= $notif_tombol ?>
                             </button>
                         </form>
                     </div>

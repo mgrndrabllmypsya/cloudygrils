@@ -294,7 +294,6 @@ tr:hover td { background:#FFF0F5; }
 <div class="main">
     <div class="topbar">
         <div class="topbar-left">
-            <!-- TOMBOL HAMBURGER (garis tiga) — hanya muncul di mobile/tablet -->
             <button class="btn-toggle-sidebar" onclick="toggleSidebar()" id="sidebarToggleBtn">
                 <i class="bi bi-list"></i>
             </button>
@@ -396,7 +395,10 @@ tr:hover td { background:#FFF0F5; }
                         } elseif (preg_match('/Jenis COD:\s*(\w+)/i', $row['catatan'] ?? '', $m_row)) {
                             $jenis_cod_row = $m_row[1];
                         }
-                        $is_beli_ke_penjual_row = ($is_cod_row && $jenis_cod_row === 'antar');
+
+                        // FIX: 'ambil' = pembeli ambil ke toko penjual → "Menunggu Pembeli"
+                        //      'antar' = penjual antar ke rumah pembeli → "Dalam Pengantaran"
+                        $is_beli_ke_penjual_row = ($is_cod_row && $jenis_cod_row === 'ambil');
 
                         $status_label = match($status) {
                             'menunggu'     => 'Menunggu',

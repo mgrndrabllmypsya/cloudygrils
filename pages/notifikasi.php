@@ -16,9 +16,7 @@ tandaiDibacaPembeli($conn, $user_id);
 // Ambil semua notifikasi
 $list = getNotifikasiPembeli($conn, $user_id);
 
-// Pisah per tipe
-$list_pesanan   = array_filter($list, fn($n) => $n['tipe'] !== 'nego');
-$list_negosiasi = array_filter($list, fn($n) => $n['tipe'] === 'nego');
+// Semua notifikasi ditampilkan dalam satu tab
 
 // Ikon & warna per tipe
 $ikon = [
@@ -197,14 +195,8 @@ function getBadgePesanan($tipe, $judul) {
 
     <!-- Tab Navigation -->
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('semua', this)">
+        <div class="tab active">
             Semua <?= count($list) > 0 ? '(' . count($list) . ')' : '' ?>
-        </div>
-        <div class="tab" onclick="switchTab('pesanan', this)">
-            Pesanan <?= count($list_pesanan) > 0 ? '(' . count($list_pesanan) . ')' : '' ?>
-        </div>
-        <div class="tab" onclick="switchTab('negosiasi', this)">
-            Negosiasi <?= count($list_negosiasi) > 0 ? '(' . count($list_negosiasi) . ')' : '' ?>
         </div>
     </div>
 
@@ -242,34 +234,6 @@ function getBadgePesanan($tipe, $judul) {
         <?php endforeach; ?>
         <?php endif; ?>
 
-        <?php endif; ?>
-    </div>
-
-    <!-- ── TAB: PESANAN ── -->
-    <div id="tab-pesanan" class="tab-content">
-        <?php if (empty($list_pesanan)): ?>
-        <div class="empty-state">
-            <i class="bi bi-bag-x"></i>
-            <p>Belum ada notifikasi pesanan.</p>
-        </div>
-        <?php else: ?>
-        <?php foreach ($list_pesanan as $n): ?>
-            <?php echo renderNotifCard($n, $ikon); ?>
-        <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
-
-    <!-- ── TAB: NEGOSIASI ── -->
-    <div id="tab-negosiasi" class="tab-content">
-        <?php if (empty($list_negosiasi)): ?>
-        <div class="empty-state">
-            <i class="bi bi-tag"></i>
-            <p>Belum ada notifikasi negosiasi.</p>
-        </div>
-        <?php else: ?>
-        <?php foreach ($list_negosiasi as $n): ?>
-            <?php echo renderNotifCard($n, $ikon); ?>
-        <?php endforeach; ?>
         <?php endif; ?>
     </div>
 </div>
@@ -334,14 +298,7 @@ function formatWaktu($created_at) {
 }
 ?>
 
-<script>
-function switchTab(name, el) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('tab-' + name).classList.add('active');
-}
-</script>
+
 
 </body>
 </html>

@@ -407,15 +407,15 @@ textarea { resize: vertical; min-height: 80px; }
         <div class="card-title" style="font-size:.95rem; margin-bottom:.75rem;"><span class="num" style="background:linear-gradient(135deg,var(--pink-1),var(--pink-deep))">▸</span> Jenis COD</div>
         <div class="cod-jenis-grid">
           <div class="cod-jenis-card" onclick="pilihCODJenis('antar')">
-  <div class="cj-icon">🛵</div>
-  <div class="cj-label">Antar ke Rumah</div>
-  <div class="cj-desc">Penjual antar ke alamatmu<br>(area Banyuwangi Kota)</div>
-</div>
-<div class="cod-jenis-card" onclick="pilihCODJenis('ambil')">
-  <div class="cj-icon">🏠</div>
-  <div class="cj-label">Beli ke Rumah Penjual</div>
-  <div class="cj-desc">Datang langsung ke tempat kami</div>
-</div>
+            <div class="cj-icon">🛵</div>
+            <div class="cj-label">Antar ke Rumah</div>
+            <div class="cj-desc">Penjual antar ke alamatmu<br>(area Banyuwangi Kota)</div>
+          </div>
+          <div class="cod-jenis-card" onclick="pilihCODJenis('ambil')">
+            <div class="cj-icon">🏠</div>
+            <div class="cj-label">Beli ke Rumah Penjual</div>
+            <div class="cj-desc">Datang langsung ke tempat kami</div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -424,7 +424,7 @@ textarea { resize: vertical; min-height: 80px; }
         </div>
 
         <div id="maps-btn-wrap" style="display:none; margin-top:8px; margin-bottom:12px;">
-          <a id="maps-link" href="#" target="_blank"
+          <a id="maps-link" href="" target="_blank"
              style="display:flex;align-items:center;justify-content:center;gap:8px;
                     width:100%;padding:11px;border-radius:10px;
                     background:linear-gradient(135deg,#1A73E8,#1557B0);
@@ -443,7 +443,7 @@ textarea { resize: vertical; min-height: 80px; }
 
         <div class="form-group">
           <label>Catatan untuk Penjual</label>
-<textarea name="catatan_cod" id="catatan_cod" placeholder="Contoh: jam berapa kamu akan datang, patokan, dll."></textarea>
+          <textarea name="catatan_cod" id="catatan_cod" placeholder="Contoh: jam berapa kamu akan datang, patokan, dll."></textarea>
         </div>
       </div>
 
@@ -618,127 +618,131 @@ textarea { resize: vertical; min-height: 80px; }
 </form>
 
 <script>
-const HARGA    = <?= $harga_produk ?>;
+const HARGA      = <?= $harga_produk ?>;
 const ADA_DISKON = <?= $ada_diskon ? 'true' : 'false' ?>;
-const DISKON   = <?= $diskon_nominal ?>;
+const DISKON     = <?= $diskon_nominal ?>;
 
-let metode     = '';
-let ongkir     = 0;
-let rekeningSel = '';
-let ekspedisi  = '';
+let metode       = '';
+let ongkir       = 0;
+let rekeningSel  = '';
+let ekspedisi    = '';
 let kecamatanSel = false;
+
+// ── Link Google Maps langsung ke lokasi toko ──
+const MAPS_TOKO = 'https://maps.app.goo.gl/zo5cvjjenoCqa7mk6';
 
 // ── Pilih Metode ──
 function pilihMetode(m) {
-  metode = m;
-  document.getElementById('inp_metode').value = m;
-  document.getElementById('tabCOD').classList.toggle('selected', m === 'cod');
-  document.getElementById('tabTransfer').classList.toggle('selected', m === 'transfer');
-  document.getElementById('secCOD').classList.toggle('visible', m === 'cod');
-  document.getElementById('secTransfer').classList.toggle('visible', m === 'transfer');
-  document.getElementById('sectionTransferDetail').style.display = m === 'transfer' ? 'block' : 'none';
+    metode = m;
+    document.getElementById('inp_metode').value = m;
+    document.getElementById('tabCOD').classList.toggle('selected', m === 'cod');
+    document.getElementById('tabTransfer').classList.toggle('selected', m === 'transfer');
+    document.getElementById('secCOD').classList.toggle('visible', m === 'cod');
+    document.getElementById('secTransfer').classList.toggle('visible', m === 'transfer');
+    document.getElementById('sectionTransferDetail').style.display = m === 'transfer' ? 'block' : 'none';
 
-  document.getElementById('step2').classList.add('active');
-  if (m === 'cod') {
-    ongkir = 0;
-    document.getElementById('rowDiskon').style.display = 'none';
-    document.getElementById('rowOngkir').style.display = 'none';
-  }
-  hitungTotal();
-  cekSubmit();
+    document.getElementById('step2').classList.add('active');
+    if (m === 'cod') {
+        ongkir = 0;
+        document.getElementById('rowDiskon').style.display = 'none';
+        document.getElementById('rowOngkir').style.display = 'none';
+    }
+    hitungTotal();
+    cekSubmit();
 }
 
 // ── COD Jenis ──
 function pilihCODJenis(j) {
-  document.getElementById('inp_cod_jenis').value = j;
-  document.querySelectorAll('.cod-jenis-card').forEach(el => el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
+    document.getElementById('inp_cod_jenis').value = j;
+    document.querySelectorAll('.cod-jenis-card').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
 
-  if (j === 'antar') {
-    document.getElementById('lokasi_cod').placeholder = 'Contoh: Jl. Ahmad Yani No. 10, RT 02/03, Kel. Sobo';
-    document.getElementById('lokasi_cod').readOnly = false;
-    document.getElementById('lokasi_cod').value = '';
-    document.getElementById('maps-btn-wrap').style.display = 'none';
-  } else {
-    const alamat  = <?= json_encode($toko['alamat'] ?? '') ?>;
-    const mapsUrl = <?= json_encode($toko['maps_url'] ?? '') ?>;
-    document.getElementById('lokasi_cod').value    = alamat || 'Rumah Penjual';
-    document.getElementById('lokasi_cod').readOnly = true;
+    const alamat   = <?= json_encode($toko['alamat'] ?? '') ?>;
+    const mapsUrl  = <?= json_encode($toko['maps_url'] ?? '') ?>;
     const mapsWrap = document.getElementById('maps-btn-wrap');
-    if (mapsUrl) {
-      document.getElementById('maps-link').href = mapsUrl;
-      mapsWrap.style.display = 'block';
+
+    if (j === 'antar') {
+        // Antar ke rumah pembeli — input alamat bebas diisi
+        document.getElementById('lokasi_cod').placeholder = 'Contoh: Jl. Ahmad Yani No. 10, RT 02/03, Kel. Sobo';
+        document.getElementById('lokasi_cod').readOnly    = false;
+        document.getElementById('lokasi_cod').value       = '';
+        mapsWrap.style.display = 'none';
     } else {
-      mapsWrap.style.display = 'none';
+        // Ambil ke rumah penjual — tampilkan alamat toko & tombol maps
+        document.getElementById('lokasi_cod').value    = alamat || 'Rumah Penjual';
+        document.getElementById('lokasi_cod').readOnly = true;
+
+        // ✅ Pakai link Google Maps langsung, sama seperti di index.php
+        document.getElementById('maps-link').href = MAPS_TOKO;
+        mapsWrap.style.display = 'block';
     }
-  }
-  cekSubmit();
+    cekSubmit();
 }
 
 // ── Rekening ──
 function pilihRek(r) {
-  rekeningSel = r;
-  document.getElementById('inp_rek').value = r;
-  document.querySelectorAll('.rek-card').forEach(el => el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
-  cekSubmit();
+    rekeningSel = r;
+    document.getElementById('inp_rek').value = r;
+    document.querySelectorAll('.rek-card').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    cekSubmit();
 }
 
 // ── Ekspedisi ──
 function pilihEks(e) {
-  ekspedisi = e;
-  document.getElementById('inp_ekspedisi').value = e;
-  document.getElementById('eksJNT').classList.toggle('selected', e === 'jnt');
-  document.getElementById('eksJNE').classList.toggle('selected', e === 'jne');
+    ekspedisi = e;
+    document.getElementById('inp_ekspedisi').value = e;
+    document.getElementById('eksJNT').classList.toggle('selected', e === 'jnt');
+    document.getElementById('eksJNE').classList.toggle('selected', e === 'jne');
 
-  const ongkirVal = e === 'jnt'
-    ? parseInt(document.getElementById('eksJNT').dataset.ongkir || 0)
-    : parseInt(document.getElementById('eksJNE').dataset.ongkir || 0);
+    const ongkirVal = e === 'jnt'
+        ? parseInt(document.getElementById('eksJNT').dataset.ongkir || 0)
+        : parseInt(document.getElementById('eksJNE').dataset.ongkir || 0);
 
-  ongkir = ongkirVal;
-  document.getElementById('inp_ongkir').value = ongkir;
+    ongkir = ongkirVal;
+    document.getElementById('inp_ongkir').value = ongkir;
 
-  if (ADA_DISKON) {
-    document.getElementById('rowDiskon').style.display = 'flex';
-  }
-  document.getElementById('rowOngkir').style.display = 'flex';
-  document.getElementById('txtOngkir').textContent = 'Rp ' + ongkir.toLocaleString('id-ID');
-  hitungTotal();
-  cekSubmit();
+    if (ADA_DISKON) {
+        document.getElementById('rowDiskon').style.display = 'flex';
+    }
+    document.getElementById('rowOngkir').style.display = 'flex';
+    document.getElementById('txtOngkir').textContent = 'Rp ' + ongkir.toLocaleString('id-ID');
+    hitungTotal();
+    cekSubmit();
 }
 
 function hitungTotal() {
-  const diskonVal = (metode === 'transfer' && ADA_DISKON) ? DISKON : 0;
-  const total = HARGA - diskonVal + ongkir;
-  document.getElementById('txtTotal').textContent = 'Rp ' + total.toLocaleString('id-ID');
-  document.getElementById('inpJumlah').value = total;
+    const diskonVal = (metode === 'transfer' && ADA_DISKON) ? DISKON : 0;
+    const total = HARGA - diskonVal + ongkir;
+    document.getElementById('txtTotal').textContent = 'Rp ' + total.toLocaleString('id-ID');
+    document.getElementById('inpJumlah').value = total;
 }
 
 function cekSubmit() {
-  let ok = false;
-  if (metode === 'cod') {
-    const jenis  = document.getElementById('inp_cod_jenis').value;
-    const lokasi = document.getElementById('lokasi_cod').value.trim();
-    ok = jenis !== '' && lokasi !== '';
-  } else if (metode === 'transfer') {
-    ok = kecamatanSel && ekspedisi !== '' && rekeningSel !== ''
-      && document.getElementById('fileBukti').files.length > 0;
-  }
-  document.getElementById('btnSubmit').disabled = !ok;
+    let ok = false;
+    if (metode === 'cod') {
+        const jenis  = document.getElementById('inp_cod_jenis').value;
+        const lokasi = document.getElementById('lokasi_cod').value.trim();
+        ok = jenis !== '' && lokasi !== '';
+    } else if (metode === 'transfer') {
+        ok = kecamatanSel && ekspedisi !== '' && rekeningSel !== ''
+            && document.getElementById('fileBukti').files.length > 0;
+    }
+    document.getElementById('btnSubmit').disabled = !ok;
 }
 
 // ── Preview bukti ──
 function previewFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById('preview-img');
-    img.src = e.target.result;
-    img.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-  cekSubmit();
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = document.getElementById('preview-img');
+        img.src = e.target.result;
+        img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    cekSubmit();
 }
 
 // ── Drag & drop ──
@@ -746,145 +750,145 @@ const ua = document.getElementById('uploadArea');
 ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('dragover'); });
 ua.addEventListener('dragleave', () => ua.classList.remove('dragover'));
 ua.addEventListener('drop', e => {
-  e.preventDefault(); ua.classList.remove('dragover');
-  const dt = e.dataTransfer;
-  if (dt.files.length) {
-    document.getElementById('fileBukti').files = dt.files;
-    previewFile(document.getElementById('fileBukti'));
-  }
+    e.preventDefault(); ua.classList.remove('dragover');
+    const dt = e.dataTransfer;
+    if (dt.files.length) {
+        document.getElementById('fileBukti').files = dt.files;
+        previewFile(document.getElementById('fileBukti'));
+    }
 });
 
 // ── BinderByte Wilayah & Ongkir ──
 async function loadProvinsi() {
-  try {
-    const res  = await fetch('../ajax/get_provinsi.php');
-    const data = await res.json();
-    const sel  = document.getElementById('selProvinsi');
-    data.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value        = p.id;
-      opt.dataset.nama = p.name;
-      opt.textContent  = p.name;
-      sel.appendChild(opt);
-    });
-  } catch(e) { console.warn('loadProvinsi:', e); }
+    try {
+        const res  = await fetch('../ajax/get_provinsi.php');
+        const data = await res.json();
+        const sel  = document.getElementById('selProvinsi');
+        data.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value        = p.id;
+            opt.dataset.nama = p.name;
+            opt.textContent  = p.name;
+            sel.appendChild(opt);
+        });
+    } catch(e) { console.warn('loadProvinsi:', e); }
 }
 
 async function loadKota() {
-  const provId = document.getElementById('selProvinsi').value;
-  const sel    = document.getElementById('selKota');
-  sel.innerHTML = '<option value="">Memuat...</option>';
-  sel.disabled  = true;
-  document.getElementById('selKecamatan').innerHTML = '<option value="">— Pilih Kecamatan —</option>';
-  document.getElementById('selKecamatan').disabled  = true;
-  document.getElementById('areaEkspedisi').style.display = 'none';
-  kecamatanSel = false;
-  try {
-    const res  = await fetch(`../ajax/get_kota.php?id_provinsi=${provId}`);
-    const data = await res.json();
-    sel.innerHTML = '<option value="">— Pilih Kota —</option>';
-    data.forEach(k => {
-      const opt = document.createElement('option');
-      opt.value        = k.id;
-      opt.dataset.nama = k.name;
-      opt.textContent  = k.name;
-      sel.appendChild(opt);
-    });
-    sel.disabled = false;
-  } catch(e) { console.warn('loadKota:', e); }
+    const provId = document.getElementById('selProvinsi').value;
+    const sel    = document.getElementById('selKota');
+    sel.innerHTML = '<option value="">Memuat...</option>';
+    sel.disabled  = true;
+    document.getElementById('selKecamatan').innerHTML = '<option value="">— Pilih Kecamatan —</option>';
+    document.getElementById('selKecamatan').disabled  = true;
+    document.getElementById('areaEkspedisi').style.display = 'none';
+    kecamatanSel = false;
+    try {
+        const res  = await fetch(`../ajax/get_kota.php?id_provinsi=${provId}`);
+        const data = await res.json();
+        sel.innerHTML = '<option value="">— Pilih Kota —</option>';
+        data.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value        = k.id;
+            opt.dataset.nama = k.name;
+            opt.textContent  = k.name;
+            sel.appendChild(opt);
+        });
+        sel.disabled = false;
+    } catch(e) { console.warn('loadKota:', e); }
 }
 
 async function loadKecamatan() {
-  const kotaId = document.getElementById('selKota').value;
-  const sel    = document.getElementById('selKecamatan');
-  sel.innerHTML = '<option value="">Memuat...</option>';
-  sel.disabled  = true;
-  document.getElementById('areaEkspedisi').style.display = 'none';
-  kecamatanSel = false;
-  try {
-    const res  = await fetch(`../ajax/get_kecamatan.php?id_kabupaten=${kotaId}`);
-    const data = await res.json();
-    sel.innerHTML = '<option value="">— Pilih Kecamatan —</option>';
-    data.forEach(k => {
-      const opt = document.createElement('option');
-      opt.value        = k.id;
-      opt.dataset.nama = k.name;
-      opt.textContent  = k.name;
-      sel.appendChild(opt);
-    });
-    sel.disabled = false;
-  } catch(e) { console.warn('loadKecamatan:', e); }
+    const kotaId = document.getElementById('selKota').value;
+    const sel    = document.getElementById('selKecamatan');
+    sel.innerHTML = '<option value="">Memuat...</option>';
+    sel.disabled  = true;
+    document.getElementById('areaEkspedisi').style.display = 'none';
+    kecamatanSel = false;
+    try {
+        const res  = await fetch(`../ajax/get_kecamatan.php?id_kabupaten=${kotaId}`);
+        const data = await res.json();
+        sel.innerHTML = '<option value="">— Pilih Kecamatan —</option>';
+        data.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value        = k.id;
+            opt.dataset.nama = k.name;
+            opt.textContent  = k.name;
+            sel.appendChild(opt);
+        });
+        sel.disabled = false;
+    } catch(e) { console.warn('loadKecamatan:', e); }
 }
 
 async function onKecamatanChange() {
-  const selKec = document.getElementById('selKecamatan');
-  const optKec = selKec.options[selKec.selectedIndex];
-  if (!optKec.value) return;
+    const selKec = document.getElementById('selKecamatan');
+    const optKec = selKec.options[selKec.selectedIndex];
+    if (!optKec.value) return;
 
-  document.getElementById('inp_kec_id').value = optKec.value;
-  kecamatanSel = true;
+    document.getElementById('inp_kec_id').value = optKec.value;
+    kecamatanSel = true;
 
-  document.getElementById('areaEkspedisi').style.display = 'block';
-  await hitungOngkir(optKec.value);
-  cekSubmit();
+    document.getElementById('areaEkspedisi').style.display = 'block';
+    await hitungOngkir(optKec.value);
+    cekSubmit();
 }
 
 async function hitungOngkir(destination) {
-  ['eksJNT','eksJNE'].forEach(id => document.getElementById(id).classList.add('loading'));
-  document.getElementById('ongkirJNT').textContent = 'Menghitung...';
-  document.getElementById('ongkirJNE').textContent = 'Menghitung...';
-  try {
-    const res  = await fetch(`../ajax/cek_ongkir.php?destination=${encodeURIComponent(destination)}`);
-    const data = await res.json();
-    const cardJNT = document.getElementById('eksJNT');
-    const cardJNE = document.getElementById('eksJNE');
-    if (data.jnt !== null) {
-      cardJNT.dataset.ongkir = data.jnt;
-      cardJNT.classList.remove('unavailable');
-      document.getElementById('ongkirJNT').textContent =
-        'Rp ' + parseInt(data.jnt).toLocaleString('id-ID') +
-        (data.jnt_etd ? ` · ${data.jnt_etd}` : '');
-    } else {
-      delete cardJNT.dataset.ongkir;
-      cardJNT.classList.add('unavailable');
-      cardJNT.classList.remove('selected');
-      document.getElementById('ongkirJNT').textContent = 'Tidak tersedia';
-      if (ekspedisi === 'jnt') {
-        ekspedisi = '';
-        document.getElementById('inp_ekspedisi').value = '';
-      }
+    ['eksJNT','eksJNE'].forEach(id => document.getElementById(id).classList.add('loading'));
+    document.getElementById('ongkirJNT').textContent = 'Menghitung...';
+    document.getElementById('ongkirJNE').textContent = 'Menghitung...';
+    try {
+        const res  = await fetch(`../ajax/cek_ongkir.php?destination=${encodeURIComponent(destination)}`);
+        const data = await res.json();
+        const cardJNT = document.getElementById('eksJNT');
+        const cardJNE = document.getElementById('eksJNE');
+        if (data.jnt !== null) {
+            cardJNT.dataset.ongkir = data.jnt;
+            cardJNT.classList.remove('unavailable');
+            document.getElementById('ongkirJNT').textContent =
+                'Rp ' + parseInt(data.jnt).toLocaleString('id-ID') +
+                (data.jnt_etd ? ` · ${data.jnt_etd}` : '');
+        } else {
+            delete cardJNT.dataset.ongkir;
+            cardJNT.classList.add('unavailable');
+            cardJNT.classList.remove('selected');
+            document.getElementById('ongkirJNT').textContent = 'Tidak tersedia';
+            if (ekspedisi === 'jnt') {
+                ekspedisi = '';
+                document.getElementById('inp_ekspedisi').value = '';
+            }
+        }
+        if (data.jne !== null) {
+            cardJNE.dataset.ongkir = data.jne;
+            cardJNE.classList.remove('unavailable');
+            document.getElementById('ongkirJNE').textContent =
+                'Rp ' + parseInt(data.jne).toLocaleString('id-ID') +
+                (data.jne_etd ? ` · ${data.jne_etd}` : '');
+        } else {
+            delete cardJNE.dataset.ongkir;
+            cardJNE.classList.add('unavailable');
+            cardJNE.classList.remove('selected');
+            document.getElementById('ongkirJNE').textContent = 'Tidak tersedia';
+            if (ekspedisi === 'jne') {
+                ekspedisi = '';
+                document.getElementById('inp_ekspedisi').value = '';
+            }
+        }
+    } catch(e) {
+        document.getElementById('ongkirJNT').textContent = 'Gagal memuat';
+        document.getElementById('ongkirJNE').textContent = 'Gagal memuat';
+    } finally {
+        ['eksJNT','eksJNE'].forEach(id => document.getElementById(id).classList.remove('loading'));
+        hitungTotal();
+        cekSubmit();
     }
-    if (data.jne !== null) {
-      cardJNE.dataset.ongkir = data.jne;
-      cardJNE.classList.remove('unavailable');
-      document.getElementById('ongkirJNE').textContent =
-        'Rp ' + parseInt(data.jne).toLocaleString('id-ID') +
-        (data.jne_etd ? ` · ${data.jne_etd}` : '');
-    } else {
-      delete cardJNE.dataset.ongkir;
-      cardJNE.classList.add('unavailable');
-      cardJNE.classList.remove('selected');
-      document.getElementById('ongkirJNE').textContent = 'Tidak tersedia';
-      if (ekspedisi === 'jne') {
-        ekspedisi = '';
-        document.getElementById('inp_ekspedisi').value = '';
-      }
-    }
-  } catch(e) {
-    document.getElementById('ongkirJNT').textContent = 'Gagal memuat';
-    document.getElementById('ongkirJNE').textContent = 'Gagal memuat';
-  } finally {
-    ['eksJNT','eksJNE'].forEach(id => document.getElementById(id).classList.remove('loading'));
-    hitungTotal();
-    cekSubmit();
-  }
 }
 
 // Live validasi lokasi COD
 document.addEventListener('DOMContentLoaded', () => {
-  loadProvinsi();
-  const loc = document.getElementById('lokasi_cod');
-  if (loc) loc.addEventListener('input', cekSubmit);
+    loadProvinsi();
+    const loc = document.getElementById('lokasi_cod');
+    if (loc) loc.addEventListener('input', cekSubmit);
 });
 </script>
 

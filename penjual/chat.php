@@ -337,10 +337,10 @@ a { text-decoration:none; color:inherit; }
                 <?php endforeach; ?>
             </div>
 
-            <form method="POST" class="chat-input-area">
-                <textarea name="pesan" class="chat-input" placeholder="Balas pesan..." rows="1" id="chatInputArea"></textarea>
-                <button type="submit" class="btn-kirim"><i class="bi bi-send-fill"></i></button>
-            </form>
+            <div class="chat-input-area">
+                <textarea class="chat-input" placeholder="Balas pesan..." rows="1" id="chatInputArea"></textarea>
+                <button type="button" class="btn-kirim" onclick="kirimPesan()"><i class="bi bi-send-fill"></i></button>
+            </div>
 
             <?php else: ?>
             <div class="chat-placeholder">
@@ -358,45 +358,98 @@ a { text-decoration:none; color:inherit; }
 const msgs = document.getElementById('chatMessages');
 if (msgs) msgs.scrollTop = msgs.scrollHeight;
 
-/* Auto-resize textarea + submit handler yang robust */
+/* Auto-resize textarea */
 const ta = document.getElementById('chatInputArea');
 if (ta) {
-    /* Auto resize */
     ta.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 100) + 'px';
     });
-
-    /* Enter kirim, Shift+Enter baris baru - pakai keydown DAN keypress untuk kompatibilitas HP */
-    function handleEnterSubmit(e) {
+    ta.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            const form = ta.closest('form');
-            if (form && ta.value.trim() !== '') {
-                form.submit();
-            }
+            kirimPesan();
         }
-    }
-    ta.addEventListener('keydown', handleEnterSubmit);
-    ta.addEventListener('keypress', handleEnterSubmit);
-
-    /* Scroll ke bawah saat keyboard muncul di HP */
+    });
     ta.addEventListener('focus', function() {
-        setTimeout(function(){
-            if (msgs) msgs.scrollTop = msgs.scrollHeight;
-        }, 400);
+        setTimeout(function(){ if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 400);
     });
 }
 
-/* Validasi form - jangan kirim kalau kosong */
-document.querySelectorAll('.chat-input-area').forEach(function(form) {
-    form.addEventListener('submit', function(e) {
-        const input = this.querySelector('.chat-input');
-        if (input && input.value.trim() === '') {
-            e.preventDefault();
-        }
-    });
-});
+/* ── Kirim pesan via AJAX ── */
+<?php if ($pembeli_aktif && $produk_aktif): ?>
+async function kirimPesan() {
+    const input = document.getElementById('chatInputArea');
+    if (!input) return;
+    const pesan = input.value.trim();
+    if (!pesan) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    input.blur();
+
+    const fd = new FormData();
+    fd.append('pesan', pesan);
+
+    const url = `chat.php?pembeli_id=<?= $pembeli_id ?>&produk_id=<?= $produk_id ?>`;
+    await fetch(url, { method: 'POST', body: fd });
+
+    // Tambah bubble langsung tanpa reload
+    appendBubble(pesan, 'admin-msg', waktuSekarang());
+}
+
+function waktuSekarang() {
+    const now = new Date();
+    return now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+
+function appendBubble(pesan, tipe, waktu) {
+    const msgs = document.getElementById('chatMessages');
+    if (!msgs) return;
+    const isAtBottom = msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 60;
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble-wrap ' + tipe;
+    wrap.innerHTML = `<div class="bubble-content">
+        <div class="bubble">${pesan.replace(/\n/g,'<br>').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <div class="bubble-time">${waktu}</div>
+    </div>`;
+    msgs.appendChild(wrap);
+    if (isAtBottom) msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ── Auto polling pesan baru dari pembeli setiap 3 detik ── */
+let lastMsgId = <?= !empty($pesan_list) ? end($pesan_list)['id'] : 0 ?>;
+
+async function pollPesanBaru() {
+    try {
+        const res  = await fetch(`../ajax/get_chat_penjual.php?pembeli_id=<?= $pembeli_id ?>&produk_id=<?= $produk_id ?>&last_id=${lastMsgId}`);
+        const data = await res.json();
+        if (!data.length) return;
+
+        const msgs = document.getElementById('chatMessages');
+        const isAtBottom = msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 60;
+
+        data.forEach(p => {
+            lastMsgId = p.id;
+            appendBubble(p.pesan, p.pengirim === 'admin' ? 'admin-msg' : 'pembeli', p.waktu);
+        });
+
+        if (isAtBottom) msgs.scrollTop = msgs.scrollHeight;
+
+        // Update badge unread di sidebar list
+        document.querySelectorAll('.badge-unread').forEach(el => {
+            const link = el.closest('a');
+            if (link && link.href.includes('pembeli_id=<?= $pembeli_id ?>') && link.href.includes('produk_id=<?= $produk_id ?>')) {
+                el.remove();
+            }
+        });
+    } catch(e) {}
+}
+
+setInterval(pollPesanBaru, 2000);
+<?php else: ?>
+function kirimPesan() {}
+<?php endif; ?>
 
 /* Sidebar toggle */
 function toggleSidebar() {

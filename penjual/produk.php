@@ -97,22 +97,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ── AUTO-UPDATE STATUS PRODUK BERDASARKAN PESANAN ──
-// Jika pesanan sudah dikonfirmasi/diproses/dikirim/selesai → produk langsung terjual
+// Prioritas 1: Jika ada pesanan selesai → terjual
 $conn->query("
     UPDATE produk p
     INNER JOIN pesanan o ON o.produk_id = p.id
     SET p.status = 'terjual'
     WHERE p.status NOT IN ('terjual', 'dihapus')
-      AND o.status IN ('dikonfirmasi', 'diproses', 'dikirim', 'selesai')
+      AND o.status = 'selesai'
 ");
 
-// Jika pesanan masih menunggu → produk ditahan
+// Prioritas 2: Jika ada pesanan aktif (menunggu/diproses/dikirim) → ditahan
 $conn->query("
     UPDATE produk p
     INNER JOIN pesanan o ON o.produk_id = p.id
     SET p.status = 'ditahan'
-    WHERE p.status = 'aktif'
-      AND o.status = 'menunggu'
+    WHERE p.status NOT IN ('terjual', 'dihapus', 'ditahan')
+      AND o.status IN ('menunggu', 'dikonfirmasi', 'diproses', 'dikirim')
 ");
 
 // ── DAFTAR PRODUK ──
