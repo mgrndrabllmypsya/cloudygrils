@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= $page_title ?? 'Cloudy Girls' ?></title>
-<link rel="icon" type="image/png" href="../asset/image/logo.png">
+<link rel="icon" type="image/png" href="../uploads/toko/logo.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -395,7 +395,7 @@ if (isset($conn)) {
     if ($q_logo) $_logo_h = mysqli_fetch_assoc($q_logo)['logo'] ?? '';
 }
 $logo_navbar_src = !empty($_logo_h)
-    ? '../uploads/toko/' . htmlspecialchars($_logo_h) . '?v=' . time()
+    ? '../uploads/toko/' . htmlspecialchars($_logo_h) . '?v=1'
     : 'https://placehold.co/40x40/FFE4EE/FF4081?text=CG';
 
 // ── DATA USER ──
