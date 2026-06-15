@@ -243,8 +243,6 @@
 
         .dot-rose { background: var(--rose-light); color: var(--rose); }
         .dot-mint  { background: var(--mint-light); color: var(--mint); }
-
-        /* ✅ FIX: dot-sand pakai warna lebih gelap agar ikon terlihat */
         .dot-sand  { background: #F5C6D5; color: var(--rose-dark); }
 
         /* RIGHT PANEL */
@@ -338,7 +336,7 @@
             display: flex;
             gap: 0;
             border-bottom: 2px solid var(--sand);
-            margin-bottom: 30px;
+            margin-bottom: 36px;
         }
 
         .tab {
@@ -347,7 +345,7 @@
             font-size: 13px;
             font-weight: 600;
             letter-spacing: .5px;
-            padding: 10px 0;
+            padding: 12px 0;
             text-decoration: none;
             color: var(--muted);
             border-bottom: 2px solid transparent;
@@ -725,7 +723,7 @@
                     Pengiriman cepat ke seluruh Indonesia
                 </div>
                 <div class="feat-pill">
-                    <div class="dot dot-sand"><i class="bi bi-shield-check-fill"></i></div>
+                    <div class="dot dot-sand"><i class="bi bi-shield-check"></i></div>
                     Belanja aman & terpercaya
                 </div>
             </div>

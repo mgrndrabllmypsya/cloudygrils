@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Daftar — Cloudy Girls</title>
+<link rel="icon" type="image/png" href="../uploads/toko/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 <style>
@@ -237,10 +238,12 @@ body {
     margin-bottom: 26px;
 }
 .tab {
+    flex: 1;
+    text-align: center;
     font-size: 13px;
     font-weight: 600;
     letter-spacing: .5px;
-    padding: 10px 20px;
+    padding: 10px 0;
     text-decoration: none;
     color: var(--muted);
     border-bottom: 2px solid transparent;
