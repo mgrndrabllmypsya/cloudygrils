@@ -342,10 +342,12 @@
         }
 
         .tab {
+            flex: 1;
+            text-align: center;
             font-size: 13px;
             font-weight: 600;
             letter-spacing: .5px;
-            padding: 10px 20px;
+            padding: 10px 0;
             text-decoration: none;
             color: var(--muted);
             border-bottom: 2px solid transparent;
