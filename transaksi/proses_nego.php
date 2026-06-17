@@ -50,7 +50,7 @@ if ($aksi === 'ajukan') {
         header("Location: ../pages/detail.php?id=$produk_id&error=invalid"); exit;
     }
 
-    $stmt = $conn->prepare("SELECT harga, status FROM produk WHERE id = ?");
+    $stmt = $conn->prepare("SELECT harga, nama_barang, status FROM produk WHERE id = ?");
     $stmt->bind_param("i", $produk_id);
     $stmt->execute();
     $produk = $stmt->get_result()->fetch_assoc();
@@ -83,7 +83,19 @@ if ($aksi === 'ajukan') {
     $ins->bind_param("iidds", $produk_id, $pembeli_id, $harga_asli, $harga_tawar, $pesan);
 
     if ($ins->execute()) {
+        $nego_id_baru = $ins->insert_id;
         $ins->close();
+
+        // ── Notifikasi konfirmasi ke pembeli ──
+        kirimNotifikasiNegoAjukan(
+            $conn,
+            $pembeli_id,
+            $nego_id_baru,
+            $produk['nama_barang'] ?? 'produk ini',
+            $harga_asli,
+            $harga_tawar
+        );
+
         header("Location: ../pages/detail.php?id=$produk_id&nego=sukses"); exit;
     } else {
         $ins->close();

@@ -54,6 +54,19 @@ function tandaiDibacaAdmin($conn) {
     mysqli_query($conn, "UPDATE notifikasi SET is_read = 1 WHERE penerima = 'admin'");
 }
 
+function kirimNotifikasiNegoAjukan($conn, $pembeli_id, $nego_id, $nama_produk, $harga_asli, $harga_tawar) {
+    $harga_asli_fmt  = 'Rp' . number_format($harga_asli,  0, ',', '.');
+    $harga_tawar_fmt = 'Rp' . number_format($harga_tawar, 0, ',', '.');
+    kirimNotifikasiPembeli(
+        $conn,
+        $pembeli_id,
+        "Nego Berhasil Dikirim",
+        "Penawaranmu sebesar {$harga_tawar_fmt} untuk produk \"{$nama_produk}\" (harga awal {$harga_asli_fmt}) sudah dikirim ke penjual. Tunggu konfirmasi dari penjual.",
+        'nego',
+        $nego_id
+    );
+}
+
 function kirimNotifikasiNegoDisetujui($conn, $pembeli_id, $nego_id, $nama_produk, $harga_asli, $harga_deal) {
     $harga_asli_fmt = 'Rp' . number_format($harga_asli, 0, ',', '.');
     $harga_deal_fmt = 'Rp' . number_format($harga_deal, 0, ',', '.');
