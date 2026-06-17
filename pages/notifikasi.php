@@ -10,23 +10,21 @@ if (!isset($_SESSION['login']) || !$_SESSION['login']) {
 
 $user_id = (int)$_SESSION['user_id'];
 
-// Tandai semua notifikasi sebagai dibaca saat halaman dibuka
+// ✅ FIX: Tandai SEMUA notifikasi sebagai dibaca SEBELUM header di-render
+// Sehingga saat header.php memanggil countUnreadPembeli(), hasilnya sudah 0
 tandaiDibacaPembeli($conn, $user_id);
 
-// Ambil semua notifikasi
+// Ambil semua notifikasi (setelah ditandai dibaca, untuk tampilan list)
 $list = getNotifikasiPembeli($conn, $user_id);
-
-// Semua notifikasi ditampilkan dalam satu tab
 
 // Ikon & warna per tipe
 $ikon = [
-    'pesanan'    => ['icon' => 'bi-bag-check',       'color' => '#C43860'],
-    'transfer'   => ['icon' => 'bi-credit-card',     'color' => '#7C3AED'],
-    'pengiriman' => ['icon' => 'bi-truck',            'color' => '#0891B2'],
-    'chat'       => ['icon' => 'bi-chat-dots',        'color' => '#059669'],
-    'sistem'     => ['icon' => 'bi-info-circle',      'color' => '#6B7280'],
-    // Tipe nego — dibedakan berdasarkan kata kunci di judul
-    'nego'       => ['icon' => 'bi-tag',              'color' => '#C43860'],
+    'pesanan'    => ['icon' => 'bi-bag-heart-fill',   'color' => '#C43860'],
+    'transfer'   => ['icon' => 'bi-wallet2',           'color' => '#7C3AED'],
+    'pengiriman' => ['icon' => 'bi-truck-front-fill',  'color' => '#0891B2'],
+    'chat'       => ['icon' => 'bi-chat-heart-fill',   'color' => '#059669'],
+    'sistem'     => ['icon' => 'bi-bell-fill',         'color' => '#6B7280'],
+    'nego'       => ['icon' => 'bi-tags-fill',         'color' => '#C43860'],
 ];
 
 // Helper: tentukan ikon & warna khusus notifikasi nego berdasarkan judul
@@ -51,44 +49,34 @@ function getBadgeNego($judul) {
 function getBadgePesanan($tipe, $judul) {
     $j = mb_strtolower($judul);
 
-    // Dikirim / dalam pengiriman (termasuk COD antar & dalam pengiriman transfer)
     if (str_contains($j, 'dalam pengiriman') || str_contains($j, 'dikirim')
         || str_contains($j, 'sedang mengantar') || str_contains($j, 'mengantar'))
         return ['label' => 'Dikirim',          'bg' => '#DBEAFE', 'color' => '#1E40AF'];
 
-    // COD siap diambil
     if (str_contains($j, 'siap diambil'))
         return ['label' => 'Siap Diambil',     'bg' => '#DBEAFE', 'color' => '#1E40AF'];
 
-    // Dikemas
     if (str_contains($j, 'dikemas'))
         return ['label' => 'Dikemas',          'bg' => '#EDE9FE', 'color' => '#5B21B6'];
 
-    // Diproses
     if (str_contains($j, 'diproses'))
         return ['label' => 'Diproses',         'bg' => '#D1FAE5', 'color' => '#065F46'];
 
-    // Selesai
     if (str_contains($j, 'selesai'))
         return ['label' => 'Selesai',          'bg' => '#D1FAE5', 'color' => '#065F46'];
 
-    // Tiba
     if (str_contains($j, 'tiba'))
         return ['label' => 'Tiba di Tujuan',   'bg' => '#D1FAE5', 'color' => '#065F46'];
 
-    // Dibatalkan
     if (str_contains($j, 'dibatalkan'))
         return ['label' => 'Dibatalkan',       'bg' => '#FEE2E2', 'color' => '#991B1B'];
 
-    // Dikonfirmasi (transfer dikonfirmasi)
     if (str_contains($j, 'dikonfirmasi') || str_contains($j, 'pembayaran dikonfirmasi'))
         return ['label' => 'Dikonfirmasi',     'bg' => '#DBEAFE', 'color' => '#1E40AF'];
 
-    // Transfer / bukti transfer
     if ($tipe === 'transfer' || str_contains($j, 'transfer') || str_contains($j, 'bukti'))
         return ['label' => 'Transfer',         'bg' => '#EDE9FE', 'color' => '#5B21B6'];
 
-    // Menunggu (termasuk "berhasil dibuat", "baru dibuat", dll — pesanan baru = menunggu)
     if (str_contains($j, 'menunggu') || str_contains($j, 'berhasil dibuat') || str_contains($j, 'baru dibuat'))
         return ['label' => 'Menunggu',         'bg' => '#FEF3C7', 'color' => '#92400E'];
 
@@ -174,6 +162,7 @@ function getBadgePesanan($tipe, $judul) {
             position: relative;
         }
         .notif-card:hover { box-shadow: 0 4px 14px rgba(196,56,96,.13); }
+        /* ✅ Semua card tampil normal karena sudah ditandai dibaca sebelum render */
         .notif-card.unread { border-left-color: #C43860; background: #fff8fb; }
 
         /* ── Icon ── */
@@ -211,22 +200,16 @@ function getBadgePesanan($tipe, $judul) {
 </head>
 <body>
 
-<?php include '../includes/header.php'; ?>
+<?php
+// ✅ Header di-include SETELAH tandaiDibacaPembeli() dipanggil di atas
+// Sehingga countUnreadPembeli() di dalam header.php akan mengembalikan 0
+include '../includes/header.php';
+?>
 
 <div class="page-wrap">
     <div class="page-header">
         <i class="bi bi-bell-fill" style="font-size:22px; color:#C43860;"></i>
         <h1>Notifikasi</h1>
-        <?php if (count($list) > 0): ?>
-        <span class="count-badge"><?= count($list) ?></span>
-        <?php endif; ?>
-    </div>
-
-    <!-- Tab Navigation -->
-    <div class="tabs">
-        <div class="tab active">
-            Semua <?= count($list) > 0 ? '(' . count($list) . ')' : '' ?>
-        </div>
     </div>
 
     <!-- ── TAB: SEMUA ── -->
@@ -317,17 +300,19 @@ function renderNotifCard($n, $ikon) {
 
 // ── Format waktu relatif ──────────────────────────────────────────────────
 function formatWaktu($created_at) {
-    $diff = time() - strtotime($created_at);
-    if ($diff < 60)         return 'Baru saja';
+    $now  = new DateTime('now', new DateTimeZone('Asia/Jakarta'));
+    $past = new DateTime($created_at, new DateTimeZone('Asia/Jakarta'));
+    $diff = $now->getTimestamp() - $past->getTimestamp();
+
+    if ($diff < 0)          return date('d M Y, H:i', $past->getTimestamp());
+    if ($diff < 60)         return $diff . ' detik lalu';
     if ($diff < 3600)       return (int)($diff / 60) . ' menit lalu';
     if ($diff < 86400)      return (int)($diff / 3600) . ' jam lalu';
-    if ($diff < 172800)     return 'Kemarin';
+    if ($diff < 172800)     return 'Kemarin, ' . $past->format('H:i');
     if ($diff < 604800)     return (int)($diff / 86400) . ' hari lalu';
-    return date('d M Y', strtotime($created_at));
+    return $past->format('d M Y, H:i');
 }
 ?>
-
-
 
 </body>
 </html>

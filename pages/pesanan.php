@@ -1,7 +1,8 @@
-<?php
+<<?php
 session_name('session_pembeli');
 session_start();
 require_once '../config/koneksi.php';
+require_once '../includes/notifikasi.php'; // ← TAMBAH INI
 
 if (!isset($_SESSION['login']) || !$_SESSION['login']) {
     header("Location: ../auth/login.php"); exit;
@@ -18,7 +19,12 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'pesanan_diterima') {
     if ($pesanan_id) {
         // Pastikan pesanan milik pembeli ini dan statusnya 'dikirim'
         $cek = mysqli_fetch_assoc(mysqli_query($conn,
-            "SELECT id FROM pesanan WHERE id=$pesanan_id AND pembeli_id=$user_id AND status='dikirim' LIMIT 1"
+            "SELECT p.*, pr.nama_barang, c.jenis AS cod_jenis
+             FROM pesanan p
+             LEFT JOIN produk pr ON pr.id = p.produk_id
+             LEFT JOIN cod c ON c.pesanan_id = p.id
+             WHERE p.id=$pesanan_id AND p.pembeli_id=$user_id AND p.status='dikirim'
+             LIMIT 1"
         ));
         if ($cek) {
             mysqli_query($conn, "UPDATE pesanan SET
@@ -26,9 +32,23 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'pesanan_diterima') {
                 selesai_at=NOW(),
                 diselesaikan_oleh='pembeli'
                 WHERE id=$pesanan_id");
+
+            // ← TAMBAH INI: kirim notifikasi ke pembeli bahwa pesanan selesai
+            $is_cod   = ($cek['metode'] === 'cod');
+            $cod_jenis = $cek['cod_jenis'] ?? null;
+            kirimNotifikasiStatusPesanan(
+                $conn,
+                $user_id,
+                $pesanan_id,
+                $cek['kode_pesanan'],
+                'selesai',
+                $is_cod,
+                $cod_jenis,
+                $cek['nama_barang']
+            );
         }
     }
-   header("Location: pesanan.php?msg=diterima"); exit;
+    header("Location: pesanan.php?msg=diterima"); exit;
 }
 
 // Ambil semua pesanan milik pembeli ini
