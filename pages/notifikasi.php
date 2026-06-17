@@ -50,20 +50,48 @@ function getBadgeNego($judul) {
 // Helper: badge label untuk pesanan berdasarkan tipe & isi pesan
 function getBadgePesanan($tipe, $judul) {
     $j = mb_strtolower($judul);
-    if (str_contains($j, 'dalam pengiriman') || str_contains($j, 'dikirim'))
-        return ['label' => 'Dalam pengiriman', 'bg' => '#DBEAFE', 'color' => '#1E40AF'];
+
+    // Dikirim / dalam pengiriman (termasuk COD antar & dalam pengiriman transfer)
+    if (str_contains($j, 'dalam pengiriman') || str_contains($j, 'dikirim')
+        || str_contains($j, 'sedang mengantar') || str_contains($j, 'mengantar'))
+        return ['label' => 'Dikirim',          'bg' => '#DBEAFE', 'color' => '#1E40AF'];
+
+    // COD siap diambil
+    if (str_contains($j, 'siap diambil'))
+        return ['label' => 'Siap Diambil',     'bg' => '#DBEAFE', 'color' => '#1E40AF'];
+
+    // Dikemas
     if (str_contains($j, 'dikemas'))
         return ['label' => 'Dikemas',          'bg' => '#EDE9FE', 'color' => '#5B21B6'];
+
+    // Diproses
     if (str_contains($j, 'diproses'))
         return ['label' => 'Diproses',         'bg' => '#D1FAE5', 'color' => '#065F46'];
-    if (str_contains($j, 'menunggu'))
-        return ['label' => 'Menunggu',         'bg' => '#FEF3C7', 'color' => '#92400E'];
-    if (str_contains($j, 'tiba') || str_contains($j, 'selesai'))
-        return ['label' => 'Tiba di tujuan',   'bg' => '#D1FAE5', 'color' => '#065F46'];
+
+    // Selesai
+    if (str_contains($j, 'selesai'))
+        return ['label' => 'Selesai',          'bg' => '#D1FAE5', 'color' => '#065F46'];
+
+    // Tiba
+    if (str_contains($j, 'tiba'))
+        return ['label' => 'Tiba di Tujuan',   'bg' => '#D1FAE5', 'color' => '#065F46'];
+
+    // Dibatalkan
     if (str_contains($j, 'dibatalkan'))
         return ['label' => 'Dibatalkan',       'bg' => '#FEE2E2', 'color' => '#991B1B'];
-    if ($tipe === 'transfer')
+
+    // Dikonfirmasi (transfer dikonfirmasi)
+    if (str_contains($j, 'dikonfirmasi') || str_contains($j, 'pembayaran dikonfirmasi'))
+        return ['label' => 'Dikonfirmasi',     'bg' => '#DBEAFE', 'color' => '#1E40AF'];
+
+    // Transfer / bukti transfer
+    if ($tipe === 'transfer' || str_contains($j, 'transfer') || str_contains($j, 'bukti'))
         return ['label' => 'Transfer',         'bg' => '#EDE9FE', 'color' => '#5B21B6'];
+
+    // Menunggu (termasuk "berhasil dibuat", "baru dibuat", dll — pesanan baru = menunggu)
+    if (str_contains($j, 'menunggu') || str_contains($j, 'berhasil dibuat') || str_contains($j, 'baru dibuat'))
+        return ['label' => 'Menunggu',         'bg' => '#FEF3C7', 'color' => '#92400E'];
+
     return ['label' => 'Pesanan',              'bg' => '#FCE7F3', 'color' => '#9D174D'];
 }
 ?>

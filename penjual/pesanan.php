@@ -221,6 +221,8 @@ tr:hover td { background:#FFF0F5; }
 .badge-dikonfirmasi { background:#FFF8E1; color:#F9A825; }
 .badge-diproses     { background:#FBE9E7; color:#E64A19; }
 .badge-dikirim      { background:#E0F2F1; color:#00897B; }
+.badge-pengantaran  { background:#E3F2FD; color:#1565C0; }   /* biru – sedang diantar COD */
+.badge-menunggu-pembeli { background:#FFF3E0; color:#E65100; } /* oranye – COD ambil di toko */
 .badge-selesai      { background:#E0F2F1; color:#00897B; }
 .badge-dibatalkan   { background:#FFEBEE; color:#E53935; }
 
@@ -409,6 +411,17 @@ tr:hover td { background:#FFF0F5; }
                             'dibatalkan'   => 'Dibatalkan',
                             default        => ucfirst($status)
                         };
+
+                        // Badge class berbeda untuk tiap kondisi status dikirim
+                        if ($status === 'dikirim') {
+                            if ($is_beli_ke_penjual_row) {
+                                $badge_class = 'badge-menunggu-pembeli';   // kuning – pembeli belum ambil
+                            } elseif ($is_cod_row) {
+                                $badge_class = 'badge-pengantaran';        // biru – sedang diantar
+                            } else {
+                                $badge_class = 'badge-dikirim';            // hijau – ekspedisi
+                            }
+                        }
                         $st_transfer = $row['status_transfer'] ?? null;
                         $butuh_aksi  = ($row['metode'] === 'transfer' && $st_transfer === 'menunggu' && $row['bukti_transfer']);
                         ?>
